@@ -6,7 +6,7 @@ const alunoLogado = Number(sessionStorage.getItem("alunoLogado"));
 const API_URL_perfil = "https://script.google.com/macros/s/AKfycby2Rb7zzG23sCtFLuUIkbXFn_q2gE4LvITZiTqKQ910p6mqTKRogZhd8gWVF4wx5Ns/exec"; 
 let dadosAlunosPerfil = [];
 
-const API_URL_login = "https://script.google.com/macros/s/AKfycbygZslTMNAen4nJ5QyUIKivrHULl7DQzPjAYXKfHuc_KfeqoDE19jYxvJiOHtY0u8dm/exec";
+const API_URL_login = "https://script.google.com/macros/s/AKfycbzFgqH9ZoG2sPvcH_CHp8xVosVDSe6BiI93DjBLEQSvOI2E8naH7I8xV-X0Km_jOzJA/exec";
 let dadosAlunosLogin = [];
 
 // ==========================================
@@ -20,20 +20,22 @@ async function inicializarPerfil() {
 
     const pagina = document.body.id;
 
-    // Se não houver ninguém logado, vai para o login
+    // Se não houver ninguém logado
     if (!alunoLogado) {
         if (pagina === "pagina_perfil") {
             alert("Por favor, faça login primeiro!");
             window.location.href = 'login.html';
-        } else {
+        } else if (pagina === "pagina_login") { 
+            // CORREÇÃO 3: Só inicializa o login se estiver de fato na página de login
             await carregarPlanilhaLogin();
             await inicializarLogin();
         }
     // Se houver alguém logado, carrega os dados do perfil
     } else {
-        const aluno = await carregarPerfilAluno(alunoLogado);
+        if (pagina === "pagina_perfil") {
+            const aluno = await carregarPerfilAluno(alunoLogado);
+        }
     }
-    
 }
 
 // ==========================================
@@ -45,7 +47,6 @@ async function carregarPlanilhaLogin() {
         dadosAlunosLogin = await resposta.json();
     } catch (erro) {
         console.error("Erro ao carregar planilha:", erro);
-        // Fallback: se a planilha falhar, tenta usar o que está no cache
         const cache = localStorage.getItem('dadosAlunosCache');
         if (cache) dadosAlunosLogin = JSON.parse(cache);
     }
@@ -57,7 +58,6 @@ async function carregarPlanilhaPerfil() {
         dadosAlunosPerfil = await resposta.json();
     } catch (erro) {
         console.error("Erro ao carregar planilha:", erro);
-        // Fallback: se a planilha falhar, tenta usar o que está no cache
         const cache = localStorage.getItem('dadosAlunosCache');
         if (cache) dadosAlunosPerfil = JSON.parse(cache);
     }
@@ -72,9 +72,10 @@ async function inicializarLogin() {
     const botao_entrar = document.getElementById("btn_entrar");
     const botao_cadastrar = document.getElementById("btn_cadastrar");
 
-    botao_conta.addEventListener("click", () => {trocaPaginaCadastro();});
-    botao_entrar.addEventListener("click", () => {fazerLogin();});
-    botao_cadastrar.addEventListener("click", () => {fazerCadastro();});
+    // CORREÇÃO 4: Verificações com "if" para o script não quebrar em páginas que não têm esses botões
+    if (botao_conta) botao_conta.addEventListener("click", () => {trocaPaginaCadastro();});
+    if (botao_entrar) botao_entrar.addEventListener("click", () => {fazerLogin();});
+    if (botao_cadastrar) botao_cadastrar.addEventListener("click", () => {fazerCadastro();});
 }
 
 async function trocaPaginaCadastro() {
@@ -83,15 +84,13 @@ async function trocaPaginaCadastro() {
     const botao_conta = document.getElementById("btn_conta");
     const login = document.getElementById("login");
     const novaConta = document.getElementById("nova_conta");
-    // Alterna a visibilidade do login e do cadastro
+    
     if (login.style.display !== "none") {
-        // Esconde o login e mostra o cadastro
         login.style.display = "none";
         novaConta.style.display = "block";
         botao_conta.textContent = "Já tenho conta";
         titulo.textContent = "Nova conta";
     } else {
-        // Esconde o cadastro e mostra o login
         login.style.display = "block";
         novaConta.style.display = "none";
         botao_conta.textContent = "Não tenho conta";
@@ -113,10 +112,9 @@ async function fazerLogin() {
         const senhaPlanilha = String(dadosAlunosLogin[i][4]).trim();
 
         if (emailPlanilha === email && senhaPlanilha === senha) {
-            // Salva os dados do usuário logado no sessionStorage
-            sessionStorage.setItem("alunoLogado", dadosAlunosLogin[i][0]); // Supondo que a matrícula esteja na primeira coluna
+            sessionStorage.setItem("alunoLogado", dadosAlunosLogin[i][0]); 
             alert("Login bem-sucedido!");
-            window.location.href = 'perfil.html'; // Redireciona para a página de perfil
+            window.location.href = 'perfil.html'; 
             return;
         }
     }
@@ -150,7 +148,6 @@ async function fazerCadastro() {
         }
     }
 
-    // Envia os dados para a planilha de login
     await fetch(API_URL_login, {
         method: "POST",
         body: JSON.stringify({
@@ -161,7 +158,7 @@ async function fazerCadastro() {
             senha: senha
         })
     });
-    // Cria uma nova aba para o perfil do aluno na planilha de perfil
+    
     await carregarPlanilhaPerfil();
     await fetch(API_URL_perfil, {
         method: "POST",
@@ -196,20 +193,19 @@ async function carregarPerfilAluno(nomeAba_matricula) {
 
     dadosAluno = await resposta.json();
 
-    document.getElementById("nomeAluno").innerHTML = dadosAluno[1][0]; // Nome do aluno
-    document.getElementById("turmaAluno").innerHTML = dadosAluno[1][1]; // Turma do aluno
-    document.getElementById("matriculaAluno").innerHTML = dadosAluno[1][2]; // Matrícula do aluno
-    document.getElementById("saldoAluno").innerHTML = `🪙 ${dadosAluno[5][1].toFixed(2)} EcoCoins`; // Saldo do aluno
+    document.getElementById("nomeAluno").innerHTML = dadosAluno[1][0]; 
+    document.getElementById("turmaAluno").innerHTML = dadosAluno[1][1]; 
+    document.getElementById("matriculaAluno").innerHTML = dadosAluno[1][2]; 
+    document.getElementById("saldoAluno").innerHTML = `🪙 ${dadosAluno[5][1].toFixed(2)} EcoCoins`; 
     
-    const tbody = document.getElementById("atividadesAluno"); // Corpo da tabela de atividades
-    tbody.innerHTML = ""; // Limpa a tabela caso já tenha dados
+    const tbody = document.getElementById("atividadesAluno"); 
+    tbody.innerHTML = ""; 
 
-    // Começa em 7 para ignorar os dados iniciais do aluno (nome, turma, matrícula, etc.) e pegar apenas as atividades
     for (let i = 7; i < dadosAluno.length; i++) {
 
-        const data = formatarData(dadosAluno[i][0]); // coluna A
-        const atividade = dadosAluno[i][1]; // coluna B
-        const valor = dadosAluno[i][3];     // coluna D
+        const data = formatarData(dadosAluno[i][0]); 
+        const atividade = dadosAluno[i][1]; 
+        const valor = dadosAluno[i][3];     
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -220,4 +216,43 @@ async function carregarPerfilAluno(nomeAba_matricula) {
         tbody.appendChild(tr);
     }
     return await dadosAluno;
+}
+
+// ============================================================
+// 7. FUNÇÃO ADICIONADA: REDEFINIR SENHA DO RECUPERAR.HTML
+// ============================================================
+async function verificarERedefinir() {
+    const matricula = document.getElementById("rec_matricula").value.trim();
+    const email = document.getElementById("rec_email").value.trim().toLowerCase();
+    const novaSenha = document.getElementById("nova_senha").value.trim();
+
+    if (!matricula || !email || !novaSenha) {
+        alert("Por favor, preencha todos os campos!");
+        return;
+    }
+
+    try {
+        const resposta = await fetch(API_URL_login, {
+            method: "POST",
+            body: JSON.stringify({
+                acao: "redefinirSenha",
+                matricula: matricula,
+                email: email,
+                novaSenha: novaSenha
+            })
+        });
+
+        const resultadoTexto = await resposta.text();
+        
+        if (resultadoTexto.includes("sucesso")) {
+            alert("Senha alterada com sucesso!");
+            window.location.href = 'login.html'; 
+        } else {
+            alert(resultadoTexto); 
+        }
+
+    } catch (erro) {
+        console.error("Erro ao redefinir senha:", erro);
+        alert("Ocorreu um erro ao tentar redefinir a senha. Tente novamente.");
+    }
 }
