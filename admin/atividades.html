@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atividades — Admin 386 EcoCoin</title>
+<link rel="stylesheet" href="estilo_admin.css">
+<script src="script_admin.js" defer></script>
+<script src="script_admin_atividades.js" defer></script>
+</head>
+<body>
+
+<noscript>
+    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+        ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
+    </div>
+</noscript>
+
+<header class="admin-header">
+    <a href="painel.html" class="logo-admin">386 <span>Admin</span></a>
+    <button type="button" class="menu-toggle-admin" aria-label="Abrir menu" aria-expanded="false">☰</button>
+    <nav><ul>
+            <li><a href="painel.html">Painel</a></li>
+            <li><a href="atividades.html" class="ativo">Atividades</a></li>
+            <li><a href="loja.html">Loja</a></li>
+            <li><a href="pedidos.html">Pedidos</a></li>
+            <li><a href="conteudo.html">Conteúdo</a></li>
+            <li><a href="log.html">Log</a></li>
+    </ul></nav>
+    <button class="sair-btn" onclick="window.location.href='logout.php'">Sair</button>
+</header>
+
+<main class="admin-main">
+    <h1 class="admin-titulo">Atividades</h1>
+    <p class="admin-subtitulo">Crie ou edite atividades que dão (ou tiram) EcoCoins de um ou mais alunos de uma vez.</p>
+
+    <div class="admin-cartao">
+        <h2 id="titulo-formulario">Nova atividade</h2>
+        <form id="form-atividade" class="admin-form">
+            <input type="hidden" id="atividade-id" value="">
+            <div class="admin-form-linha">
+                <div>
+                    <label for="atividade-nome">Nome da atividade</label>
+                    <input type="text" id="atividade-nome" required maxlength="120">
+                </div>
+                <div>
+                    <label for="atividade-valor">Valor (use negativo pra descontar)</label>
+                    <input type="number" id="atividade-valor" step="0.01" required>
+                </div>
+                <div>
+                    <label for="atividade-data">Data</label>
+                    <input type="date" id="atividade-data" required>
+                </div>
+            </div>
+
+            <label for="busca-aluno">Adicionar aluno (busque por matrícula, nome ou turma)</label>
+            <input type="text" id="busca-aluno" autocomplete="off" placeholder="Digite para buscar...">
+            <div id="resultados-busca-aluno" class="admin-busca-resultados" style="display:none;"></div>
+
+            <label>Alunos nesta atividade</label>
+            <div id="lista-alunos-selecionados" style="min-height:40px; padding:8px; border:1px dashed var(--admin-borda); border-radius:8px;">
+                <span class="admin-subtitulo" style="font-size:0.85rem;">Nenhum aluno adicionado ainda.</span>
+            </div>
+
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button type="submit" class="admin-btn">Salvar atividade</button>
+                <button type="button" class="admin-btn secundario" id="btn-cancelar-edicao" style="display:none;">Cancelar edição</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="admin-cartao">
+        <h2>Atividades cadastradas</h2>
+        <div style="overflow-x:auto;">
+            <table class="admin-tabela">
+                <thead><tr><th>Atividade</th><th>Valor</th><th>Data</th><th>Alunos</th><th></th></tr></thead>
+                <tbody id="corpo-atividades">
+                    <tr><td colspan="5" class="admin-vazio">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

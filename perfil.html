@@ -5,10 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Perfil - EcoCoin</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script_login_perfil.js"></script>
+    <script src="script.js" defer></script>
+    <script src="script_login_perfil.js" defer></script>
 </head>
 <body id="pagina_perfil">
-    <header></header>
+    <noscript>
+        <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+            ⚠️ Este site precisa de JavaScript habilitado para funcionar completamente. Habilite o JavaScript no seu navegador.
+        </div>
+    </noscript>
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo-text" style="text-decoration:none;">386 <span>EcoCoin</span></a>
+            <button type="button" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
+            <nav><ul>
+                <li><a href="/">INÍCIO</a></li>
+                <li><a href="loja.html">LOJA</a></li>
+                <li><a href="ranking.html">RANKING</a></li>
+                <li><a href="perfil.html" class="link-ativo">PERFIL</a></li>
+            </ul></nav>
+        </div>
+    </header>
 
     <main class="main-content-single">      
         <div class="card perfil-header">
@@ -20,7 +37,21 @@
                 <p>
                     <strong>Matrícula:</strong> <span id="matriculaAluno"></span> | 
                     <strong>Turma:</strong> <span id="turmaAluno"></span>
+                    <button type="button" id="btnTrocarTurma" class="link-acao">Atualizar minha turma</button>
                 </p>
+                <p id="avisoSemTurmaEsteAno" class="aviso-pendente" style="display:none;">
+                    📋 Você ainda não informou em qual turma está matriculado(a) este ano. Por favor, atualize abaixo.
+                </p>
+                <p id="avisoTrocaTurmaPendente" class="aviso-pendente" style="display:none;">
+                    ⏳ Sua solicitação para a turma <strong id="turmaSolicitadaPendente"></strong> está aguardando aprovação.
+                    <button type="button" id="btnCancelarSolicitacaoPendente" class="link-acao" style="color:inherit;">Cancelar solicitação</button>
+                </p>
+                <div id="formTrocarTurma" class="form-troca-turma" style="display:none;">
+                    <input type="text" id="novaTurma" placeholder="Turma atual" inputmode="numeric">
+                    <button type="button" id="btnConfirmarTrocaTurma" class="btn-entrar" style="width:auto; padding:8px 18px; display:inline-block;">Confirmar</button>
+                    <button type="button" id="btnCancelarTrocaTurma" class="link-acao">Cancelar</button>
+                    <p class="texto-ajuda-turma">Informe a turma em que você está matriculado(a) na escola <strong>agora</strong> — isto não é uma escolha de preferência, é uma correção de cadastro.</p>
+                </div>
                 <div id="saldoAluno" style="font-weight: bold; margin-top: 10px; font-size: 1.2rem;"></div>
             </div>
         </div>
@@ -63,12 +94,11 @@
             </table>
         </div>
 
-        <button class="btn-sair" onclick="sessionStorage.clear(); window.location.href='login.html';">
+        <button class="btn-sair" onclick="sair();">
             ❌ Sair da Conta
         </button>
     </main>
 
     <footer></footer>
-    <script src="script.js"></script>
 </body>
 </html>

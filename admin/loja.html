@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loja — Admin 386 EcoCoin</title>
+<link rel="stylesheet" href="estilo_admin.css">
+<!-- Carregados só para a prévia "como vai aparecer na loja" renderizar com o visual real do site -->
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../estilo_loja.css">
+<script src="script_admin.js" defer></script>
+<script src="script_admin_loja.js" defer></script>
+</head>
+<body>
+
+<noscript>
+    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+        ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
+    </div>
+</noscript>
+
+<header class="admin-header">
+    <a href="painel.html" class="logo-admin">386 <span>Admin</span></a>
+    <button type="button" class="menu-toggle-admin" aria-label="Abrir menu" aria-expanded="false">☰</button>
+    <nav><ul>
+            <li><a href="painel.html">Painel</a></li>
+            <li><a href="atividades.html">Atividades</a></li>
+            <li><a href="loja.html" class="ativo">Loja</a></li>
+            <li><a href="pedidos.html">Pedidos</a></li>
+            <li><a href="conteudo.html">Conteúdo</a></li>
+            <li><a href="log.html">Log</a></li>
+    </ul></nav>
+    <button class="sair-btn" onclick="window.location.href='logout.php'">Sair</button>
+</header>
+
+<main class="admin-main">
+    <h1 class="admin-titulo">Loja</h1>
+    <p class="admin-subtitulo">Itens que aparecem para os alunos resgatarem.</p>
+
+    <div class="admin-cartao">
+        <h2 id="titulo-formulario-item">Novo item</h2>
+        <form id="form-item" class="admin-form">
+            <div class="admin-form-linha">
+                <div>
+                    <label for="item-id">Identificador (só letras minúsculas/números/hífen)</label>
+                    <input type="text" id="item-id" placeholder="ex: caderno-eco" required>
+                </div>
+                <div>
+                    <label for="item-nome">Nome</label>
+                    <input type="text" id="item-nome" required maxlength="80">
+                </div>
+                <div>
+                    <label for="item-valor">Preço</label>
+                    <input type="number" id="item-valor" step="0.01" min="0.01" required>
+                </div>
+            </div>
+            <div class="admin-form-linha">
+                <div>
+                    <label for="item-icone">Ícone (emoji, se não usar imagem)</label>
+                    <input type="text" id="item-icone" maxlength="8" placeholder="🎁">
+                </div>
+            </div>
+
+            <label>Imagem (opcional, tem prioridade sobre o ícone)</label>
+            <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start;">
+                <div style="flex:1; min-width:220px;">
+                    <input type="file" id="item-imagem-arquivo" accept="image/jpeg,image/png,image/gif,image/webp">
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                        <input type="text" id="item-imagem-url" placeholder="ou cole uma URL pra baixar" style="flex:1;">
+                        <button type="button" class="admin-btn secundario" id="item-btn-baixar-url" style="white-space:nowrap;">Baixar</button>
+                    </div>
+                    <input type="hidden" id="item-imagem" value="">
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0;">
+                    <div id="item-preview-imagem" style="width:72px; height:72px; border-radius:8px; background:var(--admin-fundo); display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px dashed var(--admin-borda);"></div>
+                    <button type="button" class="admin-btn perigo pequeno" id="item-btn-remover-imagem" style="display:none; white-space:nowrap;">Remover imagem</button>
+                </div>
+            </div>
+
+            <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+                <button type="submit" class="admin-btn">Salvar item</button>
+                <button type="button" class="admin-btn secundario" id="btn-visualizar-item">👁️ Visualizar card</button>
+                <button type="button" class="admin-btn secundario" id="btn-cancelar-edicao-item" style="display:none;">Cancelar edição</button>
+            </div>
+
+            <div id="preview-card-item" style="display:none; margin-top:20px; padding:20px; background:var(--admin-fundo); border-radius:10px;">
+                <p class="admin-subtitulo" style="margin-top:0;">Como vai aparecer na loja:</p>
+                <div id="preview-card-item-conteudo" style="max-width:220px;"></div>
+            </div>
+        </form>
+    </div>
+
+    <div class="admin-cartao">
+        <h2>Catálogo</h2>
+        <div style="overflow-x:auto;">
+            <table class="admin-tabela">
+                <thead><tr><th></th><th>Nome</th><th>Preço</th><th>Status</th><th></th></tr></thead>
+                <tbody id="corpo-itens">
+                    <tr><td colspan="5" class="admin-vazio">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,287 @@
+﻿:root {
+    --admin-azul: #1e3a5f;
+    --admin-azul-claro: #eef2f7;
+    --admin-destaque: #2563eb;
+    --admin-verde: #16a34a;
+    --admin-vermelho: #dc2626;
+    --admin-amarelo: #d97706;
+    --admin-texto: #1e293b;
+    --admin-texto-suave: #64748b;
+    --admin-borda: #e2e8f0;
+    --admin-fundo: #f8fafc;
+    --admin-raio: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--admin-fundo);
+    color: var(--admin-texto);
+}
+
+header.admin-header {
+    background: var(--admin-azul);
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+header.admin-header .logo-admin {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #fff;
+    text-decoration: none;
+}
+header.admin-header .logo-admin span { color: #93c5fd; }
+
+header.admin-header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+header.admin-header nav a {
+    text-transform: uppercase;
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+header.admin-header nav a:hover, header.admin-header nav a.ativo {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+}
+header.admin-header .sair-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.menu-toggle-admin {
+    display: none;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.35);
+    color: #fff;
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 5px 11px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+@media (max-width: 720px) {
+    .menu-toggle-admin { display: inline-flex; align-items: center; justify-content: center; }
+
+    header.admin-header nav,
+    header.admin-header .sair-btn {
+        display: none;
+        width: 100%;
+    }
+    header.admin-header.menu-aberto nav,
+    header.admin-header.menu-aberto .sair-btn {
+        display: block;
+    }
+    header.admin-header nav ul {
+        flex-direction: column;
+        gap: 2px;
+        width: 100%;
+    }
+    header.admin-header nav a { display: block; padding: 12px 10px; }
+    header.admin-header.menu-aberto .sair-btn { margin-top: 4px; text-align: center; }
+}
+
+main.admin-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+}
+
+h1.admin-titulo { font-size: 1.5rem; margin: 0 0 4px; }
+p.admin-subtitulo { color: var(--admin-texto-suave); margin: 0 0 24px; }
+
+.admin-cartao {
+    background: #fff;
+    border: 1px solid var(--admin-borda);
+    border-radius: var(--admin-raio);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.admin-cartao h2 { font-size: 1.1rem; margin: 0 0 14px; }
+
+/* A pré-visualização do slide usa as mesmas classes/regras do carrossel real
+   (.meus-slides, .meus-slides img com object-fit:cover) — mas sem um
+   ancestral com altura definida, "height:100%" no CSS público não tem o que
+   resolver, e o navegador cai de volta pro tamanho intrínseco de cada imagem.
+   É por isso que o preview ficava quase quadrado com uma foto pequena e
+   gigante/esticado com outra. Dar essa altura aqui resolve pra qualquer
+   imagem, igual acontece no carrossel de verdade. */
+.preview-slide-conteudo {
+    position: relative;
+    aspect-ratio: 340 / 140;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--admin-borda);
+}
+
+.admin-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+
+table.admin-tabela { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+table.admin-tabela th {
+    text-align: left;
+    background: var(--admin-azul-claro);
+    padding: 10px 12px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--admin-texto-suave);
+    font-weight: 700;
+    border-bottom: 1px solid var(--admin-borda);
+}
+table.admin-tabela td { padding: 10px 12px; border-bottom: 1px solid var(--admin-borda); vertical-align: middle; }
+table.admin-tabela tr:last-child td { border-bottom: none; }
+table.admin-tabela tr.inativo-linha { opacity: 0.55; background: #f1f5f9; }
+
+.admin-form label { display: block; font-size: 0.85rem; font-weight: 600; margin: 12px 0 6px; }
+.admin-form input, .admin-form select, .admin-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--admin-borda);
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+.admin-form textarea { min-height: 70px; resize: vertical; }
+.admin-form-linha { display: flex; gap: 12px; flex-wrap: wrap; }
+.admin-form-linha > div { flex: 1; min-width: 140px; }
+
+.admin-btn {
+    display: inline-block;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+    background: var(--admin-destaque);
+}
+.admin-btn:hover { opacity: 0.9; }
+.admin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.admin-btn.secundario { background: #fff; color: var(--admin-texto); border: 1px solid var(--admin-borda); }
+.admin-btn.perigo { background: var(--admin-vermelho); }
+.admin-btn.sucesso { background: var(--admin-verde); }
+.admin-btn.pequeno { padding: 5px 10px; font-size: 0.75rem; }
+
+.admin-tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+.admin-tag.pendente { background: #fef3c7; color: var(--admin-amarelo); }
+.admin-tag.aprovado { background: #dbeafe; color: var(--admin-destaque); }
+.admin-tag.resgatado { background: #dcfce7; color: var(--admin-verde); }
+.admin-tag.cancelado { background: #f1f5f9; color: var(--admin-texto-suave); }
+.admin-tag.ativo { background: #dcfce7; color: var(--admin-verde); }
+.admin-tag.inativo { background: #fef2f2; color: var(--admin-vermelho); }
+
+.admin-busca-resultados {
+    border: 1px solid var(--admin-borda);
+    border-radius: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    margin-top: 6px;
+}
+.admin-busca-resultados .item-resultado {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    border-bottom: 1px solid var(--admin-borda);
+}
+.admin-busca-resultados .item-resultado:last-child { border-bottom: none; }
+.admin-busca-resultados .item-resultado:hover { background: var(--admin-azul-claro); }
+
+.admin-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--admin-azul-claro);
+    border-radius: 20px;
+    padding: 4px 6px 4px 12px;
+    font-size: 0.82rem;
+    margin: 3px 4px 3px 0;
+}
+.admin-chip button {
+    border: none;
+    background: #cbd5e1;
+    color: #1e293b;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0;
+}
+
+.admin-vazio { color: var(--admin-texto-suave); text-align: center; padding: 30px 10px; font-size: 0.9rem; }
+
+.admin-secao-conteudo {
+    background: #fff;
+    border: 1px solid var(--admin-borda);
+    border-left: 5px solid var(--admin-borda);
+    border-radius: var(--admin-raio);
+    padding: 20px;
+    margin-bottom: 28px;
+}
+.admin-secao-conteudo.cor-carrossel { border-left-color: #8b5cf6; }
+.admin-secao-conteudo.cor-eventos { border-left-color: #f59e0b; }
+.admin-secao-conteudo.cor-projetos { border-left-color: #059669; }
+.admin-secao-cabecalho { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.admin-secao-cabecalho h2 { margin: 0; }
+.admin-form-conteudo { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--admin-borda); }
+
+
+.admin-login-container {
+    max-width: 380px;
+    margin: 60px auto;
+    background: #3492d6b4;
+    border-radius: var(--admin-raio);
+    padding: 32px;
+    border: 1px solid var(--admin-borda);
+}
+.admin-login-container h1 { font-size: 1.3rem; text-align: center; margin-top: 0; }
+.admin-login-container .troca-modo { text-align: center; margin-top: 16px; font-size: 0.85rem; }
+.admin-login-container .troca-modo a { color: #fff; cursor: pointer; text-decoration: underline; }
+
+.admin-token-aviso {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 0.85rem;
+    margin-top: 14px;
+}
+
+@media (max-width: 640px) {
+    table.admin-tabela { font-size: 0.8rem; }
+    table.admin-tabela th, table.admin-tabela td { padding: 8px 6px; }
+}
+
+@media (max-width: 480px) {
+    .admin-login-container { margin: 24px auto; padding: 22px; border-radius: var(--admin-raio); }
+    main.admin-main { padding: 20px 14px 48px; }
+    .admin-cartao { padding: 16px; }
+}
+

@@ -1,58 +1,101 @@
 // ==========================================
 // CONFIGURAÇÕES E VARIÁVEIS GLOBAIS DO INDEX
 // ==========================================
-const API_URL_index = "https://script.google.com/macros/s/AKfycbyr35zQWckx2M17VxIcffnu01L4Aw682CpP8BSCwAoptlWS0nahNAzik07LbWl8VbY/exec";
-
-// --- BANCO DE DADOS LOCAL DOS EVENTOS ---
-const bancoEventos = {
-    1: {
-        tag: "OFICINA",
-        titulo: "Oficina de Hardware e Manutenção",
-        descricao: "Venha aprender na prática a desmontar, identificar componentes e fazer a manutenção preventiva dos computadores do laboratório da escola com a equipe do LIpE/UFRJ.",
-        rodape: "📅 Quinta-feira às 14h | 📍 Lab de Informática | 🪙 +50 EcoCoins",
-        link: "https://LINK-DO-FORMULARIO-1.com"
-    },
-    2: {
-        tag: "MUTIRÃO",
-        titulo: "Sexta Ecológica - Pesagem de Recicláveis",
-        descricao: "Traga suas garrafas PET, latinhas e papelão para a nossa pesagem semanal. Lembre-se: quanto mais peso você trouxer, mais EcoCoins acumula na sua conta!",
-        rodape: "📅 Sexta-feira das 08h às 12h | 📍 Pátio Central | 🪙 Ganhos por Kg",
-        link: "https://LINK-DO-FORMULARIO-2.com"
-    },
-    3: {
-        tag: "CURSO",
-        titulo: "Introdução à Automação com Arduino",
-        descricao: "Primeiros passos no desenvolvimento de circuitos e lógica de programação para o nosso sistema integrado de irrigação automatizada da horta escolar.",
-        rodape: "📅 Segunda-feira às 15h | 📍 Sala de Ciências | 🪙 +60 EcoCoins",
-        link: "https://LINK-DO-FORMULARIO-3.com"
-    }
-};
+const API_URL_RESUMO = 'api/ranking.php';
+const API_URL_CONTEUDO = 'api/conteudo_publica.php';
 
 let slideIndexIndex = 1;
+let eventosCarregados = []; // [{id, tag, titulo, descricao, rodape, link}, ...]
 
 window.addEventListener('DOMContentLoaded', async () => {
-    mostrarSlides(slideIndexIndex);
-    setInterval(() => { mudarSlide(1); }, 5000);
-    mostrarEvento(1);
+    try {
+        const resposta = await fetch(API_URL_CONTEUDO, { cache: "default" });
+        if (!resposta.ok) throw new Error("Erro ao carregar conteúdo da home.");
+        const conteudo = await resposta.json();
+
+        construirCarrossel(conteudo.carrossel || []);
+        construirAbasEventos(conteudo.eventos || []);
+        construirProjetos(conteudo.projetos || []);
+
+        mostrarSlides(slideIndexIndex);
+        setInterval(() => { mudarSlide(1); }, 5000);
+        if (eventosCarregados.length) mostrarEvento(eventosCarregados[0].id);
+    } catch (erro) {
+        console.error("Erro ao carregar conteúdo da home:", erro);
+    }
 
     try {
-        const resposta = await fetch(`${API_URL_index}?aba=Dados Gerais`);
-        if (!resposta.ok) throw new Error("Erro de resposta do servidor Google.");
-        
-        const dadosAlunos = await resposta.json();
-        if (dadosAlunos && dadosAlunos.length > 1) {
-            gerarMinisRankings(dadosAlunos);
-        }
+        const resposta = await fetch(API_URL_RESUMO, { cache: "default" });
+        if (!resposta.ok) throw new Error("Erro de resposta do servidor.");
+
+        const resumo = await resposta.json();
+        construirPodioGrafico("podio-lideres-gerais", resumo.lideres || []);
+        construirPodioGrafico("podio-mestres-moedas", resumo.mestres || []);
+        construirResumoTurmas(resumo.turmas || []);
     } catch (erro) {
-        console.error("Erro ao carregar dados do Sheets para a index:", erro);
-        const erroFeedback = `<div style="color: var(--bronze); text-align: center; padding: 10px; font-weight: 700;">Erro ao atualizar ranking</div>`;
+        console.error("Erro ao carregar o ranking na home:", erro);
+        const erroFeedback = `<div style="color: var(--cor-alerta); text-align: center; padding: 10px; font-weight: 700;">Erro ao atualizar ranking</div>`;
         document.getElementById("podio-lideres-gerais").innerHTML = erroFeedback;
         document.getElementById("podio-mestres-moedas").innerHTML = erroFeedback;
+        const resumoTurmas = document.getElementById("resumo-turmas-home");
+        if (resumoTurmas) resumoTurmas.innerHTML = erroFeedback;
     }
 });
 
-function mostrarEvento(numeroEvento) {
-    const evento = bancoEventos[numeroEvento];
+/** Monta os slides do carrossel a partir do conteúdo carregado do servidor. */
+function construirCarrossel(carrossel) {
+    const conteiner = document.querySelector('.conteiner-carrossel');
+    if (!conteiner || !carrossel.length) return;
+
+    const slides = carrossel.map(slide => `
+        <div class="meus-slides efeito-suave">
+            <img src="${escapeHtml(slide.imagem)}" alt="${escapeHtml(slide.legenda || '')}">
+            <div class="legenda-slide">${escapeHtml(slide.legenda || '')}</div>
+        </div>`).join('');
+
+    conteiner.innerHTML = slides + `
+        <a class="anterior" onclick="mudarSlide(-1)">&#10094;</a>
+        <a class="proximo" onclick="mudarSlide(1)">&#10095;</a>`;
+}
+
+/** Monta as abas numeradas e os botões "Inscrever-se" a partir dos eventos carregados. */
+function construirAbasEventos(eventos) {
+    eventosCarregados = eventos;
+
+    const cabecalho = document.querySelector('.cabecalho-abas');
+    const rodapeAcao = document.querySelector('.rodape-acao');
+    if (!cabecalho || !rodapeAcao) return;
+
+    cabecalho.innerHTML = eventos.map((evento, i) =>
+        `<button class="botao-numero" data-evento="${escapeHtml(evento.id)}">${String(i + 1).padStart(2, '0')}</button>`
+    ).join('');
+    cabecalho.querySelectorAll('.botao-numero').forEach(botao => {
+        botao.addEventListener('click', () => mostrarEvento(botao.dataset.evento));
+    });
+
+    rodapeAcao.innerHTML = eventos.map(evento =>
+        `<a id="link-botao-${escapeHtml(evento.id)}" href="${escapeHtml(evento.link || '#')}" target="_blank" class="botao-evento" style="display:none"><button class="botao-acao">Inscrever-se</button></a>`
+    ).join('');
+}
+
+/** Monta o acordeão de projetos a partir do conteúdo carregado do servidor. */
+function construirProjetos(projetos) {
+    const acordeon = document.querySelector('.acordeon');
+    if (!acordeon) return;
+
+    acordeon.innerHTML = projetos.map((projeto, i) => `
+        <div class="acordeon-item">
+            <input type="checkbox" id="projeto${i + 1}">
+            <label for="projeto${i + 1}">${escapeHtml(projeto.titulo)}</label>
+            <div class="conteudo">
+                ${projeto.parceria ? `<h4>${escapeHtml(projeto.parceria)}</h4>` : ''}
+                <p>${escapeHtml(projeto.descricao)}</p>
+            </div>
+        </div>`).join('');
+}
+
+function mostrarEvento(idEvento) {
+    const evento = eventosCarregados.find(e => e.id === idEvento);
     if (!evento) return;
 
     const tagElemento = document.getElementById("tag-evento");
@@ -69,15 +112,13 @@ function mostrarEvento(numeroEvento) {
         tagElemento.style.backgroundColor = "var(--primary-blue)";
     }
 
-    for (let i = 1; i <= 3; i++) {
-        const botaoContainer = document.getElementById(`link-botao-${i}`);
-        if (botaoContainer) botaoContainer.style.display = (i === numeroEvento) ? "inline-block" : "none";
-    }
+    eventosCarregados.forEach(e => {
+        const botaoContainer = document.getElementById(`link-botao-${e.id}`);
+        if (botaoContainer) botaoContainer.style.display = (e.id === idEvento) ? "inline-block" : "none";
+    });
 
-    const botoesNumeros = document.querySelectorAll(".botao-numero");
-    botoesNumeros.forEach((btn, index) => {
-        if (index + 1 === numeroEvento) btn.classList.add("ativo");
-        else btn.classList.remove("ativo");
+    document.querySelectorAll(".botao-numero").forEach(btn => {
+        btn.classList.toggle("ativo", btn.dataset.evento === idEvento);
     });
 }
 
@@ -92,40 +133,45 @@ function mostrarSlides(n) {
     slides[slideIndexIndex - 1].style.display = "block";
 }
 
-function gerarMinisRankings(dados) {
-    let listaAlunos = [];
-    for (let i = 1; i < dados.length; i++) {
-        const nome = String(dados[i][1]).trim();  
-        const turma = String(dados[i][2]).trim(); 
-        const ganho = parseFloat(String(dados[i][3]).replace(',', '.')) || 0; 
-        const gasto = Math.abs(parseFloat(String(dados[i][4]).replace(',', '.'))) || 0; 
-
-        if (nome) {
-            listaAlunos.push({ identificacao: `${nome} (${turma})`, ganhoTotal: ganho, gastoTotal: gasto });
-        }
-    }
-
-    const topLideres = [...listaAlunos].sort((a, b) => b.ganhoTotal - a.ganhoTotal).slice(0, 3);
-    construirPodioGrafico("podio-lideres-gerais", topLideres, "ganhoTotal");
-
-    const topMestres = [...listaAlunos].sort((a, b) => b.gastoTotal - a.gastoTotal).slice(0, 3);
-    construirPodioGrafico("podio-mestres-moedas", topMestres, "gastoTotal");
-}
-
-function construirPodioGrafico(idConteiner, dadosTop, chaveMetrica) {
+function construirPodioGrafico(idConteiner, topAlunos) {
     const conteiner = document.getElementById(idConteiner);
     if (!conteiner) return;
-    conteiner.innerHTML = ""; 
+
+    if (!topAlunos.length) {
+        conteiner.innerHTML = `<div style="color: var(--texto-suave); padding: 10px; text-align: center;">Ainda não há dados suficientes.</div>`;
+        return;
+    }
 
     const estilosMedalha = ["podio-ouro", "podio-prata", "podio-bronze"];
-    dadosTop.forEach((aluno, index) => {
-        const elementoLinha = document.createElement("div");
-        elementoLinha.className = `linha-linha-podio ${estilosMedalha[index]}`;
-        elementoLinha.innerHTML = `
-            <span class="emblema-medalha">${index + 1}º</span>
-            <span class="nome-usuario" title="${aluno.identificacao}">${aluno.identificacao}</span>
-            <strong>${aluno[chaveMetrica].toFixed(0)} 🪙</strong>
-        `;
-        conteiner.appendChild(elementoLinha);
-    });
+    conteiner.innerHTML = topAlunos.map((aluno, index) => {
+        const identificacao = `${aluno.nome} (${formatarTurma(aluno.turma)})`;
+        return `
+            <div class="linha-linha-podio ${estilosMedalha[index] || ''}">
+                <span class="emblema-medalha">${index + 1}º</span>
+                <span class="nome-usuario" title="${escapeHtml(identificacao)}">${escapeHtml(identificacao)}</span>
+                <strong>${formatarMoeda(aluno.valor)} 🪙</strong>
+            </div>`;
+    }).join('');
+}
+
+function construirResumoTurmas(topTurmas) {
+    const conteiner = document.getElementById("resumo-turmas-home");
+    if (!conteiner) return;
+
+    if (!topTurmas.length) {
+        conteiner.innerHTML = `<div style="color: var(--texto-suave); padding: 10px; text-align: center;">Ainda não há dados suficientes.</div>`;
+        return;
+    }
+
+    const maiorTotal = Math.max(...topTurmas.map(t => Number(t.total) || 0), 1);
+    const estilosBarra = ["barra-ouro", "barra-prata", "barra-bronze"];
+
+    conteiner.innerHTML = topTurmas.map((turma, index) => {
+        const largura = Math.max(4, Math.round((Number(turma.total) || 0) / maiorTotal * 100));
+        return `
+            <div class="linha-grafico">
+                <div class="info-grafico"><span>${escapeHtml(formatarTurma(turma.turma))}</span><strong>${formatarMoeda(turma.total)} 🪙</strong></div>
+                <div class="fundo-barra-grafico"><div class="barra-grafico ${estilosBarra[index] || 'barra-bronze'}" style="width: ${largura}%"></div></div>
+            </div>`;
+    }).join('');
 }

@@ -1,0 +1,4 @@
+id,tag,titulo,descricao,rodape,link,ordem,ativo
+evt-01,OFICINA,Oficina de Hardware e Manutenção,"Venha aprender na prática a desmontar, identificar componentes e fazer a manutenção preventiva dos computadores do laboratório da escola com a equipe do LIpE/UFRJ.",📅 Quinta-feira às 14h | 📍 Lab de Informática | 🪙 +50 EcoCoins,https://LINK-DO-FORMULARIO-1.com,1,1
+evt-02,MUTIRÃO,Sexta Ecológica - Pesagem de Recicláveis,"Traga suas garrafas PET, latinhas e papelão para a nossa pesagem semanal. Lembre-se: quanto mais peso você trouxer, mais EcoCoins acumula na sua conta!",📅 Sexta-feira das 08h às 12h | 📍 Pátio Central | 🪙 Ganhos por Kg,https://LINK-DO-FORMULARIO-2.com,2,1
+evt-03,CURSO,Introdução à Automação com Arduino,Primeiros passos no desenvolvimento de circuitos e lógica de programação para o nosso sistema integrado de irrigação automatizada da horta escolar.,📅 Segunda-feira às 15h | 📍 Sala de Ciências | 🪙 +60 EcoCoins,https://LINK-DO-FORMULARIO-3.com,3,1

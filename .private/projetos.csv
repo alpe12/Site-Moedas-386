@@ -1,0 +1,5 @@
+id,titulo,parceria,descricao,ordem,ativo
+proj-01,Montagem e Manutenção de Computadores,Parceria LIpE/UFRJ,Aprenda conceitos fundamentais de hardware e infraestrutura digital básica de forma totalmente prática.,1,1
+proj-02,Horta Agroecológica,Parceria Projeto Muda/UFRJ,"Criação e manutenção de hortas urbanas, aplicando ecopedagogia, autogestão e sustentabilidade no CIEP.",2,1
+proj-03,Apropriação Digital,Parceria LIpE/UFRJ,"Desenvolva fluência digital com as principais ferramentas do cotidiano: internet, planilhas eletrônicas e documentos.",3,1
+proj-04,Automação com Arduino,,Desenvolvimento e calibração do sistema de irrigação automática com sensores para a horta escolar.,4,1

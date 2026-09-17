@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log de Ações — Admin 386 EcoCoin</title>
+<link rel="stylesheet" href="estilo_admin.css">
+<script src="script_admin.js" defer></script>
+<script src="script_admin_log.js" defer></script>
+</head>
+<body>
+
+<noscript>
+    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+        ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
+    </div>
+</noscript>
+
+<header class="admin-header">
+    <a href="painel.html" class="logo-admin">386 <span>Admin</span></a>
+    <button type="button" class="menu-toggle-admin" aria-label="Abrir menu" aria-expanded="false">☰</button>
+    <nav><ul>
+            <li><a href="painel.html">Painel</a></li>
+            <li><a href="atividades.html">Atividades</a></li>
+            <li><a href="loja.html">Loja</a></li>
+            <li><a href="pedidos.html">Pedidos</a></li>
+            <li><a href="conteudo.html">Conteúdo</a></li>
+            <li><a href="log.html" class="ativo">Log</a></li>
+    </ul></nav>
+    <button class="sair-btn" onclick="window.location.href='logout.php'">Sair</button>
+</header>
+
+<main class="admin-main">
+    <h1 class="admin-titulo">Log de ações administrativas</h1>
+    <p class="admin-subtitulo">Toda ação que muda algo no site fica registrada aqui, mais recente primeiro.</p>
+
+    <div class="admin-cartao">
+        <div style="overflow-x:auto;">
+            <table class="admin-tabela">
+                <thead><tr><th>Quando</th><th>Admin</th><th>Ação</th><th>Detalhes</th></tr></thead>
+                <tbody id="corpo-log">
+                    <tr><td colspan="4" class="admin-vazio">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

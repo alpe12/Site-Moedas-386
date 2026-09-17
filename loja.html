@@ -8,7 +8,22 @@
     <link rel="stylesheet" href="estilo_loja.css">
 </head>
 <body>
-    <header> 
+    <noscript>
+        <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+            ⚠️ Este site precisa de JavaScript habilitado para funcionar completamente. Habilite o JavaScript no seu navegador.
+        </div>
+    </noscript>
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo-text" style="text-decoration:none;">386 <span>EcoCoin</span></a>
+            <button type="button" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
+            <nav><ul>
+                <li><a href="/">INÍCIO</a></li>
+                <li><a href="loja.html" class="link-ativo">LOJA</a></li>
+                <li><a href="ranking.html">RANKING</a></li>
+                <li><a href="perfil.html">PERFIL</a></li>
+            </ul></nav>
+        </div>
     </header>
 
     <main class="conteiner-loja">
@@ -19,60 +34,26 @@
                 <h2 id="saldoExibido">🪙 Carregando saldo...</h2>
                 <p class="descricao-loja">Troque suas moedas por recompensas.</p>
             </div>
-            <div class="login-mini">
-                <select id="filtroLoja" onchange="filtrarLoja()">
-                    <option value="todos">Todos os itens</option>
-                    <option value="material">Material Escolar</option>
-                    <option value="lanche">Lanches</option>
-                    <option value="lazer">Lazer / Vales</option>
-                </select>
-            </div>
         </div>
 
-        <section class="grade-produtos">
-            
-            <div class="cartao cartao-item-loja" data-categoria="material">
-                <img src="https://via.placeholder.com/200x150/f8f9fa/0056b3?text=Caderno+Eco" alt="Caderno">
-                <span class="tag-tipo-item item-material">Material</span>
-                <h3>Caderno Personalizado</h3>
-                <span class="preco-tag">30.00 🪙</span>
-                <button class="botao-resgatar" onclick="resgatarItem('Caderno')">Resgatar</button>
-            </div>
+        <div id="avisoLoginLoja" style="display:none; text-align:center; padding: 40px 20px;">
+            <p style="color: var(--texto-suave, var(--text-gray)); font-size: 1.05rem;">
+                Faça <a href="login.html" style="color: var(--primary-blue); font-weight: 700;">login</a> para ver e resgatar os itens da loja.
+            </p>
+        </div>
 
-            <div class="cartao cartao-item-loja" data-categoria="lazer">
-                <img src="https://via.placeholder.com/200x150/f8f9fa/0056b3?text=Vale+Cinema" alt="Cinema">
-                <span class="tag-tipo-item item-lazer">Lazer</span>
-                <h3>Vale-Cinema</h3>
-                <span class="preco-tag">50.00 🪙</span>
-                <button class="botao-resgatar" onclick="resgatarItem('Vale Cinema')">Resgatar</button>
-            </div>
-
-            <div class="cartao cartao-item-loja" data-categoria="lanche">
-                <img src="https://via.placeholder.com/200x150/f8f9fa/0056b3?text=Pipoca" alt="Pipoca">
-                <span class="tag-tipo-item item-lanche">Lanches</span>
-                <h3>Combo Pipoca</h3>
-                <span class="preco-tag">20.00 🪙</span>
-                <button class="botao-resgatar" onclick="resgatarItem('Combo Pipoca')">Resgatar</button>
-            </div>
-
-            <div class="cartao cartao-item-loja" data-categoria="material">
-                <img src="https://via.placeholder.com/200x150/f8f9fa/0056b3?text=Kit+Canetas" alt="Canetas">
-                <span class="tag-tipo-item item-material">Material</span>
-                <h3>Kit Canetas Coloridas</h3>
-                <span class="preco-tag">15.00 🪙</span>
-                <button class="botao-resgatar" onclick="resgatarItem('Kit Canetas')">Resgatar</button>
-            </div>
-
+        <section class="grade-produtos" id="grade-itens-loja">
+            <p style="text-align:center; color:var(--text-gray); grid-column: 1 / -1;">Carregando itens da loja...</p>
         </section>
 
-        <div class="cartao" style="margin-top: 40px; width: 100%;">
+        <div class="cartao" id="secaoPedidos" style="margin-top: 40px; width: 100%;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
                 <div>
                     <h3 style="font-size: 1.3rem; font-weight: 700;">🛍️ Meus Pedidos Realizados</h3>
                     <p class="descricao-loja">Acompanhe o andamento e o status dos seus resgates acadêmicos.</p>
                 </div>
                 <div>
-                    <select id="filtroStatusPedido" onchange="filtrarPedidosPorStatus()" style="padding: 10px 16px; border-radius: var(--raio-medio); border: 1px solid var(--cor-borda); background: #fff; font-weight: 600; color: var(--texto-principal); cursor: pointer; outline: none;">
+                    <select id="filtroStatusPedido" style="padding: 10px 16px; border-radius: var(--raio-medio); border: 1px solid var(--cor-borda); background: #fff; font-weight: 600; color: var(--texto-principal); cursor: pointer; outline: none;">
                         <option value="todos">Todos os Status</option>
                         <option value="Pendente">🟡 Pendentes</option>
                         <option value="Aprovado">🔵 Aprovados</option>
@@ -88,11 +69,12 @@
                             <th style="padding: 14px 16px;">Item Solicitado</th>
                             <th style="padding: 14px 16px;">Custo</th>
                             <th style="padding: 14px 16px; text-align: center;">Status Atual</th>
+                            <th style="padding: 14px 16px; text-align: center;">Ação</th>
                         </tr>
                     </thead>
                     <tbody id="listaPedidosAluno">
                         <tr>
-                            <td colspan="3" style="padding: 24px; text-align: center; color: var(--texto-suave);">Carregando seus pedidos...</td>
+                            <td colspan="4" style="padding: 24px; text-align: center; color: var(--texto-suave);">Carregando seus pedidos...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -101,20 +83,6 @@
     </main>
     <script src="script.js"></script>
     <script src="script_loja.js"></script>
-    <script>
-        function filtrarLoja() {
-            const filtro = document.getElementById('filtroLoja').value;
-            const itens = document.querySelectorAll('.cartao-item-loja');
-            
-            itens.forEach(item => {
-                if (filtro === 'todos' || item.getAttribute('data-categoria') === filtro) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-    </script>
     <footer></footer>
 </body>
 </html>

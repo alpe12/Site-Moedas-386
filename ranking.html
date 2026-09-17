@@ -7,7 +7,22 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <noscript>
+        <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+            ⚠️ Este site precisa de JavaScript habilitado para funcionar completamente. Habilite o JavaScript no seu navegador.
+        </div>
+    </noscript>
     <header>
+        <div class="nav-container">
+            <a href="/" class="logo-text" style="text-decoration:none;">386 <span>EcoCoin</span></a>
+            <button type="button" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
+            <nav><ul>
+                <li><a href="/">INÍCIO</a></li>
+                <li><a href="loja.html">LOJA</a></li>
+                <li><a href="ranking.html" class="link-ativo">RANKING</a></li>
+                <li><a href="perfil.html">PERFIL</a></li>
+            </ul></nav>
+        </div>
     </header>
 
     <main class="main-content-single">
@@ -20,13 +35,24 @@
                     <p class="desc">Acompanhe o desempenho de todos os alunos do CIEP 386.</p>
                 </div>
                 
-                <div class="login-mini" style="flex-direction: row; align-items: center;">
-                    <input type="text" id="buscaNome" placeholder="🔍 Buscar aluno..." onkeyup="renderizarTabelaCompleta()" style="width: 250px;">
+                <div class="login-mini" style="flex-direction: row; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <span id="grupoBusca" style="display:flex; align-items:center; flex: 1 1 160px; min-width: 160px;">
+                        <input type="text" id="buscaNome" placeholder="🔍 Buscar aluno..." style="width: 100%; max-width: 220px;">
+                    </span>
+                    <label style="font-size: 0.85rem; color: var(--text-gray); display:flex; align-items:center; gap:6px;">
+                        Mostrar:
+                        <select id="limiteRanking" style="padding: 6px 10px; border-radius: var(--raio-medio, 8px); border: 1px solid var(--cor-borda);">
+                            <option value="10">10</option>
+                            <option value="20" selected>20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </label>
                 </div>
             </div>
         </div>        
    
-        <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="card" style="padding: 0; overflow-x: auto;">
                     <table id="tabelaRankingGeral">
                         <thead>
                             <tr>
@@ -39,7 +65,7 @@
                         <tbody id="corpoTabelaRanking">
                             <tr>
                                 <td colspan="4" style="text-align: center; padding: 40px; color: #999;">
-                                Sincronizando com a planilha do Google...
+                                Carregando ranking...
                                 </td>
                             </tr>
                         </tbody>
@@ -47,36 +73,13 @@
                 </div>
         <div class="card">
             <span class="ranking-title">Resumo por Turma</span>
-            <div class="turmas-ranking-grid" style="margin: 10px auto 10px auto;">
-                <div class="turma-card gold-border">
-                    <span class="tag-azul" style="background: #ffc107; color: #000;">1º Lugar</span>
-                    <h3>0001</h3>
-                    <p class="valor-eco">0 kg</p>
-                </div>
-                <div class="turma-card silver-border">
-                    <span class="tag-azul" style="background: #c0c0c0; color: #000;">2º Lugar</span>
-                    <h3>0002</h3>
-                    <p class="valor-eco">0 kg</p>
-                </div>
-                <div class="turma-card bronze-border">
-                    <span class="tag-azul" style="background: #cd7f32; color: #000;">3º Lugar</span>
-                    <h3>0003</h3>
-                    <p class="valor-eco">0 kg</p>
-                </div>
-                <div class="turma-card red-border">
-                    <span class="tag-azul" style="background: #fa735b; color: #000;">4º Lugar</span>
-                    <h3>0004</h3>
-                    <p class="valor-eco">0 kg</p>
-                </div>
-                <div class="turma-card red-border">
-                    <span class="tag-azul" style="background: #fa735b; color: #000;">5º Lugar</span>
-                    <h3>0005</h3>
-                    <p class="valor-eco">0 kg</p>
-                </div>
+            <div id="gradeTurmas" class="turmas-ranking-grid" style="margin: 10px auto 10px auto;">
+                <p style="color: var(--text-gray); text-align:center; width:100%;">Carregando turmas...</p>
             </div>
         </div>
     </main>
     <footer></footer>
     <script src="script.js"></script>
+    <script src="script_ranking.js"></script>
 </body>
 </html>

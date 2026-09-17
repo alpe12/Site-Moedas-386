@@ -21,6 +21,16 @@
     --prata-claro: #f1f5f9;
     --bronze: #b45309;
     --bronze-claro: #ffedd5;
+    --coral: #fa735b;
+    --coral-claro: #fee4de;
+
+    /* Aliases em português usados em alguns arquivos — mantidos apontando
+       para as variáveis acima em vez de duplicar valores de cor. */
+    --cor-borda: var(--border);
+    --texto-principal: var(--text-dark);
+    --texto-suave: var(--text-gray);
+    --fundo-neutro: var(--bg-light);
+    --cor-alerta: #dc2626;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -79,6 +89,43 @@ nav a {
 }
 nav a:hover, nav a.active-link, nav a.link-ativo { color: var(--primary-blue) !important; }
 
+/* Botão hamburguer — só aparece em telas estreitas (ver media query abaixo) */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    padding: 6px 8px;
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+@media (max-width: 720px) {
+    .menu-toggle { display: block; }
+    .nav-container { flex-wrap: wrap; }
+
+    header nav {
+        width: 100%;
+        display: none;
+    }
+    header.menu-aberto nav { display: block; }
+
+    header.menu-aberto nav ul {
+        flex-direction: column !important;
+        gap: 2px !important;
+        width: 100%;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+    }
+    header.menu-aberto nav a {
+        display: block;
+        padding: 12px 8px;
+        font-size: 0.95rem;
+    }
+}
+
 /* ==========================================
    3. CARDS PADRONIZADOS PARA TODO O SITE
    ========================================== */
@@ -128,13 +175,52 @@ footer { text-align: center; padding: 40px; color: var(--text-gray); font-size: 
 /* ==========================================
    5. CONFIGURAÇÃO EXCLUSIVA DO LOGIN
    ========================================== */
-.acesso { position: absolute; left: 12vw; top: 14vh; }
+#pagina_login, #pagina_recuperar {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.acesso {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 16px 16px 40px;
+    box-sizing: border-box;
+}
 .acesso h1 { color: var(--primary-dark); text-align: center; }
 #nova_conta { display: none; }
-.area-cadastro { padding: 30px; background-color: #3492d6b4; text-align: center; border-radius: 22px; width: 380px; margin-top: 15px; }
-.area-cadastro button, .area-cadastro input, .btn-entrar { background-color: var(--white); color: var(--text-gray); padding: 12px; border: none; border-radius: 22px; width: 100%; cursor: pointer; }
+.area-cadastro { padding: 30px; background-color: #3492d6b4; text-align: center; border-radius: 22px; width: 100%; max-width: 380px; margin-top: 15px; box-sizing: border-box; }
+
+@media (max-width: 480px) {
+    .area-cadastro { padding: 22px 18px; border-radius: 18px; }
+}
+.area-cadastro button, .btn-entrar, .area-cadastro input {
+    background-color: var(--white);
+    color: var(--text-gray);
+    padding: 12px;
+    border: none;
+    border-radius: 22px;
+    width: 100%;
+}
+.area-cadastro button, .btn-entrar { cursor: pointer; }
+.area-cadastro input { cursor: text; }
+.area-cadastro button[type="button"] { width: auto; }
 input[type="submit"] { color: var(--white); background-color: var(--primary-blue); }
-.area-cadastro li { list-style: none; margin-top: 10px; }
+.area-cadastro ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.area-cadastro li {
+    list-style: none;
+    margin-top: 0 !important;
+}
 
 /* ==========================================
    6. LAYOUT E CORREÇÕES DAS PÁGINAS SINGLE (Ranking / Perfil)
@@ -169,6 +255,52 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
 .perfil-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .perfil-info { display: flex; flex-direction: column; justify-content: center; }
 .perfil-info h1 { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); }
+
+/* Botão "Trocar de turma" e afins — parecem link, não caixa de botão, pra
+   não competir visualmente com o cabeçalho do perfil. */
+.link-acao {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 6px;
+    color: var(--primary-blue);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.link-acao:hover { color: var(--primary-dark); }
+
+.aviso-pendente {
+    color: var(--bronze);
+    background: var(--bronze-claro);
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    margin-top: 6px;
+}
+
+.form-troca-turma {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+.form-troca-turma input {
+    max-width: 120px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--raio-medio);
+    font-size: 0.9rem;
+}
+.texto-ajuda-turma {
+    width: 100%;
+    margin: 4px 0 0;
+    font-size: 0.78rem;
+    color: var(--text-gray);
+}
 
 /* Ajuste do grid de conquistas do perfil */
 .conquistas-grid {
@@ -259,6 +391,7 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
 .barra-bronze { background-color: var(--bronze) !important; }
 
 .widget-ranking .botao-texto {
+    display: block !important;
     width: 100% !important;
     margin-top: 12px !important;
     padding: 10px 14px !important;
@@ -271,6 +404,8 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
     cursor: pointer;
     transition: background 0.2s;
     text-align: center;
+    text-decoration: none !important;
+    box-sizing: border-box;
 }
 .widget-ranking .botao-texto:hover { background-color: var(--primary-dark) !important; }
 
@@ -321,6 +456,7 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
 .main-content-single .gold-border { border: 2px solid var(--ouro) !important; background-color: var(--ouro-claro) !important; }
 .main-content-single .silver-border { border: 2px solid var(--prata) !important; background-color: var(--prata-claro) !important; }
 .main-content-single .bronze-border { border: 2px solid var(--bronze) !important; background-color: var(--bronze-claro) !important; }
+.main-content-single .red-border { border: 2px solid var(--coral) !important; background-color: var(--coral-claro) !important; }
 
 .main-content-single .turma-card h3 {
     font-size: 1.3rem !important;
@@ -359,4 +495,37 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
 .link-instagram:hover {
     opacity: 0.8;
     text-decoration: underline;
+}
+
+/* ==========================================
+   9. AJUSTES PARA TELAS DE CELULAR (tablets já ficam bem com as regras acima)
+   ========================================== */
+@media (max-width: 480px) {
+    .nav-container, .conteiner-navegacao { padding: 0 16px; }
+    .logo-text, .texto-logo { font-size: 1.2rem; }
+
+    .card, .cartao { padding: 16px; border-radius: var(--raio-medio); }
+
+    .main-content-single, .conteiner-ranking,
+    .conteiner-painel, .conteiner-loja {
+        padding: 0 16px !important;
+        margin-top: 24px;
+        margin-bottom: 24px;
+    }
+
+    th, .tabela-historico th,
+    td, .tabela-historico td {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+    }
+
+    /* Empilha avatar e informações do perfil em vez de forçar lado a lado */
+    .perfil-header {
+        flex-direction: column !important;
+        text-align: center !important;
+        padding: 20px 16px !important;
+    }
+    .perfil-info { align-items: center; }
+
+    footer { padding: 24px 16px; }
 }

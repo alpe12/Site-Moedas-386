@@ -8,17 +8,13 @@
 /* Grade de Produtos */
 .grade-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; margin-top: 24px; }
 .cartao-item-loja { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
-.cartao-item-loja img { width: 100%; height: 160px; object-fit: cover; border-radius: var(--raio-medio); margin-bottom: 12px; }
+.icone-item-loja { width: 100%; height: 120px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; background: var(--fundo-neutro, #f8f9fa); border-radius: var(--raio-medio); margin-bottom: 12px; overflow: hidden; }
 
-/* Tags de Categorias */
 .tag-categoria-loja { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--primary-blue); background: #e0f2fe; padding: 4px 10px; border-radius: 20px; display: inline-block; }
-.tag-tipo-item { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; margin: 8px 0; display: inline-block; color: #fff; }
-.item-material { background: #0284c7; }
-.item-lazer { background: #7c3aed; }
-.item-lanche { background: #ea580c; }
 
 .preco-tag { font-size: 1.4rem; font-weight: 800; color: var(--success-green); margin: 8px 0; display: block; }
 
 /* Botão de Resgatar */
 .botao-resgatar { width: 100%; background: var(--text-dark); color: #fff; border: none; padding: 10px 16px; border-radius: var(--raio-medio); font-weight: 600; cursor: pointer; transition: 0.2s; }
 .botao-resgatar:hover { background: var(--primary-blue); }
+.botao-resgatar:disabled { background: #94a3b8; cursor: not-allowed; }

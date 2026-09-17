@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedidos — Admin 386 EcoCoin</title>
+<link rel="stylesheet" href="estilo_admin.css">
+<script src="script_admin.js" defer></script>
+<script src="script_admin_pedidos.js" defer></script>
+</head>
+<body>
+
+<noscript>
+    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+        ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
+    </div>
+</noscript>
+
+<header class="admin-header">
+    <a href="painel.html" class="logo-admin">386 <span>Admin</span></a>
+    <button type="button" class="menu-toggle-admin" aria-label="Abrir menu" aria-expanded="false">☰</button>
+    <nav><ul>
+            <li><a href="painel.html">Painel</a></li>
+            <li><a href="atividades.html">Atividades</a></li>
+            <li><a href="loja.html">Loja</a></li>
+            <li><a href="pedidos.html" class="ativo">Pedidos</a></li>
+            <li><a href="conteudo.html">Conteúdo</a></li>
+            <li><a href="log.html">Log</a></li>
+    </ul></nav>
+    <button class="sair-btn" onclick="window.location.href='logout.php'">Sair</button>
+</header>
+
+<main class="admin-main">
+    <h1 class="admin-titulo">Pedidos da loja</h1>
+    <p class="admin-subtitulo">Todos os resgates feitos pelos alunos — altere o status conforme for atendendo.</p>
+
+    <div class="admin-cartao">
+        <label for="filtro-status" style="margin-top:0;">Filtrar por status</label>
+        <select id="filtro-status" style="max-width:220px;">
+            <option value="Todos">Todos</option>
+            <option value="Pendente">Pendente</option>
+            <option value="Aprovado">Aprovado</option>
+            <option value="Resgatado">Resgatado</option>
+            <option value="Cancelado">Cancelado</option>
+        </select>
+    </div>
+
+    <div class="admin-cartao">
+        <div style="overflow-x:auto;">
+            <table class="admin-tabela">
+                <thead><tr><th>Aluno</th><th>Turma</th><th>Item</th><th>Valor</th><th>Data</th><th>Status</th><th></th></tr></thead>
+                <tbody id="corpo-pedidos">
+                    <tr><td colspan="7" class="admin-vazio">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

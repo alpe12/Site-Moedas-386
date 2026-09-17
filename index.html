@@ -8,7 +8,22 @@
     <link rel="stylesheet" href="estilo_index.css">
 </head>
 <body> 
+    <noscript>
+        <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+            ⚠️ Este site precisa de JavaScript habilitado para funcionar completamente. Habilite o JavaScript no seu navegador.
+        </div>
+    </noscript>
     <header>
+        <div class="nav-container">
+            <a href="/" class="logo-text" style="text-decoration:none;">386 <span>EcoCoin</span></a>
+            <button type="button" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
+            <nav><ul>
+                <li><a href="/" class="link-ativo">INÍCIO</a></li>
+                <li><a href="loja.html">LOJA</a></li>
+                <li><a href="ranking.html">RANKING</a></li>
+                <li><a href="perfil.html">PERFIL</a></li>
+            </ul></nav>
+        </div>
     </header>
 
     <main class="conteiner-painel">
@@ -18,27 +33,16 @@
                     <h1>Olá, seja bem-vindo!</h1>
                     <p>O Moeda Escolar é a plataforma central do CIEP 386 para você acompanhar seus pontos e conquistas ambientais. ⟡</p>
                 </div>
-                <button class="botao-principal-painel" onclick="location.href='perfil.html'">Acessar Meu Perfil</button>
+                <a class="botao-principal-painel" href="perfil.html" style="display:inline-block; text-decoration:none; text-align:center;">Acessar Meu Perfil</a>
             </div>
 
             <div class="conteiner-carrossel">
-                <div class="meus-slides efeito-suave">
-                    <img src="Imagens/dia-do-estudante-01.jpg" alt="Gincana">
-                    <div class="legenda-slide">Gincana de Sustentabilidade 2026</div>
-                </div>
-                <div class="meus-slides efeito-suave">
-                    <img src="https://via.placeholder.com/800x340/227bdb/fff?text=Troque+seus+Reciclaveis" alt="Pesagem">
-                    <div class="legenda-slide">Sexta-feira é dia de pesagem!</div>
-                </div>
-                <a class="anterior" onclick="mudarSlide(-1)">&#10094;</a>
-                <a class="proximo" onclick="mudarSlide(1)">&#10095;</a>
+                <!-- Preenchido dinamicamente via api/conteudo_publica.php (editável em admin/conteudo.html) -->
             </div>
 
             <div class="cartao cartao-evento">
                 <div class="cabecalho-abas">
-                    <button class="botao-numero" onclick="mostrarEvento(1)">01</button>
-                    <button class="botao-numero" onclick="mostrarEvento(2)">02</button>
-                    <button class="botao-numero" onclick="mostrarEvento(3)">03</button>
+                    <!-- Preenchido dinamicamente via api/conteudo_publica.php (editável em admin/conteudo.html) -->
                 </div>
 
                 <div class="caixa-conteudo">
@@ -48,9 +52,7 @@
                     <p class="rodape-info" id="evento-rodape">Carregando informações...</p>
                     
                     <div class="rodape-acao">
-                        <a id="link-botao-1" href="https://LINK-DO-FORMULARIO-1.com" target="_blank" class="botao-evento" style="display:none"><button class="botao-acao">Inscrever-se</button></a>
-                        <a id="link-botao-2" href="https://LINK-DO-FORMULARIO-2.com" target="_blank" class="botao-evento" style="display:none"><button class="btn-action">Inscrever-se</button></a>
-                        <a id="link-botao-3" href="https://LINK-DO-FORMULARIO-3.com" target="_blank" class="botao-evento" style="display:none"><button class="botao-acao">Inscrever-se</button></a>
+                        <!-- Preenchido dinamicamente via api/conteudo_publica.php (editável em admin/conteudo.html) -->
                     </div>
                 </div>
             </div>
@@ -58,37 +60,7 @@
             <div class="secao-projetos">
                 <h2 class="titulo-secao">Outros Projetos da Escola</h2>
                 <div class="acordeon">
-                    <div class="acordeon-item">
-                        <input type="checkbox" id="projeto1">
-                        <label for="projeto1">Montagem e Manutenção de Computadores</label>
-                        <div class="conteudo">
-                            <h4>Parceria LIpE/UFRJ</h4>
-                            <p>Aprenda conceitos fundamentais de hardware e infraestrutura digital básica de forma totalmente prática.</p>
-                        </div>
-                    </div>
-                    <div class="acordeon-item">
-                        <input type="checkbox" id="projeto2">
-                        <label for="projeto2">Horta Agroecológica</label>
-                        <div class="conteudo">
-                            <h4>Parceria Projeto Muda/UFRJ</h4>
-                            <p>Criação e manutenção de hortas urbanas, aplicando ecopedagogia, autogestão e sustentabilidade no CIEP.</p>
-                        </div>
-                    </div>
-                    <div class="acordeon-item">
-                        <input type="checkbox" id="projeto3">
-                        <label for="projeto3">Apropriação Digital</label>
-                        <div class="conteudo">
-                            <h4>Parceria LIpE/UFRJ</h4>
-                            <p>Desenvolva fluência digital com as principais ferramentas do cotidiano: internet, planilhas eletrônicas e documentos.</p>
-                        </div>
-                    </div>
-                    <div class="acordeon-item">
-                        <input type="checkbox" id="projeto4">
-                        <label for="projeto4">Automação com Arduino</label>
-                        <div class="conteudo">
-                            <p>Desenvolvimento e calibração do sistema de irrigação automática com sensores para a horta escolar.</p>
-                        </div>
-                    </div>
+                    <!-- Preenchido dinamicamente via api/conteudo_publica.php (editável em admin/conteudo.html) -->
                 </div>
             </div>
         </section>
@@ -98,26 +70,15 @@
                 <span class="tag-status status-verde">Destaque da Loja</span>
                 <h2>Novos Itens!</h2>
                 <p>Cadernos e squeezes exclusivos chegaram na vitrine.</p>
-                <button class="botao-secundario" onclick="location.href='loja.html'">Visitar Loja</button>
+                <a class="botao-secundario" href="loja.html" style="display:inline-block; text-decoration:none; text-align:center;">Visitar Loja</a>
             </div>
 
             <div class="cartao widget-ranking">
                 <h3 class="titulo-widget">Resumo por Turma</h3>
-                <div class="conteiner-grafico-ranking">
-                    <div class="linha-grafico">
-                        <div class="info-grafico"><span>0001</span><strong>0 kg</strong></div>
-                        <div class="fundo-barra-grafico"><div class="barra-grafico barra-ouro" style="width: 6%"></div></div>
-                    </div>
-                    <div class="linha-grafico">
-                        <div class="info-grafico"><span>0002</span><strong>0 kg</strong></div>
-                        <div class="fundo-barra-grafico"><div class="barra-grafico barra-prata" style="width: 4%"></div></div>
-                    </div>
-                    <div class="linha-grafico">
-                        <div class="info-grafico"><span>0003</span><strong>0 kg</strong></div>
-                        <div class="fundo-barra-grafico"><div class="barra-grafico barra-bronze" style="width: 2%"></div></div>
-                    </div>
+                <div id="resumo-turmas-home" class="conteiner-grafico-ranking">
+                    <div style="color: var(--texto-suave); padding: 10px; text-align: center;">Carregando turmas...</div>
                 </div>
-                <button class="botao-texto" onclick="location.href='ranking.html'">Ver Ranking Geral →</button>
+                <a class="botao-texto" href="ranking.html">Ver Ranking Geral →</a>
             </div>    
 
             <div class="cartao widget-ranking">

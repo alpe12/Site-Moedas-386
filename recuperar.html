@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redefinir Senha - EcoCoin</title>
     <link rel="stylesheet" href="style.css">
     <style>
@@ -10,33 +11,50 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            height: 100vh;
         }
     </style> 
-    <script src="script_login_perfil.js"></script>
+    <script src="script.js" defer></script>
+    <script src="script_login_perfil.js" defer></script>
 </head>
 
-<body>
+<body id="pagina_recuperar">
 
-    <div class="logo-text" style="margin:12px 30px;">386 <span style="color: #0056b3;">EcoCoin</span></div>
+    <noscript>
+        <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+            ⚠️ Este site precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
+        </div>
+    </noscript>
+
+    <a href="/" class="logo-text" style="margin:12px 30px; text-decoration:none; display:inline-block;">386 <span style="color: #0056b3;">EcoCoin</span></a>
     
     <div class="acesso">
         <h1 id="titulo">Redefinir Senha</h1>
 
         <section class="area-cadastro">
-            <div class="cadastrar" style="margin-top: 20px; border-bottom: 1px solid rgb(255, 255, 255); padding-bottom: 20px;">
+            <form id="form-recuperar" class="cadastrar" style="margin-top: 20px; border-bottom: 1px solid rgb(255, 255, 255); padding-bottom: 20px;"
+                  onsubmit="event.preventDefault(); verificarERedefinir();">
             <ul>
-                <li><input type="number" id="rec_matricula" placeholder="Matrícula" required></li>
-                <li><input type="email" id="rec_email" placeholder="E-mail cadastrado" required></li>
-                <li><input type="password" id="nova_senha" placeholder="Nova Senha" required></li>
+                <li><input type="text" id="rec_matricula" inputmode="numeric" placeholder="Matrícula" autocomplete="off" required></li>
+                <li><input type="email" id="rec_email" placeholder="E-mail cadastrado" autocomplete="email" required></li>
+                <li><input type="text" id="rec_token" maxlength="6" placeholder="Código de recuperação" autocomplete="off" style="text-transform:uppercase;" required></li>
+                <li><input type="password" id="nova_senha" placeholder="Nova Senha" autocomplete="new-password" required></li>
                 
-                <li><input type="button" onclick="verificarERedefinir()" class="btn-entrar" value="Redefinir Senha"></li>
+                <li><input type="submit" class="btn-entrar" value="Redefinir Senha"></li>
                 
+                <li style="margin-top: 15px; text-align: center;">
+                    <span style="color: white; font-size: 0.8rem;">Não tem mais o código?</span><br>
+                    <a href="https://wa.me/SEUNUMERO?text=Olá,%20preciso%20de%20ajuda%20para%20recuperar%20minha%20senha%20do%20EcoCoin"
+                        id="link-whatsapp-recuperar" target="_blank"
+                        style="color: white; font-size: 0.8rem; text-decoration: underline;">
+                        Fale com um monitor pelo WhatsApp
+                    </a>
+                </li>
+
                 <li style="margin-top: 15px;">
                     <a href="login.html" style="color: white; font-size: 0.8rem; text-decoration: underline;">Voltar ao Login</a>
                 </li>
             </ul>
-            </div>
+            </form>
         </section>
     </div>
 </body>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Admin — 386 EcoCoin</title>
+<link rel="stylesheet" href="estilo_admin.css">
+<script src="script_admin.js" defer></script>
+<script src="script_admin_login.js" defer></script>
+</head>
+<body>
+
+<noscript>
+    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+        ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
+    </div>
+</noscript>
+
+<div class="admin-login-container">
+    <h1 id="admin-titulo">Painel Administrativo</h1>
+
+    <form id="form-login-admin" class="admin-form">
+        <label for="login-email">E-mail</label>
+        <input type="email" id="login-email" autocomplete="email" required>
+        <label for="login-senha">Senha</label>
+        <input type="password" id="login-senha" autocomplete="current-password" required>
+        <label style="display:flex; align-items:center; gap:8px; margin-top:14px; font-weight:500;" id="grupo-lembrar-me">
+            <input type="checkbox" id="login-lembrar-me" style="width:auto;">
+            Lembrar-me
+        </label>
+        <button type="submit" class="admin-btn" style="width:100%; margin-top:18px;">Entrar</button>
+    </form>
+
+    <form id="form-cadastro-admin" class="admin-form" style="display:none;">
+        <label for="cad-nome">Nome</label>
+        <input type="text" id="cad-nome" required>
+        <label for="cad-email">E-mail</label>
+        <input type="email" id="cad-email" autocomplete="email" required>
+        <label for="cad-senha">Senha</label>
+        <input type="password" id="cad-senha" autocomplete="new-password" required>
+        <label for="cad-conf-senha">Confirmar senha</label>
+        <input type="password" id="cad-conf-senha" autocomplete="new-password" required>
+        <label for="cad-token">Token de administração</label>
+        <input type="text" id="cad-token" autocomplete="off" required>
+        <button type="submit" class="admin-btn" style="width:100%; margin-top:18px;">Criar conta</button>
+    </form>
+
+    <form id="form-recuperar-admin" class="admin-form" style="display:none;">
+        <label for="rec-email">E-mail</label>
+        <input type="email" id="rec-email" autocomplete="email" required>
+        <label for="rec-token">Token de administração</label>
+        <input type="text" id="rec-token" autocomplete="off" required>
+        <label for="rec-nova-senha">Nova senha</label>
+        <input type="password" id="rec-nova-senha" autocomplete="new-password" required>
+        <button type="submit" class="admin-btn" style="width:100%; margin-top:18px;">Redefinir senha</button>
+    </form>
+
+    <div class="troca-modo">
+        <a id="link-mostrar-cadastro">Criar conta administrativa</a>
+        &nbsp;·&nbsp;
+        <a id="link-mostrar-recuperar">Esqueci minha senha</a>
+        &nbsp;·&nbsp;
+        <a id="link-mostrar-login" style="display:none;">Voltar ao login</a>
+    </div>
+</div>
+
+</body>
+</html>
