@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aluno — Admin 386 EcoCoin</title>
+<link rel="stylesheet" href="estilo_admin.css">
+<script src="script_admin.js" defer></script>
+<script src="script_admin_aluno.js" defer></script>
+</head>
+<body>
+
+<noscript>
+    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+        ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
+    </div>
+</noscript>
+
+<header class="admin-header">
+    <a href="painel.html" class="logo-admin">386 <span>Admin</span></a>
+    <button type="button" class="menu-toggle-admin" aria-label="Abrir menu" aria-expanded="false">☰</button>
+    <nav><ul>
+            <li><a href="painel.html">Painel</a></li>
+            <li><a href="aluno.html" class="ativo">Alunos</a></li>
+            <li><a href="atividades.html">Atividades</a></li>
+            <li><a href="loja.html">Loja</a></li>
+            <li><a href="pedidos.html">Pedidos</a></li>
+            <li><a href="conteudo.html">Conteúdo</a></li>
+            <li><a href="log.html">Log</a></li>
+    </ul></nav>
+    <button class="sair-btn" onclick="window.location.href='logout.php'">Sair</button>
+</header>
+
+<main class="admin-main">
+    <h1 class="admin-titulo">Aluno</h1>
+    <p class="admin-subtitulo">Busque um aluno para ver tudo que o sistema guarda sobre ele: dados de cadastro, saldo, atividades, pedidos e histórico de turmas — tudo num só lugar.</p>
+
+    <div class="admin-cartao admin-form">
+        <label for="busca-aluno-perfil" style="margin-top:0;">Buscar aluno (nome, matrícula ou turma)</label>
+        <input type="text" id="busca-aluno-perfil" autocomplete="off" placeholder="Digite para buscar...">
+        <div id="resultados-busca-aluno-perfil" class="admin-busca-resultados" style="display:none;"></div>
+    </div>
+
+    <div id="estado-perfil">
+        <div class="admin-cartao">
+            <p class="admin-vazio">Busque um aluno acima para ver os detalhes completos.</p>
+        </div>
+    </div>
+
+    <div id="perfil-aluno" style="display:none;">
+
+        <div class="admin-cartao">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+                <div>
+                    <h2 id="perfil-nome" style="margin:0 0 4px;">—</h2>
+                    <p class="admin-subtitulo" style="margin:0;" id="perfil-subtitulo">—</p>
+                </div>
+                <div id="perfil-tags" style="text-align:right;"></div>
+            </div>
+            <div class="admin-grid-2" style="margin-top:18px;">
+                <div style="background:var(--admin-fundo); border-radius:8px; padding:14px 16px;">
+                    <div style="font-size:0.75rem; text-transform:uppercase; color:var(--admin-texto-suave); font-weight:700;">Ganho total</div>
+                    <div style="font-size:1.4rem; font-weight:800;" id="perfil-ganho">🪙 0.00</div>
+                </div>
+                <div style="background:var(--admin-fundo); border-radius:8px; padding:14px 16px;">
+                    <div style="font-size:0.75rem; text-transform:uppercase; color:var(--admin-texto-suave); font-weight:700;">Gasto total</div>
+                    <div style="font-size:1.4rem; font-weight:800;" id="perfil-gasto">🪙 0.00</div>
+                </div>
+                <div style="background:var(--admin-fundo); border-radius:8px; padding:14px 16px;">
+                    <div style="font-size:0.75rem; text-transform:uppercase; color:var(--admin-texto-suave); font-weight:700;">Saldo atual</div>
+                    <div style="font-size:1.4rem; font-weight:800; color:var(--admin-verde);" id="perfil-saldo">🪙 0.00</div>
+                </div>
+            </div>
+            <p id="perfil-expiracoes" class="admin-subtitulo" style="margin:12px 0 0; font-size:0.8rem; display:none;"></p>
+        </div>
+
+        <div class="admin-cartao">
+            <h2>📋 Dados de cadastro</h2>
+            <table class="admin-tabela">
+                <tbody id="tabela-cadastro"></tbody>
+            </table>
+        </div>
+
+        <div class="admin-cartao">
+            <h2>🏫 Histórico de turmas</h2>
+            <div style="overflow-x:auto;">
+                <table class="admin-tabela">
+                    <thead><tr><th>Turma</th><th>Ano</th><th>Solicitada em</th><th>Status</th></tr></thead>
+                    <tbody id="tabela-turmas"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="admin-cartao">
+            <h2>🪙 Atividades (extrato completo)</h2>
+            <div style="overflow-x:auto;">
+                <table class="admin-tabela">
+                    <thead><tr><th>Data</th><th>Atividade</th><th>Valor</th><th>Turma na época</th></tr></thead>
+                    <tbody id="tabela-atividades"></tbody>
+                </table>
+            </div>
+            <p class="admin-subtitulo" style="margin:12px 0 0; font-size:0.8rem;">
+                Para editar ou remover um lançamento, use a tela <a href="atividades.html">Atividades</a>.
+            </p>
+        </div>
+
+        <div class="admin-cartao">
+            <h2>🛍️ Pedidos na loja (todos)</h2>
+            <div style="overflow-x:auto;">
+                <table class="admin-tabela">
+                    <thead><tr><th>Data</th><th>Item</th><th>Valor</th><th>Status</th><th>Turma na época</th></tr></thead>
+                    <tbody id="tabela-pedidos"></tbody>
+                </table>
+            </div>
+            <p class="admin-subtitulo" style="margin:12px 0 0; font-size:0.8rem;">
+                Para alterar o status de um pedido, use a tela <a href="pedidos.html">Pedidos</a>.
+            </p>
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

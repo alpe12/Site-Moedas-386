@@ -153,7 +153,7 @@ function renderizarAtividades() {
                 <table class="admin-tabela">
                     <thead><tr><th>Nome</th><th>Matrícula</th><th>Turma</th></tr></thead>
                     <tbody>
-                        ${a.alunos.map(al => `<tr><td>${escapeHtml(al.nome)}</td><td>${escapeHtml(al.matricula)}</td><td>${escapeHtml(al.turma)}${iconeHistoricoTurma(al.turmaHistorico)}</td></tr>`).join('')}
+                        ${a.alunos.map(al => `<tr><td>${linkAluno(al.matricula, escapeHtml(al.nome))}</td><td>${escapeHtml(al.matricula)}</td><td>${escapeHtml(al.turma)}${iconeHistoricoTurma(al.turmaHistorico)}</td></tr>`).join('')}
                     </tbody>
                 </table>`}
             </td>

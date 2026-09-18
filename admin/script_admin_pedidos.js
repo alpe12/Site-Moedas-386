@@ -31,7 +31,7 @@ function renderizarPedidos(pedidos) {
 
     corpo.innerHTML = pedidos.map(p => `
         <tr>
-            <td>${escapeHtml(p.nomeAluno)} <span style="color:var(--admin-texto-suave);">(${escapeHtml(p.matricula)})</span></td>
+            <td>${linkAluno(p.matricula, escapeHtml(p.nomeAluno))} <span style="color:var(--admin-texto-suave);">(${escapeHtml(p.matricula)})</span></td>
             <td>${escapeHtml(p.turma)}${iconeHistoricoTurma(p.turmaHistorico)}</td>
             <td>${escapeHtml(p.item)}</td>
             <td>🪙 ${formatarMoeda(p.valor)}</td>

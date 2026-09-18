@@ -121,7 +121,10 @@ const RANKING_APENAS_ANO_ATUAL = true;
 //          ser usado na loja. Isto afeta o saldo DE VERDADE, diferente de
 //          RANKING_APENAS_ANO_ATUAL (que só muda o que é MOSTRADO no
 //          ranking, sem tocar no saldo real).
-const EXPIRAR_SALDO_ANO_NOVO = false;
+// Fica em config_compartilhada.php (não aqui) porque o painel admin
+// isolado também precisa deste valor pra calcular o saldo de um aluno do
+// mesmo jeito que o site público (api/financeiro_utils.php) — veja aquele
+// arquivo.
 
 // --- Forçar aprovação em casos específicos da primeira troca do ano, MESMO
 //     com EXIGIR_APROVACAO_TROCA_TURMA desligada? ---

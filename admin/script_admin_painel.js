@@ -37,7 +37,7 @@ function renderizarPedidosPendentes(pedidos) {
     }
     corpo.innerHTML = pedidos.map(p => `
         <tr>
-            <td>${escapeHtml(p.nomeAluno)} <span style="color:var(--admin-texto-suave);">(${escapeHtml(p.matricula)})</span></td>
+            <td>${linkAluno(p.matricula, escapeHtml(p.nomeAluno))} <span style="color:var(--admin-texto-suave);">(${escapeHtml(p.matricula)})</span></td>
             <td>${escapeHtml(p.item)}</td>
             <td>🪙 ${formatarMoeda(p.valor)}</td>
             <td>${escapeHtml(formatarDataHora(p.data))}</td>
@@ -76,7 +76,7 @@ function renderizarContasPendentes(contas) {
     if (contas.length === 0) return;
     secao.style.display = 'block';
     corpo.innerHTML = contas.map(c => `
-        <tr><td>${escapeHtml(c.nome)}</td><td>${escapeHtml(c.matricula)}</td><td>${escapeHtml(c.turma)}</td></tr>
+        <tr><td>${linkAluno(c.matricula, escapeHtml(c.nome))}</td><td>${escapeHtml(c.matricula)}</td><td>${escapeHtml(c.turma)}</td></tr>
     `).join('');
 }
 
@@ -92,7 +92,7 @@ function renderizarTrocasTurmaPendentes(trocas) {
         const marca = t.aprovacaoForcada ? ' ⚠️' : '';
         return `
         <tr>
-            <td>${escapeHtml(t.nome)}</td>
+            <td>${linkAluno(t.matricula, escapeHtml(t.nome))}</td>
             <td>${escapeHtml(t.matricula)}</td>
             <td>${anterior}</td>
             <td>${escapeHtml(t.turmaSolicitada)} (${escapeHtml(String(t.ano))})${marca}</td>

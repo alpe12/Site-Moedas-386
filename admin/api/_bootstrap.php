@@ -67,6 +67,12 @@ require __DIR__ . '/../../api/config_compartilhada.php';
 // motivo de csv_utils.php: são os MESMOS dados, então essa lógica não pode
 // divergir entre os dois lados.
 require __DIR__ . '/../../api/turma_utils.php';
+// Funções puras pra calcular ganho/gasto/saldo (calcular_saldo_aluno_de(),
+// etc.) — mesmo motivo de turma_utils.php acima: o painel admin precisa
+// mostrar exatamente o mesmo saldo que o site público calcula, nunca uma
+// versão simplificada que poderia divergir (ex.: ignorando a expiração
+// anual de saldo). Usado por admin/api/aluno_detalhe.php.
+require __DIR__ . '/../../api/financeiro_utils.php';
 
 ini_set('session.use_strict_mode', '1');
 

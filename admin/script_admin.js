@@ -112,6 +112,16 @@ function escolherAcao(mensagem, opcoes) {
     });
 }
 
+/**
+ * Link para o perfil completo de um aluno (aluno.html) — usado sempre que
+ * um nome/matrícula de aluno aparece numa lista (atividades.html,
+ * pedidos.html, painel.html), pra dar um jeito rápido de ver tudo sobre
+ * aquele aluno sem precisar buscar de novo.
+ */
+function linkAluno(matricula, conteudoHtml) {
+    return `<a href="aluno.html?matricula=${encodeURIComponent(matricula)}">${conteudoHtml}</a>`;
+}
+
 function carregarMenuAdmin() {
     // O <header> já vem pronto no HTML (nav funciona mesmo sem JS) — aqui
     // só troca o botão "Sair" de um link simples pra um logout de verdade

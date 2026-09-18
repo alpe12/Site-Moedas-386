@@ -26,3 +26,12 @@ if (!defined('EXIGIR_APROVACAO_CONTA')) {
 if (!defined('EXIGIR_APROVACAO_TROCA_TURMA')) {
     define('EXIGIR_APROVACAO_TROCA_TURMA', false);
 }
+
+// Mesmo motivo das duas acima: o painel admin também precisa saber se o
+// saldo expira no ano novo pra poder calcular o saldo de um aluno do
+// mesmo jeito que o site público (api/financeiro_utils.php, usado pelos
+// dois lados) — veja "Expirar saldo no início de cada ano letivo?" em
+// api/config.php pra explicação completa.
+if (!defined('EXPIRAR_SALDO_ANO_NOVO')) {
+    define('EXPIRAR_SALDO_ANO_NOVO', false);
+}
