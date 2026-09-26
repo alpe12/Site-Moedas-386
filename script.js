@@ -226,3 +226,12 @@ function melhorarCampoSenha(input, { checklist = false, regras = null } = {}) {
         render();
     }
 }
+
+// ==========================================
+// EMOJI FALLBACK LOADER
+// ==========================================
+(function() {
+    const s = document.createElement('script');
+    s.src = 'emoji-fallback.js';
+    document.head.appendChild(s);
+})();

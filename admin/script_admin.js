@@ -515,3 +515,12 @@ document.addEventListener('click', (evento) => {
         mostrarHistoricoTurmaModal(decodificarBase64Json(botao.dataset.historico));
     } catch { /* dado malformado — ignora silenciosamente, não é crítico */ }
 });
+
+// ==========================================
+// EMOJI FALLBACK LOADER
+// ==========================================
+(function() {
+    const s = document.createElement('script');
+    s.src = '../emoji-fallback.js';
+    document.head.appendChild(s);
+})();
