@@ -70,7 +70,14 @@ function renderizarResultadosBusca() {
     conteiner.querySelectorAll('.item-resultado[data-matricula]').forEach(item => {
         const matricula = item.dataset.matricula;
         if (alunosSelecionados.some(sel => sel.matricula === matricula)) return; // já adicionado, não clicável
-        item.addEventListener('click', () => {
+        item.addEventListener('click', (evento) => {
+            // Sem isto, o clique continua borbulhando até o listener de
+            // "clicar fora" em document (lá embaixo) DEPOIS que
+            // renderizarResultadosBusca() já trocou o innerHTML do
+            // conteiner — o item clicado (e.target) fica órfão nesse
+            // momento, conteiner.contains(e.target) dá falso, e o próprio
+            // clique que deveria manter a lista aberta acaba fechando ela.
+            evento.stopPropagation();
             adicionarAluno({ matricula, nome: item.dataset.nome, turma: item.dataset.turma });
             renderizarResultadosBusca(); // mantém a lista aberta, só atualiza as marcas
         });

@@ -53,10 +53,14 @@ foreach (csv_assoc(ADMINS_CSV) as $a) {
 // solicitação nasce com aprovado=0 mesmo quando EXIGIR_APROVACAO_TROCA_TURMA
 // está desligada (só pra o admin saber que uma troca aconteceu sem
 // intervenção manual), então esta lista sempre inclui as duas situações —
-// quem decide se a seção aparece, de novo, é o JS do painel, consultando a
-// flag em /api/config_publica.php. Aprovar/recusar/definir retroatividade
-// é feito por admin/api/turmas.php (ação, não leitura — por isso fica num
-// arquivo separado deste, que é só leitura).
+// quem decide se a SEÇÃO aparece é o JS do painel (script_admin_painel.js),
+// mas diferente de $contasPendentes ele não confia só na flag global: cada
+// linha já vem com aprovacaoForcada/retroativoPendente, então o JS mostra
+// a seção se a flag estiver ligada OU se alguma linha tiver um desses dois
+// motivos — só trata como "nada aqui" quando de fato não sobra nenhuma
+// linha que precise de ação de verdade. Aprovar/recusar/definir
+// retroatividade é feito por admin/api/turmas.php (ação, não leitura — por
+// isso fica num arquivo separado deste, que é só leitura).
 $nomesAlunos = [];
 foreach (csv_assoc(SITE_USERS_CSV) as $u) {
     $nomesAlunos[(string)($u['matricula'] ?? '')] = (string)($u['nome'] ?? '');

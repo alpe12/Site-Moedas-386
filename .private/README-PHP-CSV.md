@@ -358,13 +358,20 @@ o servidor grava uma linha nova em `turmas_historico.csv` com `aprovado=0`
   ligada ou não a aprovação manual — isso deixa registrado, pra quem olhar
   o arquivo depois, que aquela troca não passou por conferência humana,
   mesmo que já esteja em vigor;
-- **enquanto ainda estiver com `aprovado=0`, o próprio aluno pode cancelar
-  a solicitação** (link "Cancelar solicitação" ao lado do aviso em
-  `perfil.html`) — diferente de uma recusa por um admin, cancelar
-  **remove a linha inteira** de `turmas_historico.csv` em vez de marcar
-  `aprovado=-1`: é como se a troca nunca tivesse sido pedida, não há
-  decisão nenhuma pra manter registro de. Depois de aprovada ou recusada,
-  só um admin pode mexer;
+- **enquanto ainda estiver com `aprovado=0` E ainda represada (esperando
+  um admin de verdade), o próprio aluno pode cancelar a solicitação**
+  (link "Cancelar solicitação" ao lado do aviso em `perfil.html`) —
+  diferente de uma recusa por um admin, cancelar **remove a linha
+  inteira** de `turmas_historico.csv` em vez de marcar `aprovado=-1`: é
+  como se a troca nunca tivesse sido pedida, não há decisão nenhuma pra
+  manter registro de. Uma linha `aprovado=0` que já entrou em vigor (config
+  desligada, sem `aprovacao_forcada`) não conta como pendente pra
+  `perfil.html` — não aparece o aviso nem o link, porque não há nada
+  esperando o aluno decidir (`api/profile.php` descarta essas antes de
+  devolver `trocaTurmaPendente`); a ação `cancelar` do servidor
+  (`api/turma.php`) continua aceitando qualquer linha `aprovado=0`, é só a
+  interface do aluno que passou a restringir quando oferece o link. Depois
+  de aprovada ou recusada, só um admin pode mexer;
 - com `EXIGIR_APROVACAO_TROCA_TURMA = false` (padrão) em `config.php`, a
   linha já vale como a turma atual do aluno imediatamente, apesar do
   `aprovado=0`;

@@ -19,8 +19,20 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (config.exigirAprovacaoContaAluno) {
             renderizarContasPendentes(dados.contasPendentes || []);
         }
-        if (config.exigirAprovacaoTrocaTurma) {
-            renderizarTrocasTurmaPendentes(dados.trocasTurmaPendentes || []);
+        // Diferente de contasPendentes acima: aqui existe um sinal por linha
+        // (aprovacaoForcada / retroativoPendente — veja admin/api/painel.php)
+        // que já distingue trocas que auto-aplicaram sem exigir nada de
+        // ninguém das que realmente precisam de um admin mesmo com a flag
+        // global desligada (regras 1/2/3 de aprovação forçada, ou
+        // retroatividade ainda em aberto). Confiar só na flag global aqui,
+        // como se faz pra contas, esconderia justamente essas exceções — só
+        // trata a seção como "desligada" quando NADA na lista precisa
+        // mesmo de ação, pra não sobrar como puro ruído de trocas que já
+        // entraram em vigor sozinhas.
+        const trocasTurmaPendentes = dados.trocasTurmaPendentes || [];
+        const trocasQuePrecisamDeAcao = trocasTurmaPendentes.some(t => t.aprovacaoForcada || t.retroativoPendente);
+        if (config.exigirAprovacaoTrocaTurma || trocasQuePrecisamDeAcao) {
+            renderizarTrocasTurmaPendentes(trocasTurmaPendentes);
         }
     } catch (erro) {
         console.error('Erro ao carregar painel:', erro);

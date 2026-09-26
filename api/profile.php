@@ -27,6 +27,15 @@ $anoAtual = ano_letivo_atual();
 $turmaAtual = formatar_registro_turma(turma_atual_deste_ano(turma_atual_do_aluno($historicoDoAluno), $anoAtual));
 
 $trocaPendente = troca_turma_cancelavel($historicoDoAluno);
+// troca_turma_cancelavel() devolve qualquer linha aprovado=0, mesmo já
+// aplicada (EXIGIR_APROVACAO_TROCA_TURMA desligada, sem aprovacao_forcada)
+// — o que interessa pra perfil.html é só o caso onde ainda falta um admin
+// decidir: aí sim faz sentido mostrar "aguardando aprovação" e oferecer
+// cancelar. Uma linha já em vigor não tem nada pendente do ponto de vista
+// do aluno, mesmo que um admin ainda não tenha revisado.
+if ($trocaPendente !== null && turma_registro_esta_aplicado($trocaPendente)) {
+    $trocaPendente = null;
+}
 
 $atividades = [];
 foreach (csv_assoc(ACTIVITIES_CSV) as $a) {

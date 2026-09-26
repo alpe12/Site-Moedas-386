@@ -190,13 +190,16 @@ function turma_na_data(array $historicoDoAluno, string $dataAlvo): ?array {
 
 /**
  * O registro mais recente deste aluno que ainda não foi decidido
- * (aprovado="0") — o que perfil.html oferece a opção de cancelar.
- * Diferente de existe_troca_turma_pendente(): aquela ignora linhas já
- * aplicadas (com EXIGIR_APROVACAO_TROCA_TURMA desligada, uma linha
- * aprovado=0 já conta como aplicada e não bloqueia uma nova solicitação);
- * esta aqui olha só pro aprovado bruto, porque o aluno pode querer
- * cancelar uma troca que já está em vigor mas que nenhum admin ainda
- * revisou. Devolve null se não houver nenhuma.
+ * (aprovado="0"), aplicado ou não — olha só pro aprovado bruto. Diferente
+ * de existe_troca_turma_pendente(): aquela ignora linhas já aplicadas (com
+ * EXIGIR_APROVACAO_TROCA_TURMA desligada, uma linha aprovado=0 já conta
+ * como aplicada e não bloqueia uma nova solicitação); esta aqui devolve a
+ * linha de qualquer forma e deixa quem chama decidir o que fazer com uma
+ * que já está em vigor. api/profile.php (o único uso hoje) descarta o
+ * resultado quando turma_registro_esta_aplicado() é verdade pra ele: do
+ * ponto de vista do aluno em perfil.html, uma troca já aplicada não tem
+ * nada pendente pra mostrar nem cancelar, mesmo que nenhum admin tenha
+ * revisado ainda. Devolve null se não houver nenhuma linha aprovado="0".
  */
 function troca_turma_cancelavel(array $historicoDoAluno): ?array {
     $naoDecididas = array_values(array_filter(
