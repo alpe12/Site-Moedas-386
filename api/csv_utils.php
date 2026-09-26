@@ -38,10 +38,62 @@ function acquire_lock(mixed $fh, int $modo): bool {
 }
 
 /**
+ * Registro central (caminho absoluto do arquivo => cabeçalho padrão),
+ * preenchido pelos bootstraps de cada site (api/_bootstrap.php e
+ * admin/api/_bootstrap.php) através de registrar_csv_padrao() — sempre no
+ * mesmo lugar onde eles já definem a constante do caminho e o cabeçalho,
+ * então adicionar um CSV novo continua sendo só isso: nenhum endpoint que
+ * apenas LÊ ou ESCREVE o csv precisa saber o cabeçalho dele.
+ *
+ * csv_rows() consulta este registro pra criar o arquivo (já com o
+ * cabeçalho certo) na primeira vez que algo tenta LER um CSV que ainda não
+ * existe. Sem isto, só uma escrita (append_csv()/with_locked_csv(), que já
+ * abrem em modo 'c+') criava o arquivo — uma leitura num CSV inexistente
+ * sempre devolvia [] silenciosamente, sem nunca criar nada. Se ninguém
+ * registrou cabeçalho pra aquele caminho, o comportamento continua sendo
+ * exatamente esse de antes (devolve [], não cria nada).
+ */
+$GLOBALS['__csv_headers_padrao'] = [];
+
+function registrar_csv_padrao(string $arquivo, array $header): void {
+    $GLOBALS['__csv_headers_padrao'][$arquivo] = $header;
+}
+
+function csv_header_padrao(string $arquivo): array {
+    return $GLOBALS['__csv_headers_padrao'][$arquivo] ?? [];
+}
+
+/**
+ * Garante que $arquivo já exista com $headerPadrao gravado como primeira
+ * linha, mesmo que ninguém ainda tenha escrito nada nele. Não faz nada se
+ * o arquivo já existir (mesmo vazio — quem decide o cabeçalho nesse caso é
+ * a próxima escrita, via garantir_cabecalho_atualizado()) ou se
+ * $headerPadrao vier vazio (nenhum cabeçalho registrado pra esse caminho).
+ * Usa o mesmo lock exclusivo do resto do arquivo, então duas leituras
+ * simultâneas do mesmo CSV inexistente nunca gravam o cabeçalho em duplicidade.
+ */
+function garantir_csv_criado(string $arquivo, array $headerPadrao): void {
+    if (!$headerPadrao || is_file($arquivo)) return;
+    $fh = @fopen($arquivo, 'c+');
+    if (!$fh) { error_log("garantir_csv_criado: não foi possível criar $arquivo (verifique permissões de escrita)"); return; }
+    if (!acquire_lock($fh, LOCK_EX)) { fclose($fh); return; }
+    $stat = fstat($fh);
+    if ($stat && $stat['size'] === 0) {
+        fputcsv($fh, $headerPadrao);
+        fflush($fh);
+    }
+    flock($fh, LOCK_UN);
+    fclose($fh);
+}
+
+/**
  * Lê um CSV inteiro em memória como uma lista de linhas (arrays indexados).
  * Uso interno; a maior parte do código deve preferir csv_assoc().
  */
 function csv_rows(string $file): array {
+    if (!is_file($file)) {
+        garantir_csv_criado($file, csv_header_padrao($file));
+    }
     if (!is_readable($file)) return [];
     $fh = fopen($file, 'rb');
     if (!$fh) return [];

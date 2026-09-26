@@ -271,18 +271,39 @@ function require_login(): array {
     ];
 }
 
+/**
+ * Caminho => cabeçalho padrão, um por CSV do site público. headers_para_arquivo()
+ * (usada pelas escritas) e o registro em registrar_csv_padrao() logo abaixo
+ * (que faz csv_assoc()/csv_rows() criarem sozinhos o arquivo, já com o
+ * cabeçalho certo, na primeira leitura, se ele ainda não existir) dependem
+ * dos dois do mesmo mapa. Ou seja: adicionar um CSV novo continua sendo só
+ * 3 coisas, sempre aqui em _bootstrap.php — a constante do caminho (lá em
+ * cima), a entrada em CSV_HEADERS, e uma linha neste mapa — nenhum endpoint
+ * que só lê ou escreve o CSV precisa saber o cabeçalho dele.
+ */
+function caminhos_para_headers(): array {
+    static $mapa = null;
+    if ($mapa === null) {
+        $mapa = [
+            USERS_CSV => CSV_HEADERS['usuarios'],
+            ACTIVITIES_CSV => CSV_HEADERS['atividades'],
+            ORDERS_CSV => CSV_HEADERS['pedidos'],
+            ITEMS_CSV => CSV_HEADERS['itens'],
+            CARROSSEL_CSV => CSV_HEADERS['carrossel'],
+            EVENTOS_CSV => CSV_HEADERS['eventos'],
+            PROJETOS_CSV => CSV_HEADERS['projetos'],
+            TURMAS_HISTORICO_CSV => CSV_HEADERS['turmas_historico'],
+        ];
+    }
+    return $mapa;
+}
+
 function headers_para_arquivo(string $file): array {
-    $mapa = [
-        USERS_CSV => CSV_HEADERS['usuarios'],
-        ACTIVITIES_CSV => CSV_HEADERS['atividades'],
-        ORDERS_CSV => CSV_HEADERS['pedidos'],
-        ITEMS_CSV => CSV_HEADERS['itens'],
-        CARROSSEL_CSV => CSV_HEADERS['carrossel'],
-        EVENTOS_CSV => CSV_HEADERS['eventos'],
-        PROJETOS_CSV => CSV_HEADERS['projetos'],
-        TURMAS_HISTORICO_CSV => CSV_HEADERS['turmas_historico'],
-    ];
-    return $mapa[$file] ?? [];
+    return caminhos_para_headers()[$file] ?? [];
+}
+
+foreach (caminhos_para_headers() as $arquivo => $header) {
+    registrar_csv_padrao($arquivo, $header);
 }
 
 function conta_esta_ativa(array $usuario): bool {

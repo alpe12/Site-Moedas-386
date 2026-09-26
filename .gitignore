@@ -1,0 +1,39 @@
+# ============================================================
+# Dados gerados em runtime / por instalação — nunca committados.
+# Todos são criados sozinhos pelo próprio PHP na primeira vez que
+# são necessários (veja api/csv_utils.php e os dois _bootstrap.php),
+# então o repositório não precisa (e não deve) guardar um valor de
+# exemplo pra nenhum deles.
+# ============================================================
+
+# --- site público (.private/) ---
+# Dados reais de alunos: matrícula/senha/e-mail, atividades e saldo,
+# pedidos da loja, catálogo de itens da loja, histórico de turma.
+/.private/usuarios.csv
+/.private/atividades.csv
+/.private/pedidos_loja.csv
+/.private/itens_loja.csv
+/.private/turmas_historico.csv
+/.private/rate_limit.json
+
+# Conteúdo editorial da home (carrossel/eventos/projetos) FICA
+# versionado de propósito — é o estado inicial do site, editado pelo
+# painel admin mas não "dado de usuário" — por isso NÃO entram aqui:
+#   /.private/carrossel.csv
+#   /.private/eventos.csv
+#   /.private/projetos.csv
+
+# Arquivos de sessão PHP (sess_<id>) — .htaccess e .gitkeep continuam versionados.
+/.private/sessoes/sess_*
+
+# --- painel admin (admin/.private/) ---
+/admin/.private/admins.csv
+/admin/.private/admin_log.csv
+/admin/.private/admin_token.txt
+/admin/.private/admin_rate_limit.json
+/admin/.private/sessoes/sess_*
+
+# --- imagens enviadas pelo painel admin ---
+# Conteúdo de cada instalação, não código — mantém a pasta (.gitkeep) versionada.
+/uploads/*
+!/uploads/.gitkeep

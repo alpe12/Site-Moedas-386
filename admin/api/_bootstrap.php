@@ -74,6 +74,45 @@ require __DIR__ . '/../../api/turma_utils.php';
 // anual de saldo). Usado por admin/api/aluno_detalhe.php.
 require __DIR__ . '/../../api/financeiro_utils.php';
 
+/**
+ * Caminho => cabeçalho padrão, pra cada CSV que o painel admin usa (os
+ * próprios dele e os do site público que ele também lê/escreve) — mesma
+ * ideia do site público, veja o comentário em api/_bootstrap.php.
+ * headers_para_arquivo() (pras escritas que hoje já usam ADMIN_CSV_HEADERS/
+ * SITE_CSV_HEADERS diretamente, e qualquer escrita nova) e o registro em
+ * registrar_csv_padrao() logo abaixo (que faz toda leitura por csv_assoc()
+ * criar o arquivo sozinha, já com o cabeçalho certo, se ele ainda não
+ * existir) dependem do mesmo mapa. Adicionar um CSV novo aqui continua
+ * sendo só 3 coisas, sempre neste arquivo — a constante do caminho, a
+ * entrada em ADMIN_CSV_HEADERS/SITE_CSV_HEADERS, e uma linha neste mapa.
+ */
+function caminhos_para_headers(): array {
+    static $mapa = null;
+    if ($mapa === null) {
+        $mapa = [
+            ADMINS_CSV => ADMIN_CSV_HEADERS['admins'],
+            ADMIN_LOG_CSV => ADMIN_CSV_HEADERS['log'],
+            SITE_USERS_CSV => SITE_CSV_HEADERS['usuarios'],
+            SITE_ACTIVITIES_CSV => SITE_CSV_HEADERS['atividades'],
+            SITE_ORDERS_CSV => SITE_CSV_HEADERS['pedidos'],
+            SITE_ITEMS_CSV => SITE_CSV_HEADERS['itens'],
+            SITE_CARROSSEL_CSV => SITE_CSV_HEADERS['carrossel'],
+            SITE_EVENTOS_CSV => SITE_CSV_HEADERS['eventos'],
+            SITE_PROJETOS_CSV => SITE_CSV_HEADERS['projetos'],
+            SITE_TURMAS_HISTORICO_CSV => SITE_CSV_HEADERS['turmas_historico'],
+        ];
+    }
+    return $mapa;
+}
+
+function headers_para_arquivo(string $file): array {
+    return caminhos_para_headers()[$file] ?? [];
+}
+
+foreach (caminhos_para_headers() as $arquivo => $header) {
+    registrar_csv_padrao($arquivo, $header);
+}
+
 ini_set('session.use_strict_mode', '1');
 
 session_name('ecocoin_admin_session');
