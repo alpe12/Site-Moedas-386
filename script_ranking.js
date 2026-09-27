@@ -26,7 +26,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     // a primeira letra" ela é escondida e o servidor ignora qualquer
     // tentativa de busca mesmo que alguém chame a API direto.
     if (configRanking.mostrarApenasPrimeiraLetra) {
-        if (grupoBusca) grupoBusca.style.display = 'none';
+        if (grupoBusca) grupoBusca.classList.add('oculto');
     } else if (campoBusca) {
         if (buscaLocalHabilitada) {
             // Filtrar uma lista já carregada é instantâneo — sem debounce.
@@ -89,7 +89,7 @@ async function carregarPoolCompleto() {
     } catch (erro) {
         console.error('Erro ao carregar ranking:', erro);
         poolRankingCompleto = [];
-        if (corpo) corpo.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:40px; color:var(--cor-alerta); font-weight:700;">
+        if (corpo) corpo.innerHTML = `<tr><td colspan="4" class="texto-estado texto-estado--tabela texto-estado--erro">
             Não foi possível carregar o ranking agora. Tente novamente mais tarde.</td></tr>`;
     }
 }
@@ -130,7 +130,7 @@ function renderizarTabelaCompleta(lista) {
     if (!corpo) return;
 
     if (lista.length === 0) {
-        corpo.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:40px; color:#999;">
+        corpo.innerHTML = `<tr><td colspan="4" class="texto-estado texto-estado--tabela">
             Nenhum aluno encontrado.</td></tr>`;
         return;
     }
@@ -163,20 +163,18 @@ function renderizarResumoPorTurma() {
     const topTurmas = [...totalPorTurma.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
 
     if (topTurmas.length === 0) {
-        grade.innerHTML = `<p style="color: var(--text-gray); text-align:center; width:100%;">Ainda não há dados suficientes.</p>`;
+        grade.innerHTML = `<p class="texto-estado">Ainda não há dados suficientes.</p>`;
         return;
     }
 
     const estilosBorda = ['gold-border', 'silver-border', 'bronze-border', 'red-border', 'red-border'];
-    grade.innerHTML = topTurmas.map(([turma, total], index) => `
-        <div class="turma-card ${estilosBorda[index] || 'red-border'}">
-            <span class="tag-azul" style="background: ${corPosicao(index)}; color: #000;">${index + 1}º Lugar</span>
+    grade.innerHTML = topTurmas.map(([turma, total], index) => {
+        const classeBorda = estilosBorda[index] || 'red-border';
+        return `
+        <div class="turma-card ${classeBorda}">
+            <span class="tag-azul ${classeBorda}">${index + 1}º Lugar</span>
             <h3>${escapeHtml(formatarTurma(turma))}</h3>
             <p class="valor-eco">🪙 ${formatarMoeda(total)}</p>
-        </div>
-    `).join('');
-}
-
-function corPosicao(index) {
-    return ['#ffc107', '#c0c0c0', '#cd7f32', '#fa735b', '#fa735b'][index] || '#fa735b';
+        </div>`;
+    }).join('');
 }

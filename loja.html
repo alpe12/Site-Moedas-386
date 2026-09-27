@@ -11,13 +11,13 @@
 </head>
 <body>
     <noscript>
-        <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+        <div class="aviso-noscript">
             ⚠️ Este site precisa de JavaScript habilitado para funcionar completamente. Habilite o JavaScript no seu navegador.
         </div>
     </noscript>
     <header>
         <div class="nav-container">
-            <a href="/" class="logo-text" style="text-decoration:none;">386 <span>EcoCoin</span></a>
+            <a href="/" class="logo-text">386 <span>EcoCoin</span></a>
             <button type="button" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
             <nav><ul>
                 <li><a href="/">INÍCIO</a></li>
@@ -38,24 +38,24 @@
             </div>
         </div>
 
-        <div id="avisoLoginLoja" style="display:none; text-align:center; padding: 40px 20px;">
-            <p style="color: var(--texto-suave, var(--text-gray)); font-size: 1.05rem;">
-                Faça <a href="login.html" style="color: var(--primary-blue); font-weight: 700;">login</a> para ver e resgatar os itens da loja.
+        <div id="avisoLoginLoja" class="oculto">
+            <p>
+                Faça <a href="login.html">login</a> para ver e resgatar os itens da loja.
             </p>
         </div>
 
         <section class="grade-produtos" id="grade-itens-loja">
-            <p style="text-align:center; color:var(--text-gray); grid-column: 1 / -1;">Carregando itens da loja...</p>
+            <p class="texto-estado">Carregando itens da loja...</p>
         </section>
 
-        <div class="cartao" id="secaoPedidos" style="margin-top: 40px; width: 100%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+        <div class="cartao" id="secaoPedidos">
+            <div class="cabecalho-pedidos">
                 <div>
-                    <h3 style="font-size: 1.3rem; font-weight: 700;">🛍️ Meus Pedidos Realizados</h3>
+                    <h3>🛍️ Meus Pedidos Realizados</h3>
                     <p class="descricao-loja">Acompanhe o andamento e o status dos seus resgates acadêmicos.</p>
                 </div>
                 <div>
-                    <select id="filtroStatusPedido" style="padding: 10px 16px; border-radius: var(--raio-medio); border: 1px solid var(--cor-borda); background: #fff; font-weight: 600; color: var(--texto-principal); cursor: pointer; outline: none;">
+                    <select id="filtroStatusPedido">
                         <option value="todos">Todos os Status</option>
                         <option value="Pendente">🟡 Pendentes</option>
                         <option value="Aprovado">🔵 Aprovados</option>
@@ -64,19 +64,19 @@
                 </div>
             </div>
 
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <div class="rolagem-horizontal">
+                <table class="tabela-historico">
                     <thead>
-                        <tr style="background: var(--fundo-neutro); border-bottom: 2px solid var(--cor-borda); color: var(--texto-suave); font-size: 0.85rem; text-transform: uppercase; font-weight: 700;">
-                            <th style="padding: 14px 16px;">Item Solicitado</th>
-                            <th style="padding: 14px 16px;">Custo</th>
-                            <th style="padding: 14px 16px; text-align: center;">Status Atual</th>
-                            <th style="padding: 14px 16px; text-align: center;">Ação</th>
+                        <tr>
+                            <th>Item Solicitado</th>
+                            <th>Custo</th>
+                            <th>Status Atual</th>
+                            <th>Ação</th>
                         </tr>
                     </thead>
                     <tbody id="listaPedidosAluno">
                         <tr>
-                            <td colspan="4" style="padding: 24px; text-align: center; color: var(--texto-suave);">Carregando seus pedidos...</td>
+                            <td colspan="4" class="texto-estado texto-estado--tabela">Carregando seus pedidos...</td>
                         </tr>
                     </tbody>
                 </table>

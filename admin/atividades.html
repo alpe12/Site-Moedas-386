@@ -11,7 +11,7 @@
 <body>
 
 <noscript>
-    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+    <div class="aviso-noscript">
         ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
     </div>
 </noscript>
@@ -56,23 +56,23 @@
 
             <label for="busca-aluno">Adicionar aluno (busque por matrícula, nome ou turma)</label>
             <input type="text" id="busca-aluno" autocomplete="off" placeholder="Digite para buscar...">
-            <div id="resultados-busca-aluno" class="admin-busca-resultados" style="display:none;"></div>
+            <div id="resultados-busca-aluno" class="admin-busca-resultados oculto"></div>
 
             <label>Alunos nesta atividade</label>
-            <div id="lista-alunos-selecionados" style="min-height:40px; padding:8px; border:1px dashed var(--admin-borda); border-radius:8px;">
-                <span class="admin-subtitulo" style="font-size:0.85rem;">Nenhum aluno adicionado ainda.</span>
+            <div id="lista-alunos-selecionados" class="admin-lista-selecionados">
+                <span class="admin-subtitulo admin-subtitulo--pequeno">Nenhum aluno adicionado ainda.</span>
             </div>
 
-            <div style="margin-top:20px; display:flex; gap:10px;">
+            <div class="admin-form-acoes">
                 <button type="submit" class="admin-btn">Salvar atividade</button>
-                <button type="button" class="admin-btn secundario" id="btn-cancelar-edicao" style="display:none;">Cancelar edição</button>
+                <button type="button" class="admin-btn secundario oculto" id="btn-cancelar-edicao">Cancelar edição</button>
             </div>
         </form>
     </div>
 
     <div class="admin-cartao">
         <h2>Atividades cadastradas</h2>
-        <div style="overflow-x:auto;">
+        <div class="rolagem-horizontal">
             <table class="admin-tabela">
                 <thead><tr><th>Atividade</th><th>Valor</th><th>Data</th><th>Alunos</th><th></th></tr></thead>
                 <tbody id="corpo-atividades">

@@ -35,6 +35,42 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Aviso de JavaScript desabilitado — mesmo bloco em index/login/loja/perfil/ranking/recuperar */
+.aviso-noscript { background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626; }
+
+/* Utilitários genéricos usados por vários scripts/páginas */
+.oculto { display: none !important; }
+.rolagem-horizontal { overflow-x: auto; }
+.texto-centro { text-align: center; }
+
+/* Estados de carregamento / vazio / erro dos widgets preenchidos via JS —
+   usado na home, loja, ranking e perfil. --tabela é a variante mais
+   espaçosa, pra quando o texto ocupa o lugar de uma tabela/grade inteira. */
+.texto-estado { color: var(--texto-suave); text-align: center; padding: 10px; width: 100%; grid-column: 1 / -1; }
+.texto-estado--erro { color: var(--cor-alerta); font-weight: 700; }
+.texto-estado--tabela { padding: 40px; }
+
+/* Avisos temporários no canto da tela (mostrarAviso(), em script.js) */
+.conteiner-avisos { position: fixed; top: 16px; right: 16px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; max-width: 340px; }
+.aviso-toast {
+    padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    font-size: 0.9rem; font-weight: 600; line-height: 1.4; border-left: 4px solid;
+    opacity: 0; transform: translateX(20px); transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.aviso-toast.aviso-toast--visivel { opacity: 1; transform: translateX(0); }
+.aviso-toast--info { background:#eff6ff; border-left-color:#2563eb; color:#1e3a8a; }
+.aviso-toast--sucesso { background:#f0fdf4; border-left-color:#16a34a; color:#14532d; }
+.aviso-toast--erro { background:#fef2f2; border-left-color:#dc2626; color:#7f1d1d; }
+
+/* Campo de senha com botão de mostrar/ocultar e checklist de regras
+   (melhorarCampoSenha(), em script.js) */
+.wrapper-senha { position: relative; }
+.wrapper-senha input { padding-right: 42px; }
+.botao-mostrar-senha { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.15rem; padding: 6px; line-height: 1; }
+.checklist-senha { margin-top: 8px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 3px; }
+.checklist-senha .regra-ok { color: #4ade80; }
+.checklist-senha .regra-erro { color: #dc2626; }
+
 body {
     font-family: 'Noto Color Emoji', 'Segoe UI', system-ui, -apple-system, sans-serif;
     background-color: var(--bg-light);
@@ -69,6 +105,7 @@ header {
     font-weight: 800; 
     color: var(--text-dark); 
     letter-spacing: -0.5px;
+    text-decoration: none;
 }
 .logo-text span, .texto-logo span { color: var(--primary-blue); }
 
@@ -195,7 +232,14 @@ footer { text-align: center; padding: 40px; color: var(--text-gray); font-size: 
     box-sizing: border-box;
 }
 .acesso h1 { color: var(--primary-dark); text-align: center; }
-#nova_conta { display: none; }
+
+/* Cabeçalho "solto" do login/recuperar (não usa o header/nav-container
+   compartilhado com o resto do site) */
+#pagina_login .logo-text, #pagina_recuperar .logo-text { margin: 12px 30px; display: inline-block; }
+#pagina_login .logo-text span, #pagina_recuperar .logo-text span { color: #0056b3; }
+#rec_token { text-transform: uppercase; }
+.bloco-ajuda-whatsapp { text-align: center; margin-top: 15px; }
+
 .area-cadastro { padding: 30px; background-color: #3492d6b4; text-align: center; border-radius: 22px; width: 100%; max-width: 380px; margin-top: 15px; box-sizing: border-box; }
 
 @media (max-width: 480px) {
@@ -225,6 +269,28 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
     list-style: none;
     margin-top: 0 !important;
 }
+
+/* Formulários de login/cadastro/recuperação — mesmas classes em
+   login.html e recuperar.html, sem regra própria até agora. */
+.cadastrar { margin-top: 20px; border-bottom: 1px solid #fff; padding-bottom: 20px; }
+.redes { border-top: 1px solid #fff; padding-top: 20px; }
+.link-claro { color: #fff; font-size: 0.8rem; text-decoration: underline; }
+.link-claro--grande { font-size: 0.9rem; }
+.texto-claro { color: #fff; font-size: 0.8rem; }
+.btn-entrar--bloco { margin-top: 10px; display: block; text-align: center; }
+.btn-entrar--escuro { background-color: var(--primary-dark); color: #fff; }
+.btn-entrar--cinza { background: #475569; }
+.btn-entrar--flex { flex: 1; }
+
+/* Modal de código de recuperação, mostrado uma vez após o cadastro
+   (mostrarModalToken(), em script_login_perfil.js) */
+.modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal-cadastro { background: #fff; border-radius: 16px; padding: 32px; max-width: 400px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+.modal-cadastro h2 { margin-bottom: 8px; }
+.modal-cadastro__intro { color: #475569; font-size: 0.95rem; margin-bottom: 16px; }
+.modal-cadastro__token { font-size: 2rem; font-weight: 800; letter-spacing: 6px; background: #f1f5f9; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+.modal-cadastro__acoes { display: flex; gap: 10px; justify-content: center; }
+.modal-cadastro__aviso { color: #b45309; background: #fef3c7; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; margin-top: 14px; }
 
 /* ==========================================
    6. LAYOUT E CORREÇÕES DAS PÁGINAS SINGLE (Ranking / Perfil)
@@ -275,6 +341,10 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
 }
 .link-acao:hover { color: var(--primary-dark); }
 
+/* Dentro do aviso âmbar de turma pendente, o botão "Cancelar solicitação"
+   deve herdar a cor do aviso, não a azul padrão do .link-acao. */
+.aviso-pendente .link-acao { color: inherit; }
+
 .aviso-pendente {
     color: var(--bronze);
     background: var(--bronze-claro);
@@ -299,6 +369,11 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
     border-radius: var(--raio-medio);
     font-size: 0.9rem;
 }
+/* O botão "Confirmar" some junto de outros botões de largura total do
+   .btn-entrar — aqui ele fica lado a lado com o campo de turma. */
+.form-troca-turma .btn-entrar { width: auto; padding: 8px 18px; display: inline-block; }
+
+.saldo-aluno { font-weight: bold; margin-top: 10px; font-size: 1.2rem; }
 .texto-ajuda-turma {
     width: 100%;
     margin: 4px 0 0;
@@ -425,6 +500,7 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
     gap: 16px !important;
     justify-content: space-between !important;
     width: 100% !important;
+    margin: 10px auto;
 }
 
 /* Transforma cada elemento de turma do ranking em um card vertical perfeito */
@@ -461,6 +537,14 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
 .main-content-single .silver-border { border: 2px solid var(--prata) !important; background-color: var(--prata-claro) !important; }
 .main-content-single .bronze-border { border: 2px solid var(--bronze) !important; background-color: var(--bronze-claro) !important; }
 .main-content-single .red-border { border: 2px solid var(--coral) !important; background-color: var(--coral-claro) !important; }
+
+/* Selo "1º/2º/3º Lugar" do resumo por turma: mesma classe de borda do
+   card reaproveitada pra colorir o selo (cores próprias, não as
+   variáveis --ouro/--prata/--bronze — mantém a cor exata que já existia). */
+.main-content-single .turma-card .tag-azul.gold-border { background: #ffc107 !important; color: #000 !important; }
+.main-content-single .turma-card .tag-azul.silver-border { background: #c0c0c0 !important; color: #000 !important; }
+.main-content-single .turma-card .tag-azul.bronze-border { background: #cd7f32 !important; color: #000 !important; }
+.main-content-single .turma-card .tag-azul.red-border { background: #fa735b !important; color: #000 !important; }
 
 .main-content-single .turma-card h3 {
     font-size: 1.3rem !important;
@@ -500,6 +584,16 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
     opacity: 0.8;
     text-decoration: underline;
 }
+
+/* Barra de busca + limite do ranking geral (ranking.html) */
+.cabecalho-ranking { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+.cabecalho-ranking h2 { margin-top: 10px; }
+.card--tabela { padding: 0; overflow-x: auto; }
+.controles-ranking { display: flex; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 10px; }
+.controles-ranking .grupo-busca { display: flex; align-items: center; flex: 1 1 160px; min-width: 160px; }
+.controles-ranking .grupo-busca input { width: 100%; max-width: 220px; }
+.controles-ranking label { font-size: 0.85rem; color: var(--text-gray); display: flex; align-items: center; gap: 6px; }
+.controles-ranking select { padding: 6px 10px; border-radius: var(--raio-medio); border: 1px solid var(--cor-borda); }
 
 /* ==========================================
    9. AJUSTES PARA TELAS DE CELULAR (tablets já ficam bem com as regras acima)

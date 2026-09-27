@@ -11,7 +11,7 @@
 <body>
 
 <noscript>
-    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+    <div class="aviso-noscript">
         ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
     </div>
 </noscript>
@@ -36,9 +36,9 @@
     <p class="admin-subtitulo">Busque um aluno para ver tudo que o sistema guarda sobre ele: dados de cadastro, saldo, atividades, pedidos e histórico de turmas — tudo num só lugar.</p>
 
     <div class="admin-cartao admin-form">
-        <label for="busca-aluno-perfil" style="margin-top:0;">Buscar aluno (nome, matrícula ou turma)</label>
+        <label for="busca-aluno-perfil" class="admin-label-topo">Buscar aluno (nome, matrícula ou turma)</label>
         <input type="text" id="busca-aluno-perfil" autocomplete="off" placeholder="Digite para buscar...">
-        <div id="resultados-busca-aluno-perfil" class="admin-busca-resultados" style="display:none;"></div>
+        <div id="resultados-busca-aluno-perfil" class="admin-busca-resultados oculto"></div>
     </div>
 
     <div id="estado-perfil">
@@ -47,43 +47,43 @@
         </div>
     </div>
 
-    <div id="perfil-aluno" style="display:none;">
+    <div id="perfil-aluno" class="oculto">
 
         <div class="admin-cartao">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+            <div class="admin-perfil-cabecalho">
                 <div>
-                    <h2 id="perfil-nome" style="margin:0 0 4px;">—</h2>
-                    <p class="admin-subtitulo" style="margin:0;" id="perfil-subtitulo">—</p>
+                    <h2 id="perfil-nome">—</h2>
+                    <p class="admin-subtitulo" id="perfil-subtitulo">—</p>
                 </div>
-                <div id="perfil-tags" style="text-align:right;"></div>
+                <div id="perfil-tags" class="admin-perfil-tags"></div>
             </div>
-            <div class="admin-grid-2" style="margin-top:18px;">
-                <div style="background:var(--admin-fundo); border-radius:8px; padding:14px 16px;">
-                    <div style="font-size:0.75rem; text-transform:uppercase; color:var(--admin-texto-suave); font-weight:700;">Ganho total</div>
-                    <div style="font-size:1.4rem; font-weight:800;" id="perfil-ganho">🪙 0.00</div>
+            <div class="admin-grid-2">
+                <div class="admin-stat">
+                    <div class="admin-stat__rotulo">Ganho total</div>
+                    <div class="admin-stat__valor" id="perfil-ganho">🪙 0.00</div>
                 </div>
-                <div style="background:var(--admin-fundo); border-radius:8px; padding:14px 16px;">
-                    <div style="font-size:0.75rem; text-transform:uppercase; color:var(--admin-texto-suave); font-weight:700;">Gasto total</div>
-                    <div style="font-size:1.4rem; font-weight:800;" id="perfil-gasto">🪙 0.00</div>
+                <div class="admin-stat">
+                    <div class="admin-stat__rotulo">Gasto total</div>
+                    <div class="admin-stat__valor" id="perfil-gasto">🪙 0.00</div>
                 </div>
-                <div style="background:var(--admin-fundo); border-radius:8px; padding:14px 16px;">
-                    <div style="font-size:0.75rem; text-transform:uppercase; color:var(--admin-texto-suave); font-weight:700;">Saldo atual</div>
-                    <div style="font-size:1.4rem; font-weight:800; color:var(--admin-verde);" id="perfil-saldo">🪙 0.00</div>
+                <div class="admin-stat">
+                    <div class="admin-stat__rotulo">Saldo atual</div>
+                    <div class="admin-stat__valor admin-stat__valor--positivo" id="perfil-saldo">🪙 0.00</div>
                 </div>
             </div>
-            <p id="perfil-expiracoes" class="admin-subtitulo" style="margin:12px 0 0; font-size:0.8rem; display:none;"></p>
+            <p id="perfil-expiracoes" class="admin-subtitulo admin-nota-tabela oculto"></p>
         </div>
 
         <div class="admin-cartao">
             <h2>📋 Dados de cadastro</h2>
-            <table class="admin-tabela">
+            <table class="admin-tabela admin-tabela--cadastro">
                 <tbody id="tabela-cadastro"></tbody>
             </table>
         </div>
 
         <div class="admin-cartao">
             <h2>🏫 Histórico de turmas</h2>
-            <div style="overflow-x:auto;">
+            <div class="rolagem-horizontal">
                 <table class="admin-tabela">
                     <thead><tr><th>Turma</th><th>Ano</th><th>Solicitada em</th><th>Status</th></tr></thead>
                     <tbody id="tabela-turmas"></tbody>
@@ -93,26 +93,26 @@
 
         <div class="admin-cartao">
             <h2>🪙 Atividades (extrato completo)</h2>
-            <div style="overflow-x:auto;">
+            <div class="rolagem-horizontal">
                 <table class="admin-tabela">
                     <thead><tr><th>Data</th><th>Atividade</th><th>Valor</th><th>Turma na época</th></tr></thead>
                     <tbody id="tabela-atividades"></tbody>
                 </table>
             </div>
-            <p class="admin-subtitulo" style="margin:12px 0 0; font-size:0.8rem;">
+            <p class="admin-subtitulo admin-nota-tabela">
                 Para editar ou remover um lançamento, use a tela <a href="atividades.html">Atividades</a>.
             </p>
         </div>
 
         <div class="admin-cartao">
             <h2>🛍️ Pedidos na loja (todos)</h2>
-            <div style="overflow-x:auto;">
+            <div class="rolagem-horizontal">
                 <table class="admin-tabela">
                     <thead><tr><th>Data</th><th>Item</th><th>Valor</th><th>Status</th><th>Turma na época</th></tr></thead>
                     <tbody id="tabela-pedidos"></tbody>
                 </table>
             </div>
-            <p class="admin-subtitulo" style="margin:12px 0 0; font-size:0.8rem;">
+            <p class="admin-subtitulo admin-nota-tabela">
                 Para alterar o status de um pedido, use a tela <a href="pedidos.html">Pedidos</a>.
             </p>
         </div>

@@ -21,12 +21,13 @@
 }
 .texto-boas-vindas h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; color: #0f172a; }
 .texto-boas-vindas p { color: #334155; font-size: 0.95rem; max-width: 600px; }
-.botao-principal-painel { background: var(--primary-blue); color: #fff; border: none; padding: 12px 24px; border-radius: var(--raio-medio); font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+.botao-principal-painel { background: var(--primary-blue); color: #fff; border: none; padding: 12px 24px; border-radius: var(--raio-medio); font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; display: inline-block; text-decoration: none; text-align: center; }
 .botao-principal-painel:hover { background: var(--primary-dark); }
 
 /* Carrossel de Imagens */
 .conteiner-carrossel { position: relative; aspect-ratio: 21 / 10; max-height: 340px; overflow: hidden; border-radius: var(--raio-grande); box-shadow: var(--sombra-media); margin-bottom: 24px; background: #000; }
 .meus-slides { display: none; height: 100%; }
+.meus-slides.ativo { display: block; }
 .meus-slides img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
 .legenda-slide { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 24px; font-weight: 700; color: #fff; font-size: 1.1rem; }
 .anterior, .proximo { cursor: pointer; position: absolute; top: 0; height: 100%; width: 50px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 24px; text-decoration: none; opacity: 0; transition: 0.2s; z-index: 10; }
@@ -39,11 +40,15 @@
 .botao-numero { background: #f1f5f9; border: none; padding: 8px 16px; border-radius: var(--raio-medio); color: var(--text-gray); font-weight: 700; cursor: pointer; transition: 0.2s; }
 .botao-numero.ativo { background: var(--primary-blue); color: #fff; }
 .tag-status { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; display: inline-block; margin-bottom: 12px; color: #ffffff !important; background-color: var(--primary-blue); }
+.tag-status.tag-esporte { background-color: #0e4768; }
+.tag-status.tag-oficina { background-color: #fd7e14; }
 .caixa-conteudo h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
 .descricao { color: var(--text-gray); font-size: 0.95rem; margin-bottom: 16px; }
 .rodape-info { font-size: 0.85rem; color: var(--text-gray); border-top: 1px solid var(--border); padding-top: 12px; font-weight: 500; }
 .botao-acao { background: var(--text-dark); color: #fff; border: none; padding: 10px 20px; border-radius: var(--raio-medio); font-weight: 600; cursor: pointer; margin-top: 16px; transition: 0.2s; }
 .botao-acao:hover { background: #000; }
+.botao-evento { display: none; }
+.botao-evento.ativo { display: inline-block; }
 
 /* Menu Expansível (Acordeon) */
 .titulo-secao { font-size: 1.2rem; font-weight: 800; margin: 32px 0 16px; }
@@ -60,7 +65,7 @@
 .cartao-loja-destaque { background: linear-gradient(135deg, #fef08a, #fef9c3); border: 1px solid #fef23a; border-radius: var(--raio-grande); padding: 24px; margin-bottom: 24px; }
 .cartao-loja-destaque h2 { font-size: 1.3rem; font-weight: 800; margin: 6px 0; }
 .cartao-loja-destaque p { font-size: 0.9rem; color: #713f12; margin-bottom: 14px; }
-.botao-secundario { background: #713f12; color: #fff; border: none; padding: 8px 16px; border-radius: var(--raio-medio); font-weight: 600; cursor: pointer; }
+.botao-secundario { background: #713f12; color: #fff; border: none; padding: 8px 16px; border-radius: var(--raio-medio); font-weight: 600; cursor: pointer; display: inline-block; text-decoration: none; text-align: center; }
 
 /* Gráficos do Mini Ranking Lateral */
 .titulo-widget { font-size: 1rem; font-weight: 800; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }

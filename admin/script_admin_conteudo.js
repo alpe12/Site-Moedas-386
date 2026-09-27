@@ -4,7 +4,7 @@ const RENDERIZADORES_LINHA = {
     carrossel: (item) => `
         <td>${item.ordem}</td>
         <td>${escapeHtml(item.legenda)}</td>
-        <td style="max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(item.imagem)}</td>
+        <td class="admin-celula-truncada">${escapeHtml(item.imagem)}</td>
         <td>${tagStatus(item.ativo)}</td>
         <td>${botoesAcao(item.id, 'carrossel', item.ativo)}</td>`,
     eventos: (item) => `
@@ -26,7 +26,7 @@ function tagStatus(ativo) {
 
 function botoesAcao(id, tipo, ativo) {
     return `
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <div class="admin-acoes-linha">
             <button type="button" class="admin-btn secundario pequeno" data-editar="${escapeHtml(id)}" data-tipo-btn="${tipo}">Editar</button>
             <button type="button" class="admin-btn ${ativo ? 'secundario' : 'sucesso'} pequeno" data-toggle="${escapeHtml(id)}" data-tipo-btn="${tipo}" data-ativo="${ativo ? '1' : '0'}">${ativo ? 'Desativar' : 'Ativar'}</button>
             <button type="button" class="admin-btn secundario pequeno" data-duplicar="${escapeHtml(id)}" data-tipo-btn="${tipo}">Duplicar</button>
@@ -109,12 +109,12 @@ function formularioDoTipo(tipo) {
 function abrirFormularioParaCriar(tipo) {
     const form = formularioDoTipo(tipo);
     limparFormularioConteudo(form);
-    form.style.display = 'block';
+    form.classList.remove('oculto');
     form.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function esconderFormulario(form) {
-    form.style.display = 'none';
+    form.classList.add('oculto');
     limparFormularioConteudo(form);
 }
 
@@ -134,7 +134,7 @@ function carregarParaEdicaoConteudo(tipo, id) {
         previewImagemCarrossel.atualizarPreview(item.imagem);
     }
 
-    form.style.display = 'block';
+    form.classList.remove('oculto');
     form.scrollIntoView({ behavior: 'smooth', block: 'center' });
     atualizarPreviewSlideSeVisivel();
 }
@@ -147,30 +147,30 @@ function limparFormularioConteudo(form) {
     if (form.dataset.tipo === 'carrossel') {
         form.querySelector('.campo-imagem-url').value = '';
         previewImagemCarrossel.atualizarPreview('');
-        form.querySelector('.preview-slide-carrossel').style.display = 'none';
+        form.querySelector('.preview-slide-carrossel').classList.add('oculto');
     }
 }
 
 function alternarPreviewSlide() {
     const painel = formularioDoTipo('carrossel').querySelector('.preview-slide-carrossel');
-    const mostrando = painel.style.display !== 'none';
-    painel.style.display = mostrando ? 'none' : 'block';
-    if (!mostrando) atualizarPreviewSlideSeVisivel();
+    const estaOculto = painel.classList.contains('oculto');
+    painel.classList.toggle('oculto', !estaOculto);
+    if (estaOculto) atualizarPreviewSlideSeVisivel();
 }
 
 function atualizarPreviewSlideSeVisivel() {
     const form = formularioDoTipo('carrossel');
     const painel = form.querySelector('.preview-slide-carrossel');
-    if (painel.style.display === 'none') return;
+    if (painel.classList.contains('oculto')) return;
 
     const legenda = form.querySelector('[data-campo="legenda"]').value.trim() || 'Legenda do slide';
     const imagem = form.querySelector('[data-campo="imagem"]').value.trim();
 
     painel.querySelector('.preview-slide-conteudo').innerHTML = `
-        <div class="meus-slides" style="display:block; position:relative;">
+        <div class="meus-slides ativo admin-slide-mock">
             ${imagem
-                ? `<img src="${escapeHtml(resolverCaminhoImagemAdmin(imagem))}" alt="" style="width:100%; border-radius:8px;">`
-                : `<div style="background:var(--admin-borda); height:100%; display:flex; align-items:center; justify-content:center; color:var(--admin-texto-suave);">Sem imagem</div>`}
+                ? `<img src="${escapeHtml(resolverCaminhoImagemAdmin(imagem))}" alt="">`
+                : `<div class="admin-slide-mock-sem-imagem">Sem imagem</div>`}
             <div class="legenda-slide">${escapeHtml(legenda)}</div>
         </div>`;
 }

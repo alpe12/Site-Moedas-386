@@ -28,7 +28,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (dadosLoja.autenticado === false) {
             // Modo "loja visível sem login": mostra o catálogo, mas sem
             // saldo/pedidos (isso exige estar logado).
-            document.getElementById('secaoPedidos').style.display = 'none';
+            document.getElementById('secaoPedidos').classList.add('oculto');
             document.getElementById('saldoExibido').innerText = `🪙 Faça login no Perfil para ver seu saldo e resgatar prêmios`;
             renderizarGradeItens(cacheItensLoja, false, 'deslogado');
             return;
@@ -49,10 +49,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 function mostrarSecaoDeslogado() {
-    document.getElementById('secaoPedidos').style.display = 'none';
+    document.getElementById('secaoPedidos').classList.add('oculto');
     document.getElementById('saldoExibido').innerText = `🪙 Faça login para acessar a loja.`;
-    document.getElementById('avisoLoginLoja').style.display = 'block';
-    document.getElementById('grade-itens-loja').style.display = 'none';
+    document.getElementById('avisoLoginLoja').classList.remove('oculto');
+    document.getElementById('grade-itens-loja').classList.add('oculto');
 }
 
 function renderizarGradeItens(itens, contaAtiva, motivoBloqueio) {
@@ -60,8 +60,7 @@ function renderizarGradeItens(itens, contaAtiva, motivoBloqueio) {
     if (!grade) return;
 
     if (itens.length === 0) {
-        grade.innerHTML = `<p style="text-align:center; color:var(--text-gray); grid-column: 1 / -1;">
-            Nenhum item disponível no momento.</p>`;
+        grade.innerHTML = `<p class="texto-estado">Nenhum item disponível no momento.</p>`;
         return;
     }
 
@@ -75,7 +74,7 @@ function renderizarGradeItens(itens, contaAtiva, motivoBloqueio) {
         <div class="cartao cartao-item-loja" data-item-id="${escapeHtml(item.id)}">
             <div class="icone-item-loja" aria-hidden="true">
                 ${item.imagem
-                    ? `<img src="${escapeHtml(item.imagem)}" alt="${escapeHtml(item.nome)}" style="width:100%; height:100%; object-fit:cover; border-radius: inherit;">`
+                    ? `<img src="${escapeHtml(item.imagem)}" alt="${escapeHtml(item.nome)}">`
                     : escapeHtml(item.icone || ICONE_PADRAO)}
             </div>
             <h3>${escapeHtml(item.nome)}</h3>
@@ -114,7 +113,7 @@ async function carregarPedidosDoAluno() {
     } catch (erro) {
         console.error("Erro ao carregar lista de pedidos:", erro);
         document.getElementById("listaPedidosAluno").innerHTML = `
-            <tr><td colspan="4" style="padding:24px; text-align:center; color:var(--cor-alerta); font-weight:600;">
+            <tr><td colspan="4" class="texto-estado texto-estado--tabela texto-estado--erro">
             Não foi possível carregar seu histórico de pedidos.</td></tr>`;
     }
 }
@@ -136,29 +135,31 @@ function renderizarTabelaPedidos(listaDePedidos) {
     tbody.innerHTML = "";
 
     if (listaDePedidos.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="padding:24px; text-align:center; color:var(--text-gray);">
+        tbody.innerHTML = `<tr><td colspan="4" class="texto-estado texto-estado--tabela">
             Nenhum pedido encontrado.</td></tr>`;
         return;
     }
 
+    const classesPorStatus = {
+        Aprovado: 'status-pedido--aprovado',
+        Resgatado: 'status-pedido--resgatado',
+        Cancelado: 'status-pedido--cancelado',
+    };
+
     listaDePedidos.forEach(pedido => {
-        let corFundo = "#fef3c7", corTexto = "#d97706";
-        if (pedido.status === "Aprovado") { corFundo = "#dbeafe"; corTexto = "var(--primary-blue)"; }
-        if (pedido.status === "Resgatado") { corFundo = "#dcfce7"; corTexto = "var(--success-green)"; }
-        if (pedido.status === "Cancelado") { corFundo = "#f1f5f9"; corTexto = "var(--text-gray)"; }
+        const classeStatus = classesPorStatus[pedido.status] || '';
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td style="padding:14px 16px; font-weight:700;">${escapeHtml(pedido.item)}</td>
-            <td style="padding:14px 16px; font-weight:600; color:var(--text-gray);">🪙 ${formatarMoeda(pedido.valor)}</td>
-            <td style="padding:14px 16px; text-align:center;">
-                <span style="background:${corFundo}; color:${corTexto}; padding:6px 14px; border-radius:20px;
-                font-size:0.75rem; font-weight:700; display:inline-block; text-transform:uppercase;">
+            <td>${escapeHtml(pedido.item)}</td>
+            <td>🪙 ${formatarMoeda(pedido.valor)}</td>
+            <td>
+                <span class="status-pedido ${classeStatus}">
                     ${escapeHtml(pedido.status)}
                 </span>
             </td>
-            <td style="padding:14px 16px; text-align:center;">
-                ${pedido.cancelavel ? `<button class="botao-cancelar-pedido" style="background:#fff; border:1px solid var(--cor-alerta); color:var(--cor-alerta); border-radius:6px; padding:6px 12px; font-size:0.8rem; font-weight:700; cursor:pointer;">Cancelar</button>` : ''}
+            <td>
+                ${pedido.cancelavel ? `<button class="botao-cancelar-pedido">Cancelar</button>` : ''}
             </td>`;
 
         if (pedido.cancelavel) {

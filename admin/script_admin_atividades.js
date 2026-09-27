@@ -9,7 +9,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('busca-aluno').addEventListener('input', (e) => {
         clearTimeout(debounceBuscaAluno);
         const termo = e.target.value.trim();
-        if (!termo) { document.getElementById('resultados-busca-aluno').style.display = 'none'; return; }
+        if (!termo) { document.getElementById('resultados-busca-aluno').classList.add('oculto'); return; }
         debounceBuscaAluno = setTimeout(() => buscarAlunos(termo), 300);
     });
 
@@ -20,7 +20,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const conteiner = document.getElementById('resultados-busca-aluno');
         const campoBusca = document.getElementById('busca-aluno');
         if (!conteiner.contains(e.target) && e.target !== campoBusca) {
-            conteiner.style.display = 'none';
+            conteiner.classList.add('oculto');
         }
     });
 
@@ -51,21 +51,20 @@ function renderizarResultadosBusca() {
     const conteiner = document.getElementById('resultados-busca-aluno');
 
     if (ultimosResultadosBusca.length === 0) {
-        conteiner.innerHTML = '<div class="item-resultado" style="cursor:default; color:var(--admin-texto-suave);">Nenhum aluno encontrado.</div>';
-        conteiner.style.display = 'block';
+        conteiner.innerHTML = '<div class="item-resultado item-resultado--vazio">Nenhum aluno encontrado.</div>';
+        conteiner.classList.remove('oculto');
         return;
     }
 
     conteiner.innerHTML = ultimosResultadosBusca.map(a => {
         const jaAdicionado = alunosSelecionados.some(sel => sel.matricula === a.matricula);
         return `
-            <div class="item-resultado" data-matricula="${escapeHtml(a.matricula)}" data-nome="${escapeHtml(a.nome)}" data-turma="${escapeHtml(a.turma)}"
-                 style="${jaAdicionado ? 'cursor:default; color:var(--admin-texto-suave); background:var(--admin-fundo);' : ''}">
+            <div class="item-resultado${jaAdicionado ? ' item-resultado--adicionado' : ''}" data-matricula="${escapeHtml(a.matricula)}" data-nome="${escapeHtml(a.nome)}" data-turma="${escapeHtml(a.turma)}">
                 ${jaAdicionado ? '✓ ' : ''}<strong>${escapeHtml(a.nome)}</strong> — matrícula ${escapeHtml(a.matricula)}, turma ${escapeHtml(a.turma)}
                 ${jaAdicionado ? ' <em>(já adicionado)</em>' : ''}
             </div>`;
     }).join('');
-    conteiner.style.display = 'block';
+    conteiner.classList.remove('oculto');
 
     conteiner.querySelectorAll('.item-resultado[data-matricula]').forEach(item => {
         const matricula = item.dataset.matricula;
@@ -104,7 +103,7 @@ async function removerAlunoSelecionado(matricula, nome) {
 function renderizarAlunosSelecionados() {
     const conteiner = document.getElementById('lista-alunos-selecionados');
     if (alunosSelecionados.length === 0) {
-        conteiner.innerHTML = '<span class="admin-subtitulo" style="font-size:0.85rem;">Nenhum aluno adicionado ainda.</span>';
+        conteiner.innerHTML = '<span class="admin-subtitulo admin-subtitulo--pequeno">Nenhum aluno adicionado ainda.</span>';
         return;
     }
     conteiner.innerHTML = alunosSelecionados.map(a => `
@@ -149,13 +148,13 @@ function renderizarAtividades() {
             <td>${a.valor > 0 ? '+' : ''}${formatarMoeda(a.valor)}</td>
             <td>${escapeHtml(a.data)}</td>
             <td>${a.alunos.length}</td>
-            <td style="white-space:nowrap;">
+            <td class="admin-celula-acoes">
                 <button type="button" class="admin-btn secundario pequeno" data-editar="${escapeHtml(a.id)}">Editar</button>
                 <button type="button" class="admin-btn perigo pequeno" data-remover="${escapeHtml(a.id)}">Remover</button>
             </td>
         </tr>
-        <tr class="linha-detalhe" data-detalhe-de="${escapeHtml(a.id)}" style="display:none;">
-            <td colspan="5" style="background:var(--admin-fundo);">
+        <tr class="linha-detalhe oculto" data-detalhe-de="${escapeHtml(a.id)}">
+            <td colspan="5" class="celula-detalhe">
                 ${a.alunos.length === 0 ? '<span class="admin-subtitulo">Nenhum aluno.</span>' : `
                 <table class="admin-tabela">
                     <thead><tr><th>Nome</th><th>Matrícula</th><th>Turma</th></tr></thead>
@@ -170,7 +169,7 @@ function renderizarAtividades() {
     corpo.querySelectorAll('[data-toggle]').forEach(btn => {
         btn.addEventListener('click', () => {
             const linha = corpo.querySelector(`.linha-detalhe[data-detalhe-de="${CSS.escape(btn.dataset.toggle)}"]`);
-            if (linha) linha.style.display = linha.style.display === 'none' ? 'table-row' : 'none';
+            if (linha) linha.classList.toggle('oculto');
         });
     });
     corpo.querySelectorAll('[data-editar]').forEach(btn => {
@@ -191,11 +190,11 @@ function carregarParaEdicao(id) {
     document.getElementById('atividade-data').value = atividade.data;
     alunosSelecionados = atividade.alunos.map(a => ({ matricula: a.matricula, nome: a.nome, turma: a.turma }));
     renderizarAlunosSelecionados();
-    document.getElementById('resultados-busca-aluno').style.display = 'none';
+    document.getElementById('resultados-busca-aluno').classList.add('oculto');
     document.getElementById('busca-aluno').value = '';
 
     document.getElementById('titulo-formulario').textContent = 'Editar atividade';
-    document.getElementById('btn-cancelar-edicao').style.display = 'inline-block';
+    document.getElementById('btn-cancelar-edicao').classList.remove('oculto');
     document.querySelector('.admin-cartao').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -206,10 +205,10 @@ function limparFormulario() {
     document.getElementById('atividade-data').value = new Date().toISOString().slice(0, 10);
     alunosSelecionados = [];
     renderizarAlunosSelecionados();
-    document.getElementById('resultados-busca-aluno').style.display = 'none';
+    document.getElementById('resultados-busca-aluno').classList.add('oculto');
     document.getElementById('busca-aluno').value = '';
     document.getElementById('titulo-formulario').textContent = 'Nova atividade';
-    document.getElementById('btn-cancelar-edicao').style.display = 'none';
+    document.getElementById('btn-cancelar-edicao').classList.add('oculto');
 }
 
 async function salvarAtividade(e) {

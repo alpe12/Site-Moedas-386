@@ -32,7 +32,7 @@ function garantirConteinerAvisos() {
     if (!c) {
         c = document.createElement('div');
         c.id = 'conteiner-avisos';
-        c.style.cssText = 'position: fixed; top: 16px; right: 16px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; max-width: 340px;';
+        c.className = 'conteiner-avisos';
         document.body.appendChild(c);
     }
     return c;
@@ -40,23 +40,16 @@ function garantirConteinerAvisos() {
 
 function mostrarAviso(mensagem, tipo = 'info', duracaoMs = 4500) {
     const conteiner = garantirConteinerAvisos();
-    const cores = {
-        info: { fundo: '#eff6ff', borda: '#2563eb', texto: '#1e3a8a' },
-        sucesso: { fundo: '#f0fdf4', borda: '#16a34a', texto: '#14532d' },
-        erro: { fundo: '#fef2f2', borda: '#dc2626', texto: '#7f1d1d' },
-    };
-    const cor = cores[tipo] || cores.info;
+    const classesPorTipo = { info: 'aviso-toast--info', sucesso: 'aviso-toast--sucesso', erro: 'aviso-toast--erro' };
+    const classeTipo = classesPorTipo[tipo] || classesPorTipo.info;
 
     const aviso = document.createElement('div');
-    aviso.style.cssText = `background:${cor.fundo}; border-left:4px solid ${cor.borda}; color:${cor.texto};
-        padding:12px 16px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); font-size:0.88rem;
-        font-weight:600; line-height:1.4; opacity:0; transform:translateX(20px); transition:opacity .25s,transform .25s;`;
+    aviso.className = `aviso-toast ${classeTipo}`;
     aviso.textContent = mensagem;
     conteiner.appendChild(aviso);
-    requestAnimationFrame(() => { aviso.style.opacity = '1'; aviso.style.transform = 'translateX(0)'; });
+    requestAnimationFrame(() => aviso.classList.add('aviso-toast--visivel'));
     setTimeout(() => {
-        aviso.style.opacity = '0';
-        aviso.style.transform = 'translateX(20px)';
+        aviso.classList.remove('aviso-toast--visivel');
         setTimeout(() => aviso.remove(), 300);
     }, duracaoMs);
 }
@@ -65,11 +58,11 @@ function mostrarAviso(mensagem, tipo = 'info', duracaoMs = 4500) {
 function confirmarAcao(mensagem, textoBotaoConfirmar = 'Confirmar') {
     return new Promise(resolve => {
         const overlay = document.createElement('div');
-        overlay.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.55); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px;';
+        overlay.className = 'admin-modal-overlay';
         overlay.innerHTML = `
-            <div style="background:#fff; border-radius:12px; padding:24px; max-width:380px; width:100%; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
-                <p style="margin:0 0 20px; font-size:0.95rem; color:#1e293b;">${escapeHtml(mensagem)}</p>
-                <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <div class="admin-modal-cartao">
+                <p class="admin-modal-texto">${escapeHtml(mensagem)}</p>
+                <div class="admin-modal-acoes">
                     <button class="admin-btn secundario" id="admin-confirmar-nao">Cancelar</button>
                     <button class="admin-btn perigo" id="admin-confirmar-sim">${escapeHtml(textoBotaoConfirmar)}</button>
                 </div>
@@ -88,14 +81,14 @@ function confirmarAcao(mensagem, textoBotaoConfirmar = 'Confirmar') {
 function escolherAcao(mensagem, opcoes) {
     return new Promise(resolve => {
         const overlay = document.createElement('div');
-        overlay.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.55); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px;';
+        overlay.className = 'admin-modal-overlay';
         const botoesHtml = opcoes.map((op, i) =>
             `<button class="admin-btn ${escapeHtml(op.classe || 'secundario')}" data-i="${i}">${escapeHtml(op.texto)}</button>`
         ).join('');
         overlay.innerHTML = `
-            <div style="background:#fff; border-radius:12px; padding:24px; max-width:420px; width:100%; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
-                <p style="margin:0 0 20px; font-size:0.95rem; color:#1e293b;">${escapeHtml(mensagem)}</p>
-                <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+            <div class="admin-modal-cartao admin-modal-cartao--largo">
+                <p class="admin-modal-texto">${escapeHtml(mensagem)}</p>
+                <div class="admin-modal-acoes">
                     <button class="admin-btn secundario" id="admin-escolher-cancelar">Cancelar</button>
                     ${botoesHtml}
                 </div>
@@ -153,16 +146,15 @@ function tratarNaoAutenticado(resposta) {
  */
 function melhorarCampoSenha(input, { checklist = false, regras = null } = {}) {
     const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'position:relative;';
+    wrapper.className = 'wrapper-senha';
     input.replaceWith(wrapper);
     wrapper.appendChild(input);
-    input.style.paddingRight = '42px';
 
     const botao = document.createElement('button');
     botao.type = 'button';
     botao.textContent = '👁️';
     botao.setAttribute('aria-label', 'Mostrar senha');
-    botao.style.cssText = 'position:absolute; right:4px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.15rem; padding:6px; line-height:1;';
+    botao.className = 'botao-mostrar-senha';
     wrapper.appendChild(botao);
     botao.addEventListener('click', () => {
         const mostrando = input.type === 'text';
@@ -173,7 +165,7 @@ function melhorarCampoSenha(input, { checklist = false, regras = null } = {}) {
 
     if (checklist && regras) {
         const lista = document.createElement('div');
-        lista.style.cssText = 'margin-top:8px; font-size:0.8rem; display:flex; flex-direction:column; gap:3px;';
+        lista.className = 'checklist-senha';
         wrapper.insertAdjacentElement('afterend', lista);
 
         const itens = [{ testar: v => v.length >= regras.senhaMinTamanho, texto: `Pelo menos ${regras.senhaMinTamanho} caracteres` }];
@@ -184,7 +176,7 @@ function melhorarCampoSenha(input, { checklist = false, regras = null } = {}) {
         const render = () => {
             lista.innerHTML = itens.map(item => {
                 const ok = item.testar(input.value);
-                return `<span style="color:${ok ? '#4ade80' : '#dc2626'};">${ok ? '✓' : '✗'} ${escapeHtml(item.texto)}</span>`;
+                return `<span class="${ok ? 'regra-ok' : 'regra-erro'}">${ok ? '✓' : '✗'} ${escapeHtml(item.texto)}</span>`;
             }).join('');
         };
         input.addEventListener('input', render);
@@ -209,11 +201,11 @@ function configurarCampoImagem({ inputArquivo, inputUrl, botaoBaixar, botaoRemov
     function atualizarPreview(caminho) {
         if (elementoPreview) {
             elementoPreview.innerHTML = caminho
-                ? `<img src="${escapeHtml(resolverCaminhoImagemAdmin(caminho))}" alt="" style="width:100%; height:100%; object-fit:cover;">`
-                : `<span style="color:var(--admin-texto-suave); font-size:0.7rem; text-align:center; padding:4px;">Sem imagem</span>`;
+                ? `<img src="${escapeHtml(resolverCaminhoImagemAdmin(caminho))}" alt="" class="admin-preview-imagem">`
+                : `<span class="admin-preview-vazio">Sem imagem</span>`;
         }
         if (botaoRemover) {
-            botaoRemover.style.display = caminho ? 'inline-block' : 'none';
+            botaoRemover.classList.toggle('oculto', !caminho);
         }
     }
 
@@ -357,7 +349,7 @@ function iconeHistoricoTurma(historico) {
 
 function mostrarHistoricoTurmaModal(historico) {
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.55); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px;';
+    overlay.className = 'admin-modal-overlay';
     const linhas = historico.map(h => `
         <tr>
             <td>${escapeHtml(h.turma)}</td>
@@ -366,13 +358,13 @@ function mostrarHistoricoTurmaModal(historico) {
             <td>${escapeHtml(rotuloStatusTurma(h.status))}</td>
         </tr>`).join('');
     overlay.innerHTML = `
-        <div style="background:#fff; border-radius:12px; padding:24px; max-width:480px; width:100%; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
-            <h3 style="margin:0 0 14px; font-size:1rem;">Histórico de turmas</h3>
-            <table class="admin-tabela" style="width:100%;">
+        <div class="admin-modal-cartao admin-modal-cartao--historico">
+            <h3>Histórico de turmas</h3>
+            <table class="admin-tabela">
                 <thead><tr><th>Turma</th><th>Ano</th><th>Solicitada em</th><th>Status</th></tr></thead>
                 <tbody>${linhas}</tbody>
             </table>
-            <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+            <div class="admin-modal-acoes">
                 <button class="admin-btn secundario" id="admin-historico-fechar">Fechar</button>
             </div>
         </div>`;
@@ -393,8 +385,8 @@ function mostrarHistoricoTurmaModal(historico) {
  */
 function abrirModalDecisaoTurma(troca) {
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.55); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px;';
-    overlay.innerHTML = '<div class="admin-turma-conteudo" style="background:#fff; border-radius:12px; padding:24px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:0 20px 40px rgba(0,0,0,0.25);"></div>';
+    overlay.className = 'admin-modal-overlay';
+    overlay.innerHTML = '<div class="admin-modal-cartao admin-modal-cartao--turma admin-turma-conteudo"></div>';
     document.body.appendChild(overlay);
 
     let mudou = false;
@@ -449,27 +441,27 @@ function abrirModalDecisaoTurma(troca) {
             </tr>`).join('') || '<tr><td colspan="4" class="admin-vazio">Sem histórico.</td></tr>';
 
         const blocoRetroativo = troca.retroativoPendente ? `
-            <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:14px; margin-bottom:18px;">
-                <p style="margin:0 0 10px; font-size:0.85rem;">
+            <div class="admin-aviso-retroativo">
+                <p>
                     ⚠️ Esta é a primeira turma do aluno neste ano letivo, mas a série (primeiro número) não
                     mudou — pode ser repetência de ano (série igual, turma nova) ou só uma realocação no meio
                     do ano. Deve contar como se já valesse desde 1º de janeiro de ${escapeHtml(String(troca.ano))}?
                 </p>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <div class="admin-botoes-linha">
                     <button class="admin-btn secundario pequeno" id="admin-turma-retro-sim">Sim, desde 01/01</button>
                     <button class="admin-btn secundario pequeno" id="admin-turma-retro-nao">Não, a partir da data pedida</button>
                 </div>
             </div>` : '';
 
         const blocoMotivo = troca.aprovacaoForcada && troca.motivoAprovacaoForcada ? `
-            <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:10px 14px; margin-bottom:18px; font-size:0.82rem;">
+            <div class="admin-aviso-motivo-forcado">
                 🔒 Esta troca exige aprovação mesmo com o auto-aplicar geral ligado: ${escapeHtml(troca.motivoAprovacaoForcada)}
             </div>` : '';
 
         const blocoAcoes = troca.statusAprovacao === 'pendente'
             ? `<button class="admin-btn perigo" id="admin-turma-recusar">Recusar</button>
                <button class="admin-btn sucesso" id="admin-turma-aprovar">Aprovar</button>`
-            : `<span style="align-self:center; color:var(--admin-texto-suave); font-size:0.85rem;">Aprovação: ${escapeHtml(rotuloStatusTurma(troca.statusAprovacao))}.</span>`;
+            : `<span class="admin-status-simples">Aprovação: ${escapeHtml(rotuloStatusTurma(troca.statusAprovacao))}.</span>`;
 
         const turmaAnteriorTexto = troca.turmaAnterior
             ? `${escapeHtml(troca.turmaAnterior)} (${escapeHtml(String(troca.turmaAnteriorAno ?? '?'))})`
@@ -477,10 +469,10 @@ function abrirModalDecisaoTurma(troca) {
 
         const conteudo = overlay.querySelector('.admin-turma-conteudo');
         conteudo.innerHTML = `
-            <h3 style="margin:0 0 4px; font-size:1.05rem;">Troca de turma</h3>
-            <p style="margin:0 0 16px; color:var(--admin-texto-suave); font-size:0.85rem;">Revise as informações antes de decidir.</p>
-            <table class="admin-tabela" style="width:100%; margin-bottom:18px;">
-                <tr><th style="width:40%;">Nome</th><td>${escapeHtml(troca.nome)}</td></tr>
+            <h3>Troca de turma</h3>
+            <p>Revise as informações antes de decidir.</p>
+            <table class="admin-tabela admin-tabela--info">
+                <tr><th>Nome</th><td>${escapeHtml(troca.nome)}</td></tr>
                 <tr><th>Matrícula</th><td>${escapeHtml(troca.matricula)}</td></tr>
                 <tr><th>Antes</th><td>${turmaAnteriorTexto}</td></tr>
                 <tr><th>Solicitada</th><td>${escapeHtml(troca.turmaSolicitada)} (${escapeHtml(String(troca.ano))})</td></tr>
@@ -488,12 +480,12 @@ function abrirModalDecisaoTurma(troca) {
             </table>
             ${blocoMotivo}
             ${blocoRetroativo}
-            <p style="margin:0 0 8px; font-weight:600; font-size:0.85rem;">Histórico completo de turmas deste aluno</p>
-            <table class="admin-tabela" style="width:100%;">
+            <p class="admin-subtitulo-historico">Histórico completo de turmas deste aluno</p>
+            <table class="admin-tabela">
                 <thead><tr><th>Turma</th><th>Ano</th><th>Solicitada em</th><th>Status</th></tr></thead>
                 <tbody>${linhasHistorico}</tbody>
             </table>
-            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px; flex-wrap:wrap;">
+            <div class="admin-modal-acoes">
                 <button class="admin-btn secundario" id="admin-turma-fechar">Fechar</button>
                 ${blocoAcoes}
             </div>`;

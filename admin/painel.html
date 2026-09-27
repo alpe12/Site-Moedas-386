@@ -11,7 +11,7 @@
 <body>
 
 <noscript>
-    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+    <div class="aviso-noscript">
         ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
     </div>
 </noscript>
@@ -37,7 +37,7 @@
 
     <div class="admin-cartao">
         <h2>🛍️ Pedidos pendentes</h2>
-        <div style="overflow-x:auto;">
+        <div class="rolagem-horizontal">
             <table class="admin-tabela">
                 <thead>
                     <tr><th>Aluno</th><th>Item</th><th>Valor</th><th>Data</th><th></th></tr>
@@ -49,41 +49,41 @@
         </div>
     </div>
 
-    <div id="secao-contas-pendentes" class="admin-cartao" style="display:none;">
+    <div id="secao-contas-pendentes" class="admin-cartao oculto">
         <h2>👤 Contas de aluno pendentes de aprovação</h2>
-        <div style="overflow-x:auto;">
+        <div class="rolagem-horizontal">
             <table class="admin-tabela">
                 <thead><tr><th>Nome</th><th>Matrícula</th><th>Turma</th></tr></thead>
                 <tbody id="corpo-contas-pendentes"></tbody>
             </table>
         </div>
-        <p class="admin-subtitulo" style="margin-top:12px; margin-bottom:0; font-size:0.8rem;">
+        <p class="admin-subtitulo admin-nota-tabela">
             Para aprovar, edite <code>.private/usuarios.csv</code> e troque a coluna <code>ativo</code> para <code>1</code> na linha do aluno.
         </p>
     </div>
 
-    <div id="secao-trocas-turma-pendentes" class="admin-cartao" style="display:none;">
+    <div id="secao-trocas-turma-pendentes" class="admin-cartao oculto">
         <h2>🔄 Trocas de turma pendentes de aprovação</h2>
-        <div style="overflow-x:auto;">
+        <div class="rolagem-horizontal">
             <table class="admin-tabela">
                 <thead><tr><th>Nome</th><th>Matrícula</th><th>Turma atual</th><th>Turma solicitada</th><th>Solicitada em</th><th></th></tr></thead>
                 <tbody id="corpo-trocas-turma-pendentes"></tbody>
             </table>
         </div>
-        <p class="admin-subtitulo" style="margin-top:12px; margin-bottom:0; font-size:0.8rem;">
+        <p class="admin-subtitulo admin-nota-tabela">
             Clique em "Revisar" para ver o histórico completo do aluno e aprovar ou recusar.
         </p>
     </div>
 
-    <div id="secao-admins-pendentes" class="admin-cartao" style="display:none;">
+    <div id="secao-admins-pendentes" class="admin-cartao oculto">
         <h2>🔑 Contas admin pendentes de aprovação</h2>
-        <div style="overflow-x:auto;">
+        <div class="rolagem-horizontal">
             <table class="admin-tabela">
                 <thead><tr><th>Nome</th><th>E-mail</th></tr></thead>
                 <tbody id="corpo-admins-pendentes"></tbody>
             </table>
         </div>
-        <p class="admin-subtitulo" style="margin-top:12px; margin-bottom:0; font-size:0.8rem;">
+        <p class="admin-subtitulo admin-nota-tabela">
             Para aprovar, edite <code>admin/.private/admins.csv</code> e troque a coluna <code>ativo</code> para <code>1</code> na linha correspondente.
         </p>
     </div>

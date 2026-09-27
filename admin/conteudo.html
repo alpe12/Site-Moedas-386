@@ -14,7 +14,7 @@
 <body>
 
 <noscript>
-    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+    <div class="aviso-noscript">
         ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
     </div>
 </noscript>
@@ -44,7 +44,7 @@
             <button type="button" class="admin-btn pequeno btn-novo" data-tipo="carrossel">+ Adicionar novo</button>
         </div>
 
-        <form class="admin-form admin-form-conteudo" data-tipo="carrossel" data-campos="imagem,legenda" style="display:none;">
+        <form class="admin-form admin-form-conteudo oculto" data-tipo="carrossel" data-campos="imagem,legenda">
             <input type="hidden" class="campo-id" value="">
             <div class="admin-form-linha">
                 <div><label>Legenda</label><input type="text" data-campo="legenda" required></div>
@@ -52,33 +52,33 @@
             </div>
 
             <label>Imagem</label>
-            <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start;">
-                <div style="flex:1; min-width:220px;">
+            <div class="admin-campo-imagem">
+                <div class="admin-campo-imagem__upload">
                     <input type="file" class="campo-imagem-arquivo" accept="image/jpeg,image/png,image/gif,image/webp">
-                    <div style="display:flex; gap:6px; margin-top:8px;">
-                        <input type="text" class="campo-imagem-url" placeholder="ou cole uma URL pra baixar" style="flex:1;">
-                        <button type="button" class="admin-btn secundario btn-baixar-imagem" style="white-space:nowrap;">Baixar</button>
+                    <div class="admin-campo-imagem__url-linha">
+                        <input type="text" class="campo-imagem-url" placeholder="ou cole uma URL pra baixar">
+                        <button type="button" class="admin-btn secundario btn-baixar-imagem admin-nowrap">Baixar</button>
                     </div>
                     <input type="hidden" data-campo="imagem" value="">
                 </div>
-                <div style="display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0;">
-                    <div class="preview-imagem-conteudo" style="width:72px; height:72px; border-radius:8px; background:var(--admin-fundo); display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px dashed var(--admin-borda);"></div>
-                    <button type="button" class="admin-btn perigo pequeno btn-remover-imagem" style="display:none; white-space:nowrap;">Remover imagem</button>
+                <div class="admin-campo-imagem__preview-coluna">
+                    <div class="preview-imagem-conteudo admin-preview-caixa"></div>
+                    <button type="button" class="admin-btn perigo pequeno btn-remover-imagem admin-nowrap oculto">Remover imagem</button>
                 </div>
             </div>
 
-            <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <div class="admin-form-conteudo-acoes">
                 <button type="submit" class="admin-btn">Salvar</button>
                 <button type="button" class="admin-btn secundario btn-visualizar-slide">👁️ Visualizar slide</button>
                 <button type="button" class="admin-btn secundario btn-fechar-form">Cancelar</button>
             </div>
-            <div class="preview-slide-carrossel" style="display:none; margin-top:16px; padding:16px; background:var(--admin-fundo); border-radius:10px; max-width:340px;">
-                <p class="admin-subtitulo" style="margin-top:0;">Como vai aparecer no carrossel:</p>
+            <div class="preview-slide-carrossel admin-preview-slide oculto">
+                <p class="admin-subtitulo">Como vai aparecer no carrossel:</p>
                 <div class="preview-slide-conteudo"></div>
             </div>
         </form>
 
-        <div style="overflow-x:auto; margin-top:16px;">
+        <div class="rolagem-horizontal">
             <table class="admin-tabela"><thead><tr><th>Ordem</th><th>Legenda</th><th>Imagem</th><th>Status</th><th></th></tr></thead>
                 <tbody class="corpo-lista" data-tipo="carrossel"><tr><td colspan="5" class="admin-vazio">Carregando...</td></tr></tbody>
             </table>
@@ -91,7 +91,7 @@
             <button type="button" class="admin-btn pequeno btn-novo" data-tipo="eventos">+ Adicionar novo</button>
         </div>
 
-        <form class="admin-form admin-form-conteudo" data-tipo="eventos" data-campos="tag,titulo,descricao,rodape,link" style="display:none;">
+        <form class="admin-form admin-form-conteudo oculto" data-tipo="eventos" data-campos="tag,titulo,descricao,rodape,link">
             <input type="hidden" class="campo-id" value="">
             <div class="admin-form-linha">
                 <div><label>Tag (ex: OFICINA)</label><input type="text" data-campo="tag" required></div>
@@ -103,13 +103,13 @@
                 <div><label>Rodapé (data/local/recompensa)</label><input type="text" data-campo="rodape" required></div>
                 <div><label>Link de inscrição (opcional)</label><input type="text" data-campo="link"></div>
             </div>
-            <div style="margin-top:16px; display:flex; gap:10px;">
+            <div class="admin-form-conteudo-acoes">
                 <button type="submit" class="admin-btn">Salvar</button>
                 <button type="button" class="admin-btn secundario btn-fechar-form">Cancelar</button>
             </div>
         </form>
 
-        <div style="overflow-x:auto; margin-top:16px;">
+        <div class="rolagem-horizontal">
             <table class="admin-tabela"><thead><tr><th>Ordem</th><th>Tag</th><th>Título</th><th>Status</th><th></th></tr></thead>
                 <tbody class="corpo-lista" data-tipo="eventos"><tr><td colspan="5" class="admin-vazio">Carregando...</td></tr></tbody>
             </table>
@@ -122,7 +122,7 @@
             <button type="button" class="admin-btn pequeno btn-novo" data-tipo="projetos">+ Adicionar novo</button>
         </div>
 
-        <form class="admin-form admin-form-conteudo" data-tipo="projetos" data-campos="titulo,parceria,descricao" style="display:none;">
+        <form class="admin-form admin-form-conteudo oculto" data-tipo="projetos" data-campos="titulo,parceria,descricao">
             <input type="hidden" class="campo-id" value="">
             <div class="admin-form-linha">
                 <div><label>Título</label><input type="text" data-campo="titulo" required></div>
@@ -130,13 +130,13 @@
                 <div><label>Ordem</label><input type="number" class="campo-ordem" value="1" required></div>
             </div>
             <label>Descrição</label><textarea data-campo="descricao" required></textarea>
-            <div style="margin-top:16px; display:flex; gap:10px;">
+            <div class="admin-form-conteudo-acoes">
                 <button type="submit" class="admin-btn">Salvar</button>
                 <button type="button" class="admin-btn secundario btn-fechar-form">Cancelar</button>
             </div>
         </form>
 
-        <div style="overflow-x:auto; margin-top:16px;">
+        <div class="rolagem-horizontal">
             <table class="admin-tabela"><thead><tr><th>Ordem</th><th>Título</th><th>Status</th><th></th></tr></thead>
                 <tbody class="corpo-lista" data-tipo="projetos"><tr><td colspan="4" class="admin-vazio">Carregando...</td></tr></tbody>
             </table>

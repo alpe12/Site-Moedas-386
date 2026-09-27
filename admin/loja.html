@@ -14,7 +14,7 @@
 <body>
 
 <noscript>
-    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+    <div class="aviso-noscript">
         ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
     </div>
 </noscript>
@@ -63,37 +63,37 @@
             </div>
 
             <label>Imagem (opcional, tem prioridade sobre o ícone)</label>
-            <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start;">
-                <div style="flex:1; min-width:220px;">
+            <div class="admin-campo-imagem">
+                <div class="admin-campo-imagem__upload">
                     <input type="file" id="item-imagem-arquivo" accept="image/jpeg,image/png,image/gif,image/webp">
-                    <div style="display:flex; gap:6px; margin-top:8px;">
-                        <input type="text" id="item-imagem-url" placeholder="ou cole uma URL pra baixar" style="flex:1;">
-                        <button type="button" class="admin-btn secundario" id="item-btn-baixar-url" style="white-space:nowrap;">Baixar</button>
+                    <div class="admin-campo-imagem__url-linha">
+                        <input type="text" id="item-imagem-url" placeholder="ou cole uma URL pra baixar">
+                        <button type="button" class="admin-btn secundario admin-nowrap" id="item-btn-baixar-url">Baixar</button>
                     </div>
                     <input type="hidden" id="item-imagem" value="">
                 </div>
-                <div style="display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0;">
-                    <div id="item-preview-imagem" style="width:72px; height:72px; border-radius:8px; background:var(--admin-fundo); display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px dashed var(--admin-borda);"></div>
-                    <button type="button" class="admin-btn perigo pequeno" id="item-btn-remover-imagem" style="display:none; white-space:nowrap;">Remover imagem</button>
+                <div class="admin-campo-imagem__preview-coluna">
+                    <div id="item-preview-imagem" class="admin-preview-caixa"></div>
+                    <button type="button" class="admin-btn perigo pequeno admin-nowrap oculto" id="item-btn-remover-imagem">Remover imagem</button>
                 </div>
             </div>
 
-            <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+            <div class="admin-form-acoes">
                 <button type="submit" class="admin-btn">Salvar item</button>
                 <button type="button" class="admin-btn secundario" id="btn-visualizar-item">👁️ Visualizar card</button>
-                <button type="button" class="admin-btn secundario" id="btn-cancelar-edicao-item" style="display:none;">Cancelar edição</button>
+                <button type="button" class="admin-btn secundario oculto" id="btn-cancelar-edicao-item">Cancelar edição</button>
             </div>
 
-            <div id="preview-card-item" style="display:none; margin-top:20px; padding:20px; background:var(--admin-fundo); border-radius:10px;">
-                <p class="admin-subtitulo" style="margin-top:0;">Como vai aparecer na loja:</p>
-                <div id="preview-card-item-conteudo" style="max-width:220px;"></div>
+            <div id="preview-card-item" class="admin-preview-item oculto">
+                <p class="admin-subtitulo">Como vai aparecer na loja:</p>
+                <div id="preview-card-item-conteudo" class="admin-preview-item__conteudo"></div>
             </div>
         </form>
     </div>
 
     <div class="admin-cartao">
         <h2>Catálogo</h2>
-        <div style="overflow-x:auto;">
+        <div class="rolagem-horizontal">
             <table class="admin-tabela">
                 <thead><tr><th></th><th>Nome</th><th>Preço</th><th>Status</th><th></th></tr></thead>
                 <tbody id="corpo-itens">

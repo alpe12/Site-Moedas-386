@@ -19,13 +19,13 @@ async function carregarLog() {
             const resumo = truncado ? detalhes.slice(0, 80) + '…' : detalhes;
             return `
             <tr>
-                <td style="white-space:nowrap;">${escapeHtml(formatarDataHora(l.data))}</td>
+                <td class="admin-nowrap">${escapeHtml(formatarDataHora(l.data))}</td>
                 <td>${escapeHtml(l.admin_email)}</td>
                 <td>${escapeHtml(l.acao)}</td>
                 <td>
                     <span data-resumo="${i}">${escapeHtml(resumo)}</span>
-                    ${truncado ? `<button type="button" class="admin-btn secundario pequeno" data-expandir="${i}" style="margin-left:6px;">Ver mais</button>
-                    <div data-completo="${i}" style="display:none; margin-top:6px; white-space:pre-wrap; color:var(--admin-texto-suave);">${escapeHtml(detalhes)}</div>` : ''}
+                    ${truncado ? `<button type="button" class="admin-btn secundario pequeno" data-expandir="${i}">Ver mais</button>
+                    <div data-completo="${i}" class="admin-log-detalhe oculto">${escapeHtml(detalhes)}</div>` : ''}
                 </td>
             </tr>`;
         }).join('');
@@ -35,10 +35,10 @@ async function carregarLog() {
                 const i = btn.dataset.expandir;
                 const resumo = corpo.querySelector(`[data-resumo="${i}"]`);
                 const completo = corpo.querySelector(`[data-completo="${i}"]`);
-                const mostrandoCompleto = completo.style.display !== 'none';
-                completo.style.display = mostrandoCompleto ? 'none' : 'block';
-                resumo.style.display = mostrandoCompleto ? 'inline' : 'none';
-                btn.textContent = mostrandoCompleto ? 'Ver mais' : 'Ver menos';
+                const estaOculto = completo.classList.contains('oculto');
+                completo.classList.toggle('oculto', !estaOculto);
+                resumo.classList.toggle('oculto', estaOculto);
+                btn.textContent = estaOculto ? 'Ver menos' : 'Ver mais';
             });
         });
     } catch (erro) {

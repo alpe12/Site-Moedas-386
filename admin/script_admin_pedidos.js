@@ -31,14 +31,14 @@ function renderizarPedidos(pedidos) {
 
     corpo.innerHTML = pedidos.map(p => `
         <tr>
-            <td>${linkAluno(p.matricula, escapeHtml(p.nomeAluno))} <span style="color:var(--admin-texto-suave);">(${escapeHtml(p.matricula)})</span></td>
+            <td>${linkAluno(p.matricula, escapeHtml(p.nomeAluno))} <span class="admin-texto-suave">(${escapeHtml(p.matricula)})</span></td>
             <td>${escapeHtml(p.turma)}${iconeHistoricoTurma(p.turmaHistorico)}</td>
             <td>${escapeHtml(p.item)}</td>
             <td>🪙 ${formatarMoeda(p.valor)}</td>
             <td>${escapeHtml(formatarDataHora(p.data))}</td>
             <td><span class="admin-tag ${CLASSES_STATUS[p.status] || ''}">${escapeHtml(p.status)}</span></td>
             <td>
-                <select data-id="${escapeHtml(p.id)}" style="width:auto; padding:5px 8px; font-size:0.8rem;">
+                <select data-id="${escapeHtml(p.id)}" class="admin-select-inline">
                     ${opcoesStatus.map(s => `<option value="${s}" ${s === p.status ? 'selected' : ''}>${s}</option>`).join('')}
                 </select>
             </td>

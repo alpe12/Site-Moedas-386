@@ -25,14 +25,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function alternarPreviewCard() {
     const painel = document.getElementById('preview-card-item');
-    const mostrando = painel.style.display !== 'none';
-    painel.style.display = mostrando ? 'none' : 'block';
-    if (!mostrando) atualizarPreviewCardSeVisivel();
+    const estaOculto = painel.classList.contains('oculto');
+    painel.classList.toggle('oculto', !estaOculto);
+    if (estaOculto) atualizarPreviewCardSeVisivel();
 }
 
 function atualizarPreviewCardSeVisivel() {
     const painel = document.getElementById('preview-card-item');
-    if (painel.style.display === 'none') return;
+    if (painel.classList.contains('oculto')) return;
 
     const nome = document.getElementById('item-nome').value.trim() || 'Nome do item';
     const valor = Number(document.getElementById('item-valor').value) || 0;
@@ -43,7 +43,7 @@ function atualizarPreviewCardSeVisivel() {
         <div class="cartao cartao-item-loja">
             <div class="icone-item-loja" aria-hidden="true">
                 ${imagem
-                    ? `<img src="${escapeHtml(resolverCaminhoImagemAdmin(imagem))}" alt="" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`
+                    ? `<img src="${escapeHtml(resolverCaminhoImagemAdmin(imagem))}" alt="">`
                     : escapeHtml(icone || '🎁')}
             </div>
             <h3>${escapeHtml(nome)}</h3>
@@ -75,13 +75,13 @@ function renderizarItens() {
 
     corpo.innerHTML = itensCache.map(i => `
         <tr class="${i.ativo ? '' : 'inativo-linha'}">
-            <td style="font-size:1.5rem; width:40px;">
-                ${i.imagem ? `<img src="${escapeHtml(resolverCaminhoImagemAdmin(i.imagem))}" alt="" style="width:32px; height:32px; object-fit:cover; border-radius:6px;">` : escapeHtml(i.icone || '🎁')}
+            <td class="admin-celula-icone">
+                ${i.imagem ? `<img src="${escapeHtml(resolverCaminhoImagemAdmin(i.imagem))}" alt="" class="admin-miniatura">` : escapeHtml(i.icone || '🎁')}
             </td>
-            <td>${escapeHtml(i.nome)}<br><span style="color:var(--admin-texto-suave); font-size:0.75rem;">${escapeHtml(i.id)}</span></td>
+            <td>${escapeHtml(i.nome)}<br><span class="admin-subtexto">${escapeHtml(i.id)}</span></td>
             <td>🪙 ${formatarMoeda(i.valor)}</td>
             <td><span class="admin-tag ${i.ativo ? 'ativo' : 'inativo'}">${i.ativo ? 'Ativo' : 'Inativo'}</span></td>
-            <td style="white-space:nowrap;">
+            <td class="admin-celula-acoes">
                 <button type="button" class="admin-btn secundario pequeno" data-editar="${escapeHtml(i.id)}">Editar</button>
                 <button type="button" class="admin-btn ${i.ativo ? 'secundario' : 'sucesso'} pequeno" data-toggle="${escapeHtml(i.id)}" data-ativo="${i.ativo ? '1' : '0'}">${i.ativo ? 'Desativar' : 'Ativar'}</button>
                 <button type="button" class="admin-btn perigo pequeno" data-remover="${escapeHtml(i.id)}">Remover</button>
@@ -108,7 +108,7 @@ function carregarItemParaEdicao(id) {
     previewImagemItem.atualizarPreview(item.imagem);
 
     document.getElementById('titulo-formulario-item').textContent = 'Editar item';
-    document.getElementById('btn-cancelar-edicao-item').style.display = 'inline-block';
+    document.getElementById('btn-cancelar-edicao-item').classList.remove('oculto');
     document.querySelector('.admin-cartao').scrollIntoView({ behavior: 'smooth' });
     atualizarPreviewCardSeVisivel();
 }
@@ -118,9 +118,9 @@ function limparFormularioItem() {
     document.getElementById('item-id').disabled = false;
     document.getElementById('item-imagem').value = '';
     previewImagemItem.atualizarPreview('');
-    document.getElementById('preview-card-item').style.display = 'none';
+    document.getElementById('preview-card-item').classList.add('oculto');
     document.getElementById('titulo-formulario-item').textContent = 'Novo item';
-    document.getElementById('btn-cancelar-edicao-item').style.display = 'none';
+    document.getElementById('btn-cancelar-edicao-item').classList.add('oculto');
 }
 
 async function salvarItem(e) {

@@ -8,13 +8,13 @@ window.addEventListener('DOMContentLoaded', () => {
     campoBusca.addEventListener('input', (e) => {
         clearTimeout(debounceBuscaPerfil);
         const termo = e.target.value.trim();
-        if (!termo) { conteinerResultados.style.display = 'none'; return; }
+        if (!termo) { conteinerResultados.classList.add('oculto'); return; }
         debounceBuscaPerfil = setTimeout(() => buscarAlunosPerfil(termo), 300);
     });
 
     document.addEventListener('click', (e) => {
         if (!conteinerResultados.contains(e.target) && e.target !== campoBusca) {
-            conteinerResultados.style.display = 'none';
+            conteinerResultados.classList.add('oculto');
         }
     });
 
@@ -45,8 +45,8 @@ function renderizarResultadosBuscaPerfil() {
     const conteiner = document.getElementById('resultados-busca-aluno-perfil');
 
     if (ultimosResultadosBuscaPerfil.length === 0) {
-        conteiner.innerHTML = '<div class="item-resultado" style="cursor:default; color:var(--admin-texto-suave);">Nenhum aluno encontrado.</div>';
-        conteiner.style.display = 'block';
+        conteiner.innerHTML = '<div class="item-resultado item-resultado--vazio">Nenhum aluno encontrado.</div>';
+        conteiner.classList.remove('oculto');
         return;
     }
 
@@ -54,11 +54,11 @@ function renderizarResultadosBuscaPerfil() {
         <div class="item-resultado" data-matricula="${escapeHtml(a.matricula)}">
             <strong>${escapeHtml(a.nome)}</strong> — matrícula ${escapeHtml(a.matricula)}, turma ${escapeHtml(a.turma)}
         </div>`).join('');
-    conteiner.style.display = 'block';
+    conteiner.classList.remove('oculto');
 
     conteiner.querySelectorAll('[data-matricula]').forEach(item => {
         item.addEventListener('click', () => {
-            conteiner.style.display = 'none';
+            conteiner.classList.add('oculto');
             document.getElementById('busca-aluno-perfil').value = item.dataset.matricula;
             carregarPerfil(item.dataset.matricula);
         });
@@ -70,8 +70,8 @@ async function carregarPerfil(matricula) {
     const perfil = document.getElementById('perfil-aluno');
 
     estadoPerfil.innerHTML = '<div class="admin-cartao"><p class="admin-vazio">Carregando...</p></div>';
-    estadoPerfil.style.display = 'block';
-    perfil.style.display = 'none';
+    estadoPerfil.classList.remove('oculto');
+    perfil.classList.add('oculto');
 
     try {
         const resposta = await fetch(`api/aluno_detalhe.php?matricula=${encodeURIComponent(matricula)}`, { credentials: 'same-origin', cache: 'no-store' });
@@ -86,12 +86,12 @@ async function carregarPerfil(matricula) {
         history.replaceState(null, '', url);
 
         renderizarPerfil(dados);
-        estadoPerfil.style.display = 'none';
-        perfil.style.display = 'block';
+        estadoPerfil.classList.add('oculto');
+        perfil.classList.remove('oculto');
     } catch (erro) {
         estadoPerfil.innerHTML = `<div class="admin-cartao"><p class="admin-vazio">${escapeHtml(erro.message)}</p></div>`;
-        estadoPerfil.style.display = 'block';
-        perfil.style.display = 'none';
+        estadoPerfil.classList.remove('oculto');
+        perfil.classList.add('oculto');
     }
 }
 
@@ -123,26 +123,26 @@ function renderizarPerfil(dados) {
 
     const elExpiracoes = document.getElementById('perfil-expiracoes');
     if (f.expiracoes && f.expiracoes.length > 0) {
-        elExpiracoes.style.display = 'block';
+        elExpiracoes.classList.remove('oculto');
         elExpiracoes.innerHTML = '⏳ Saldo expirado no início do ano: ' + f.expiracoes.map(e =>
             `${escapeHtml(String(e.ano))} (🪙 ${formatarMoeda(Math.abs(e.valor))})`
         ).join(', ');
     } else {
-        elExpiracoes.style.display = 'none';
+        elExpiracoes.classList.add('oculto');
     }
 
     // --- Dados de cadastro ---
     const cadastroTexto = dados.cadastroAproximado
-        ? `${formatarDataHora(dados.cadastroAproximado)} <span class="admin-subtitulo" style="font-size:0.75rem;">(aproximado — data da primeira turma registrada no cadastro; não existe uma data de cadastro gravada diretamente)</span>`
+        ? `${formatarDataHora(dados.cadastroAproximado)} <span class="admin-texto-pequeno">(aproximado — data da primeira turma registrada no cadastro; não existe uma data de cadastro gravada diretamente)</span>`
         : '<span class="admin-subtitulo">Não disponível (aluno sem nenhuma turma registrada).</span>';
 
     document.getElementById('tabela-cadastro').innerHTML = `
-        <tr><th style="width:30%;">Matrícula</th><td>${escapeHtml(aluno.matricula)}</td></tr>
+        <tr><th>Matrícula</th><td>${escapeHtml(aluno.matricula)}</td></tr>
         <tr><th>Nome</th><td>${escapeHtml(aluno.nome)}</td></tr>
         <tr><th>E-mail</th><td>${escapeHtml(aluno.email)}</td></tr>
         <tr><th>Conta</th><td>${contaAtiva ? '<span class="admin-tag ativo">Ativa</span>' : '<span class="admin-tag pendente">Pendente de aprovação</span>'}</td></tr>
         <tr><th>Cadastrado em</th><td>${cadastroTexto}</td></tr>
-        <tr><th>Código de recuperação de senha</th><td><code>${escapeHtml(aluno.resetToken || '—')}</code> <span class="admin-subtitulo" style="font-size:0.75rem;">(mostre ao aluno se ele perder o código, pra redefinir a senha)</span></td></tr>
+        <tr><th>Código de recuperação de senha</th><td><code>${escapeHtml(aluno.resetToken || '—')}</code> <span class="admin-texto-pequeno">(mostre ao aluno se ele perder o código, pra redefinir a senha)</span></td></tr>
     `;
 
     // --- Histórico de turmas ---
@@ -164,8 +164,8 @@ function renderizarPerfil(dados) {
         : atividades.map(a => `
             <tr>
                 <td>${escapeHtml(a.data)}</td>
-                <td>${escapeHtml(a.atividade)}${a.quantidadeAlunosNaLinha > 1 ? ` <span class="admin-subtitulo" style="font-size:0.75rem;" title="Este lançamento creditou ${a.quantidadeAlunosNaLinha} alunos de uma vez">(turma, ${a.quantidadeAlunosNaLinha} alunos)</span>` : ''}</td>
-                <td style="color:${a.valor < 0 ? 'var(--admin-vermelho)' : 'inherit'};">${a.valor > 0 ? '+' : ''}${formatarMoeda(a.valor)}</td>
+                <td>${escapeHtml(a.atividade)}${a.quantidadeAlunosNaLinha > 1 ? ` <span class="admin-texto-pequeno" title="Este lançamento creditou ${a.quantidadeAlunosNaLinha} alunos de uma vez">(turma, ${a.quantidadeAlunosNaLinha} alunos)</span>` : ''}</td>
+                <td${a.valor < 0 ? ' class="admin-valor-negativo"' : ''}>${a.valor > 0 ? '+' : ''}${formatarMoeda(a.valor)}</td>
                 <td>${escapeHtml(a.turma)}</td>
             </tr>`).join('');
 

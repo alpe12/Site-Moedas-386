@@ -14,6 +14,66 @@
 
 * { box-sizing: border-box; }
 
+/* Aviso de JavaScript desabilitado (mesmo bloco em todas as páginas do painel) */
+.aviso-noscript { background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626; }
+
+/* Utilitário genérico de visibilidade, pra JS não escrever em .style.* */
+.oculto { display: none !important; }
+.rolagem-horizontal { overflow-x: auto; }
+p.admin-subtitulo.admin-nota-tabela { margin-top: 12px; margin-bottom: 0; font-size: 0.8rem; }
+.admin-nowrap { white-space: nowrap; }
+[data-expandir] { margin-left: 6px; }
+.admin-log-detalhe { margin-top: 6px; white-space: pre-wrap; color: var(--admin-texto-suave); }
+
+/* Avisos temporários no canto da tela (mostrarAviso(), em script_admin.js) */
+.conteiner-avisos { position: fixed; top: 16px; right: 16px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; max-width: 340px; }
+.aviso-toast {
+    padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    font-size: 0.88rem; font-weight: 600; line-height: 1.4; border-left: 4px solid;
+    opacity: 0; transform: translateX(20px); transition: opacity .25s, transform .25s;
+}
+.aviso-toast.aviso-toast--visivel { opacity: 1; transform: translateX(0); }
+.aviso-toast--info { background:#eff6ff; border-left-color:#2563eb; color:#1e3a8a; }
+.aviso-toast--sucesso { background:#f0fdf4; border-left-color:#16a34a; color:#14532d; }
+.aviso-toast--erro { background:#fef2f2; border-left-color:#dc2626; color:#7f1d1d; }
+
+/* Campo de senha com botão de mostrar/ocultar e checklist de regras
+   (melhorarCampoSenha(), em script_admin.js) */
+.wrapper-senha { position: relative; }
+.wrapper-senha input { padding-right: 42px; }
+.botao-mostrar-senha { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.15rem; padding: 6px; line-height: 1; }
+.checklist-senha { margin-top: 8px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 3px; }
+.checklist-senha .regra-ok { color: #4ade80; }
+.checklist-senha .regra-erro { color: #dc2626; }
+
+/* Modais do painel (confirmarAcao, escolherAcao, histórico de turma,
+   decisão de troca de turma) — todos compartilham o mesmo overlay/cartão,
+   só o conteúdo interno muda. */
+.admin-modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.55); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.admin-modal-cartao { background: #fff; border-radius: 12px; padding: 24px; max-width: 380px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
+.admin-modal-cartao--largo { max-width: 420px; }
+.admin-modal-cartao--historico { max-width: 480px; }
+.admin-modal-cartao--historico h3 { margin: 0 0 14px; font-size: 1rem; }
+.admin-modal-cartao--historico table.admin-tabela + .admin-modal-acoes { margin-top: 16px; }
+.admin-modal-cartao--turma { max-width: 520px; max-height: 85vh; overflow-y: auto; }
+.admin-turma-conteudo h3 { margin: 0 0 4px; font-size: 1.05rem; }
+.admin-turma-conteudo > p:first-of-type { margin: 0 0 16px; color: var(--admin-texto-suave); font-size: 0.85rem; }
+.admin-turma-conteudo table.admin-tabela + .admin-modal-acoes { margin-top: 20px; }
+.admin-tabela--info { margin-bottom: 18px; }
+.admin-tabela--info th { width: 40%; }
+.admin-subtitulo-historico { margin: 0 0 8px; font-weight: 600; font-size: 0.85rem; }
+.admin-status-simples { align-self: center; color: var(--admin-texto-suave); font-size: 0.85rem; }
+.admin-botoes-linha { display: flex; gap: 8px; flex-wrap: wrap; }
+.admin-aviso-retroativo { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; margin-bottom: 18px; }
+.admin-aviso-retroativo p { margin: 0 0 10px; font-size: 0.85rem; }
+.admin-aviso-motivo-forcado { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; font-size: 0.82rem; }
+.admin-modal-texto { margin: 0 0 20px; font-size: 0.95rem; color: #1e293b; }
+.admin-modal-acoes { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+/* Miniatura de imagem enviada/baixada por URL (configurarCampoImagem()) */
+.admin-preview-imagem { width: 100%; height: 100%; object-fit: cover; }
+.admin-preview-vazio { color: var(--admin-texto-suave); font-size: 0.7rem; text-align: center; padding: 4px; }
+
 body {
     margin: 0;
     font-family: 'Noto Color Emoji', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -112,6 +172,60 @@ main.admin-main {
 
 h1.admin-titulo { font-size: 1.5rem; margin: 0 0 4px; }
 p.admin-subtitulo { color: var(--admin-texto-suave); margin: 0 0 24px; }
+.admin-subtitulo--pequeno { font-size: 0.85rem; margin: 0; }
+
+.admin-lista-selecionados { min-height: 40px; padding: 8px; border: 1px dashed var(--admin-borda); border-radius: 8px; }
+.admin-form-acoes { margin-top: 20px; display: flex; gap: 10px; }
+.admin-filtro-status { max-width: 220px; }
+.admin-select-inline { width: auto; padding: 5px 8px; font-size: 0.8rem; }
+
+/* Campo de imagem com upload/URL/preview (configurarCampoImagem()) */
+.admin-campo-imagem { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
+.admin-campo-imagem__upload { flex: 1; min-width: 220px; }
+.admin-campo-imagem__url-linha { display: flex; gap: 6px; margin-top: 8px; }
+.admin-campo-imagem__url-linha input { flex: 1; }
+.admin-campo-imagem__preview-coluna { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+.admin-preview-caixa { width: 72px; height: 72px; border-radius: 8px; background: var(--admin-fundo); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px dashed var(--admin-borda); }
+
+/* Prévia "como vai aparecer" de um item da loja / card, dentro do form */
+.admin-preview-item { margin-top: 20px; padding: 20px; background: var(--admin-fundo); border-radius: 10px; }
+.admin-preview-item__conteudo { max-width: 220px; }
+
+/* Colunas de ícone/miniatura e subtexto (id/matrícula) nas tabelas de catálogo */
+.admin-celula-icone { font-size: 1.5rem; width: 40px; }
+.admin-miniatura { width: 32px; height: 32px; object-fit: cover; border-radius: 6px; }
+.admin-subtexto { color: var(--admin-texto-suave); font-size: 0.75rem; }
+
+/* Formulários de conteúdo da home (carrossel/eventos/projetos) — reaproveita
+   as classes de campo-de-imagem já usadas em loja.html */
+.admin-form-conteudo-acoes { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+.admin-preview-slide { margin-top: 16px; padding: 16px; background: var(--admin-fundo); border-radius: 10px; max-width: 340px; }
+.admin-secao-conteudo .rolagem-horizontal { margin-top: 16px; }
+.admin-celula-truncada { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-acoes-linha { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Perfil completo do aluno (aluno.html) */
+.admin-form label.admin-label-topo { margin-top: 0; }
+.admin-perfil-cabecalho { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.admin-perfil-cabecalho h2 { margin: 0 0 4px; }
+.admin-perfil-cabecalho p.admin-subtitulo { margin: 0; }
+.admin-perfil-tags { text-align: right; }
+.admin-perfil-cabecalho + .admin-grid-2 { margin-top: 18px; }
+.admin-stat { background: var(--admin-fundo); border-radius: 8px; padding: 14px 16px; }
+.admin-stat__rotulo { font-size: 0.75rem; text-transform: uppercase; color: var(--admin-texto-suave); font-weight: 700; }
+.admin-stat__valor { font-size: 1.4rem; font-weight: 800; }
+.admin-stat__valor--positivo { color: var(--admin-verde); }
+.admin-valor-negativo { color: var(--admin-vermelho); }
+.admin-texto-pequeno { font-size: 0.75rem; }
+.admin-tabela--cadastro th { width: 30%; }
+
+/* Miniatura do slide de carrossel dentro do painel "como vai aparecer" —
+   reaproveita .meus-slides/.legenda-slide do site público (carregados
+   aqui só pra isso), só precisa de um contexto de posicionamento próprio
+   já que aqui não existe o .conteiner-carrossel que normalmente dá isso. */
+.admin-slide-mock { position: relative; }
+.admin-slide-mock img { border-radius: 8px; }
+.admin-slide-mock-sem-imagem { background: var(--admin-borda); height: 100%; display: flex; align-items: center; justify-content: center; color: var(--admin-texto-suave); }
 
 .admin-cartao {
     background: #fff;
@@ -186,6 +300,10 @@ table.admin-tabela tr.inativo-linha { opacity: 0.55; background: #f1f5f9; }
 .admin-btn.perigo { background: var(--admin-vermelho); }
 .admin-btn.sucesso { background: var(--admin-verde); }
 .admin-btn.pequeno { padding: 5px 10px; font-size: 0.75rem; }
+.admin-btn--bloco { width: 100%; margin-top: 18px; }
+
+.admin-checkbox-linha { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-weight: 500; }
+.admin-checkbox-linha input { width: auto; }
 
 .admin-tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
 .admin-tag.pendente { background: #fef3c7; color: var(--admin-amarelo); }
@@ -209,7 +327,12 @@ table.admin-tabela tr.inativo-linha { opacity: 0.55; background: #f1f5f9; }
     border-bottom: 1px solid var(--admin-borda);
 }
 .admin-busca-resultados .item-resultado:last-child { border-bottom: none; }
-.admin-busca-resultados .item-resultado:hover { background: var(--admin-azul-claro); }
+.admin-busca-resultados .item-resultado:not(.item-resultado--adicionado):hover { background: var(--admin-azul-claro); }
+.admin-busca-resultados .item-resultado--adicionado,
+.admin-busca-resultados .item-resultado--vazio { cursor: default; color: var(--admin-texto-suave); }
+.admin-busca-resultados .item-resultado--adicionado { background: var(--admin-fundo); }
+
+.celula-detalhe { background: var(--admin-fundo); }
 
 .admin-chip {
     display: inline-flex;
@@ -236,6 +359,8 @@ table.admin-tabela tr.inativo-linha { opacity: 0.55; background: #f1f5f9; }
 }
 
 .admin-vazio { color: var(--admin-texto-suave); text-align: center; padding: 30px 10px; font-size: 0.9rem; }
+.admin-texto-suave { color: var(--admin-texto-suave); }
+.admin-celula-acoes { white-space: nowrap; }
 
 .admin-secao-conteudo {
     background: #fff;

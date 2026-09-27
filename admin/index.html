@@ -11,7 +11,7 @@
 <body>
 
 <noscript>
-    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+    <div class="aviso-noscript">
         ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
     </div>
 </noscript>
@@ -24,14 +24,14 @@
         <input type="email" id="login-email" autocomplete="email" required>
         <label for="login-senha">Senha</label>
         <input type="password" id="login-senha" autocomplete="current-password" required>
-        <label style="display:flex; align-items:center; gap:8px; margin-top:14px; font-weight:500;" id="grupo-lembrar-me">
-            <input type="checkbox" id="login-lembrar-me" style="width:auto;">
+        <label class="admin-checkbox-linha" id="grupo-lembrar-me">
+            <input type="checkbox" id="login-lembrar-me">
             Lembrar-me
         </label>
-        <button type="submit" class="admin-btn" style="width:100%; margin-top:18px;">Entrar</button>
+        <button type="submit" class="admin-btn admin-btn--bloco">Entrar</button>
     </form>
 
-    <form id="form-cadastro-admin" class="admin-form" style="display:none;">
+    <form id="form-cadastro-admin" class="admin-form oculto">
         <label for="cad-nome">Nome</label>
         <input type="text" id="cad-nome" required>
         <label for="cad-email">E-mail</label>
@@ -42,17 +42,17 @@
         <input type="password" id="cad-conf-senha" autocomplete="new-password" required>
         <label for="cad-token">Token de administração</label>
         <input type="text" id="cad-token" autocomplete="off" required>
-        <button type="submit" class="admin-btn" style="width:100%; margin-top:18px;">Criar conta</button>
+        <button type="submit" class="admin-btn admin-btn--bloco">Criar conta</button>
     </form>
 
-    <form id="form-recuperar-admin" class="admin-form" style="display:none;">
+    <form id="form-recuperar-admin" class="admin-form oculto">
         <label for="rec-email">E-mail</label>
         <input type="email" id="rec-email" autocomplete="email" required>
         <label for="rec-token">Token de administração</label>
         <input type="text" id="rec-token" autocomplete="off" required>
         <label for="rec-nova-senha">Nova senha</label>
         <input type="password" id="rec-nova-senha" autocomplete="new-password" required>
-        <button type="submit" class="admin-btn" style="width:100%; margin-top:18px;">Redefinir senha</button>
+        <button type="submit" class="admin-btn admin-btn--bloco">Redefinir senha</button>
     </form>
 
     <div class="troca-modo">
@@ -60,7 +60,7 @@
         &nbsp;·&nbsp;
         <a id="link-mostrar-recuperar">Esqueci minha senha</a>
         &nbsp;·&nbsp;
-        <a id="link-mostrar-login" style="display:none;">Voltar ao login</a>
+        <a id="link-mostrar-login" class="oculto">Voltar ao login</a>
     </div>
 </div>
 

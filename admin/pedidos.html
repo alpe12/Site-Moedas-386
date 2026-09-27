@@ -11,7 +11,7 @@
 <body>
 
 <noscript>
-    <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+    <div class="aviso-noscript">
         ⚠️ Este painel precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
     </div>
 </noscript>
@@ -36,8 +36,8 @@
     <p class="admin-subtitulo">Todos os resgates feitos pelos alunos — altere o status conforme for atendendo.</p>
 
     <div class="admin-cartao">
-        <label for="filtro-status" style="margin-top:0;">Filtrar por status</label>
-        <select id="filtro-status" style="max-width:220px;">
+        <label for="filtro-status">Filtrar por status</label>
+        <select id="filtro-status" class="admin-filtro-status">
             <option value="Todos">Todos</option>
             <option value="Pendente">Pendente</option>
             <option value="Aprovado">Aprovado</option>
@@ -47,7 +47,7 @@
     </div>
 
     <div class="admin-cartao">
-        <div style="overflow-x:auto;">
+        <div class="rolagem-horizontal">
             <table class="admin-tabela">
                 <thead><tr><th>Aluno</th><th>Turma</th><th>Item</th><th>Valor</th><th>Data</th><th>Status</th><th></th></tr></thead>
                 <tbody id="corpo-pedidos">

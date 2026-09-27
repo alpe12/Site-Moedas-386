@@ -10,13 +10,13 @@
 </head>
 <body>
     <noscript>
-        <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+        <div class="aviso-noscript">
             ⚠️ Este site precisa de JavaScript habilitado para funcionar completamente. Habilite o JavaScript no seu navegador.
         </div>
     </noscript>
     <header>
         <div class="nav-container">
-            <a href="/" class="logo-text" style="text-decoration:none;">386 <span>EcoCoin</span></a>
+            <a href="/" class="logo-text">386 <span>EcoCoin</span></a>
             <button type="button" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
             <nav><ul>
                 <li><a href="/">INÍCIO</a></li>
@@ -30,20 +30,20 @@
     <main class="main-content-single">
 
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div class="cabecalho-ranking">
                 <div>
                     <span class="tag-azul">Classificação</span>
-                    <h2 style="margin-top: 10px;">Ranking Geral de Alunos</h2>
+                    <h2>Ranking Geral de Alunos</h2>
                     <p class="desc">Acompanhe o desempenho de todos os alunos do CIEP 386.</p>
                 </div>
                 
-                <div class="login-mini" style="flex-direction: row; align-items: center; flex-wrap: wrap; gap: 10px;">
-                    <span id="grupoBusca" style="display:flex; align-items:center; flex: 1 1 160px; min-width: 160px;">
-                        <input type="text" id="buscaNome" placeholder="🔍 Buscar aluno..." style="width: 100%; max-width: 220px;">
+                <div class="controles-ranking">
+                    <span id="grupoBusca" class="grupo-busca">
+                        <input type="text" id="buscaNome" placeholder="🔍 Buscar aluno...">
                     </span>
-                    <label style="font-size: 0.85rem; color: var(--text-gray); display:flex; align-items:center; gap:6px;">
+                    <label>
                         Mostrar:
-                        <select id="limiteRanking" style="padding: 6px 10px; border-radius: var(--raio-medio, 8px); border: 1px solid var(--cor-borda);">
+                        <select id="limiteRanking">
                             <option value="10">10</option>
                             <option value="20" selected>20</option>
                             <option value="50">50</option>
@@ -54,7 +54,7 @@
             </div>
         </div>        
    
-        <div class="card" style="padding: 0; overflow-x: auto;">
+        <div class="card card--tabela">
                     <table id="tabelaRankingGeral">
                         <thead>
                             <tr>
@@ -66,7 +66,7 @@
                         </thead>
                         <tbody id="corpoTabelaRanking">
                             <tr>
-                                <td colspan="4" style="text-align: center; padding: 40px; color: #999;">
+                                <td colspan="4" class="texto-estado texto-estado--tabela">
                                 Carregando ranking...
                                 </td>
                             </tr>
@@ -75,8 +75,8 @@
                 </div>
         <div class="card">
             <span class="ranking-title">Resumo por Turma</span>
-            <div id="gradeTurmas" class="turmas-ranking-grid" style="margin: 10px auto 10px auto;">
-                <p style="color: var(--text-gray); text-align:center; width:100%;">Carregando turmas...</p>
+            <div id="gradeTurmas" class="turmas-ranking-grid">
+                <p class="texto-estado">Carregando turmas...</p>
             </div>
         </div>
     </main>

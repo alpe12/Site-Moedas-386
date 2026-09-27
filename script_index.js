@@ -3,8 +3,10 @@
 // ==========================================
 const API_URL_RESUMO = 'api/ranking.php';
 const API_URL_CONTEUDO = 'api/conteudo_publica.php';
+const INTERVALO_CARROSSEL_MS = 5000;
 
 let slideIndexIndex = 1;
+let intervaloCarrossel = null;
 let eventosCarregados = []; // [{id, tag, titulo, descricao, rodape, link}, ...]
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -18,7 +20,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         construirProjetos(conteudo.projetos || []);
 
         mostrarSlides(slideIndexIndex);
-        setInterval(() => { mudarSlide(1); }, 5000);
+        iniciarAutoAvancoCarrossel();
         if (eventosCarregados.length) mostrarEvento(eventosCarregados[0].id);
     } catch (erro) {
         console.error("Erro ao carregar conteúdo da home:", erro);
@@ -34,13 +36,40 @@ window.addEventListener('DOMContentLoaded', async () => {
         construirResumoTurmas(resumo.turmas || []);
     } catch (erro) {
         console.error("Erro ao carregar o ranking na home:", erro);
-        const erroFeedback = `<div style="color: var(--cor-alerta); text-align: center; padding: 10px; font-weight: 700;">Erro ao atualizar ranking</div>`;
+        const erroFeedback = `<div class="texto-estado texto-estado--erro">Erro ao atualizar ranking</div>`;
         document.getElementById("podio-lideres-gerais").innerHTML = erroFeedback;
         document.getElementById("podio-mestres-moedas").innerHTML = erroFeedback;
         const resumoTurmas = document.getElementById("resumo-turmas-home");
         if (resumoTurmas) resumoTurmas.innerHTML = erroFeedback;
     }
 });
+
+// Roda em paralelo com o resto (listener separado) pra não atrasar o
+// carrossel/eventos/ranking esperando essa checagem de login.
+window.addEventListener('DOMContentLoaded', personalizarBoasVindas);
+
+/**
+ * Personaliza o cartão de boas-vindas quando o aluno está logado: troca o
+ * título pelo nome dele e remove o botão "Acessar Meu Perfil" (não faz
+ * sentido mandar pra si mesmo, já está na home). Deslogado (401), o
+ * cartão fica como está — texto genérico com o botão de acesso.
+ */
+async function personalizarBoasVindas() {
+    try {
+        const resposta = await fetch('api/profile.php', { credentials: 'same-origin', cache: 'no-store' });
+        if (!resposta.ok) return;
+
+        const aluno = await resposta.json();
+        if (!aluno || !aluno.nome) return;
+
+        const titulo = document.getElementById('titulo-boas-vindas');
+        if (titulo) titulo.textContent = `Olá, ${aluno.nome}!`;
+
+        document.getElementById('botao-boas-vindas')?.remove();
+    } catch (erro) {
+        console.error("Erro ao verificar login na home:", erro);
+    }
+}
 
 /** Monta os slides do carrossel a partir do conteúdo carregado do servidor. */
 function construirCarrossel(carrossel) {
@@ -54,8 +83,47 @@ function construirCarrossel(carrossel) {
         </div>`).join('');
 
     conteiner.innerHTML = slides + `
-        <a class="anterior" onclick="mudarSlide(-1)">&#10094;</a>
-        <a class="proximo" onclick="mudarSlide(1)">&#10095;</a>`;
+        <a class="anterior" data-slide="-1">&#10094;</a>
+        <a class="proximo" data-slide="1">&#10095;</a>`;
+
+    // Clique manual numa seta: navega e reinicia a contagem do auto-avanço.
+    conteiner.querySelectorAll('.anterior, .proximo').forEach(seta => {
+        seta.addEventListener('click', () => mudarSlide(Number(seta.dataset.slide), true));
+    });
+
+    // Pausa o auto-avanço com o mouse sobre o carrossel; ao sair, retoma
+    // com a contagem zerada.
+    conteiner.addEventListener('mouseenter', pararAutoAvancoCarrossel);
+    conteiner.addEventListener('mouseleave', iniciarAutoAvancoCarrossel);
+}
+
+/** Inicia o auto-avanço do carrossel. Se já estiver rodando, reinicia a
+ *  contagem — por isso serve tanto pro início quanto pra "resetar o tempo". */
+function iniciarAutoAvancoCarrossel() {
+    pararAutoAvancoCarrossel();
+    if (document.getElementsByClassName("meus-slides").length > 1) {
+        intervaloCarrossel = setInterval(() => mudarSlide(1), INTERVALO_CARROSSEL_MS);
+    }
+}
+
+function pararAutoAvancoCarrossel() {
+    clearInterval(intervaloCarrossel);
+    intervaloCarrossel = null;
+}
+
+/** @param manual `true` quando a troca vem de um clique do usuário nas setas: reinicia a contagem do auto-avanço. */
+function mudarSlide(n, manual = false) {
+    mostrarSlides(slideIndexIndex += n);
+    if (manual) iniciarAutoAvancoCarrossel();
+}
+
+function mostrarSlides(n) {
+    const slides = document.getElementsByClassName("meus-slides");
+    if (slides.length === 0) return;
+    if (n > slides.length) { slideIndexIndex = 1; }
+    if (n < 1) { slideIndexIndex = slides.length; }
+    for (const slide of slides) slide.classList.remove('ativo');
+    slides[slideIndexIndex - 1].classList.add('ativo');
 }
 
 /** Monta as abas numeradas e os botões "Inscrever-se" a partir dos eventos carregados. */
@@ -74,18 +142,21 @@ function construirAbasEventos(eventos) {
     });
 
     rodapeAcao.innerHTML = eventos.map(evento =>
-        `<a id="link-botao-${escapeHtml(evento.id)}" href="${escapeHtml(evento.link || '#')}" target="_blank" class="botao-evento" style="display:none"><button class="botao-acao">Inscrever-se</button></a>`
+        `<a id="link-botao-${escapeHtml(evento.id)}" href="${escapeHtml(evento.link || '#')}" target="_blank" class="botao-evento"><button class="botao-acao">Inscrever-se</button></a>`
     ).join('');
 }
 
-/** Monta o acordeão de projetos a partir do conteúdo carregado do servidor. */
+/** Monta o acordeão de projetos a partir do conteúdo carregado do servidor.
+ *  Os itens usam <input type="radio"> com o mesmo "name": abrir um fecha
+ *  os outros nativamente (comportamento padrão de grupo de rádio), sem
+ *  depender de JS pra isso. */
 function construirProjetos(projetos) {
     const acordeon = document.querySelector('.acordeon');
     if (!acordeon) return;
 
     acordeon.innerHTML = projetos.map((projeto, i) => `
         <div class="acordeon-item">
-            <input type="checkbox" id="projeto${i + 1}">
+            <input type="radio" name="acordeon-projetos" id="projeto${i + 1}">
             <label for="projeto${i + 1}">${escapeHtml(projeto.titulo)}</label>
             <div class="conteudo">
                 ${projeto.parceria ? `<h4>${escapeHtml(projeto.parceria)}</h4>` : ''}
@@ -93,6 +164,19 @@ function construirProjetos(projetos) {
             </div>
         </div>`).join('');
 }
+
+// Melhoria progressiva do acordeão: rádios nativos não se desmarcam com um
+// novo clique, então isso permite fechar o item já aberto clicando nele de
+// novo. Sem JS o acordeão continua funcionando normalmente — só não fecha
+// sozinho, que já é o comportamento nativo de um grupo de rádio.
+document.addEventListener('click', (evento) => {
+    const label = evento.target.closest('.acordeon-item label');
+    if (!label) return;
+    const input = document.getElementById(label.getAttribute('for'));
+    if (!input || input.type !== 'radio') return;
+    evento.preventDefault();
+    input.checked = !input.checked;
+});
 
 function mostrarEvento(idEvento) {
     const evento = eventosCarregados.find(e => e.id === idEvento);
@@ -104,17 +188,13 @@ function mostrarEvento(idEvento) {
     document.getElementById("evento-descricao").innerText = evento.descricao;
     document.getElementById("evento-rodape").innerText = evento.rodape;
 
-    if (evento.tag === "Esporte") {
-        tagElemento.style.backgroundColor = "#0e4768";
-    } else if (evento.tag === "Oficina") {
-        tagElemento.style.backgroundColor = "#fd7e14";
-    } else {
-        tagElemento.style.backgroundColor = "var(--primary-blue)";
-    }
+    tagElemento.classList.remove('tag-esporte', 'tag-oficina');
+    if (evento.tag === "Esporte") tagElemento.classList.add('tag-esporte');
+    else if (evento.tag === "Oficina") tagElemento.classList.add('tag-oficina');
 
     eventosCarregados.forEach(e => {
         const botaoContainer = document.getElementById(`link-botao-${e.id}`);
-        if (botaoContainer) botaoContainer.style.display = (e.id === idEvento) ? "inline-block" : "none";
+        if (botaoContainer) botaoContainer.classList.toggle('ativo', e.id === idEvento);
     });
 
     document.querySelectorAll(".botao-numero").forEach(btn => {
@@ -122,23 +202,12 @@ function mostrarEvento(idEvento) {
     });
 }
 
-function mudarSlide(n) { mostrarSlides(slideIndexIndex += n); }
-
-function mostrarSlides(n) {
-    let slides = document.getElementsByClassName("meus-slides");
-    if (slides.length === 0) return;
-    if (n > slides.length) { slideIndexIndex = 1 }
-    if (n < 1) { slideIndexIndex = slides.length }
-    for (let i = 0; i < slides.length; i++) { slides[i].style.display = "none"; }
-    slides[slideIndexIndex - 1].style.display = "block";
-}
-
 function construirPodioGrafico(idConteiner, topAlunos) {
     const conteiner = document.getElementById(idConteiner);
     if (!conteiner) return;
 
     if (!topAlunos.length) {
-        conteiner.innerHTML = `<div style="color: var(--texto-suave); padding: 10px; text-align: center;">Ainda não há dados suficientes.</div>`;
+        conteiner.innerHTML = `<div class="texto-estado">Ainda não há dados suficientes.</div>`;
         return;
     }
 
@@ -159,7 +228,7 @@ function construirResumoTurmas(topTurmas) {
     if (!conteiner) return;
 
     if (!topTurmas.length) {
-        conteiner.innerHTML = `<div style="color: var(--texto-suave); padding: 10px; text-align: center;">Ainda não há dados suficientes.</div>`;
+        conteiner.innerHTML = `<div class="texto-estado">Ainda não há dados suficientes.</div>`;
         return;
     }
 

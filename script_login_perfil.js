@@ -36,10 +36,14 @@ async function inicializarRecuperar() {
 
     const novaSenha = document.getElementById("nova_senha");
     if (novaSenha) melhorarCampoSenha(novaSenha, { checklist: true, regras: config });
+
+    const formRecuperar = document.getElementById("form-recuperar");
+    if (formRecuperar) formRecuperar.addEventListener("submit", (evento) => { evento.preventDefault(); verificarERedefinir(); });
 }
 
 async function inicializarPerfil() {
     configurarTrocaTurma();
+    document.getElementById("btnSair")?.addEventListener("click", sair);
     await carregarPerfil();
 }
 
@@ -114,17 +118,13 @@ function trocaPaginaCadastro() {
     const login = document.getElementById("login");
     const novaConta = document.getElementById("nova_conta");
 
-    if (login.style.display !== "none") {
-        login.style.display = "none";
-        novaConta.style.display = "block";
-        if (botao_conta) botao_conta.textContent = "Já tenho conta";
-        if (titulo) titulo.textContent = "Nova conta";
-    } else {
-        login.style.display = "block";
-        novaConta.style.display = "none";
-        if (botao_conta) botao_conta.textContent = "Não tenho conta";
-        if (titulo) titulo.textContent = "Acesse sua conta";
-    }
+    // Se o login está visível agora, este clique vai TROCAR para o
+    // cadastro (e vice-versa) — o texto do título/botão segue o destino.
+    const indoParaCadastro = !login.classList.contains('oculto');
+    login.classList.toggle('oculto', indoParaCadastro);
+    novaConta.classList.toggle('oculto', !indoParaCadastro);
+    if (botao_conta) botao_conta.textContent = indoParaCadastro ? "Já tenho conta" : "Não tenho conta";
+    if (titulo) titulo.textContent = indoParaCadastro ? "Nova conta" : "Acesse sua conta";
 }
 
 async function fazerLogin() {
@@ -247,28 +247,26 @@ async function fazerCadastro(config) {
  */
 function mostrarModalToken(token, contaAtiva) {
     const overlay = document.createElement('div');
-    overlay.style.cssText = `
-        position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 10000;
-        display: flex; align-items: center; justify-content: center; padding: 20px;`;
+    overlay.className = 'modal-overlay';
 
     const avisoConta = contaAtiva
         ? ''
-        : `<p style="color:#b45309; background:#fef3c7; padding:10px 14px; border-radius:8px; font-size:0.9rem; margin-top:14px;">
+        : `<p class="modal-cadastro__aviso">
              Sua conta foi criada, mas ainda precisa ser aprovada antes de aparecer no ranking ou fazer resgates.
            </p>`;
 
     overlay.innerHTML = `
-        <div style="background:#fff; border-radius:16px; padding:32px; max-width:400px; width:100%; text-align:center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
-            <h2 style="margin-bottom: 8px;">Cadastro realizado! 🎉</h2>
-            <p style="color:#475569; font-size:0.95rem; margin-bottom: 16px;">
+        <div class="modal-cadastro">
+            <h2>Cadastro realizado! 🎉</h2>
+            <p class="modal-cadastro__intro">
                 Guarde este código. Ele será pedido se você esquecer sua senha, e <strong>não será mostrado de novo</strong>.
             </p>
-            <div style="font-size:2rem; font-weight:800; letter-spacing:6px; background:#f1f5f9; border-radius:10px; padding:16px; margin-bottom:16px;">
+            <div class="modal-cadastro__token">
                 ${escapeHtml(token || '------')}
             </div>
-            <div style="display:flex; gap:10px; justify-content:center;">
-                <button id="btn-copiar-token" class="btn-entrar" style="flex:1;">Copiar código</button>
-                <button id="btn-fechar-token" class="btn-entrar" style="flex:1; background:#475569;">Entendi</button>
+            <div class="modal-cadastro__acoes">
+                <button id="btn-copiar-token" class="btn-entrar btn-entrar--flex">Copiar código</button>
+                <button id="btn-fechar-token" class="btn-entrar btn-entrar--flex btn-entrar--cinza">Entendi</button>
             </div>
             ${avisoConta}
         </div>`;
@@ -329,25 +327,25 @@ function renderizarPerfil(aluno) {
     const form = document.getElementById("formTrocarTurma");
 
     if (trocaTurmaPendenteAtual) {
-        if (botaoTrocar) botaoTrocar.style.display = "none";
+        if (botaoTrocar) botaoTrocar.classList.add('oculto');
         if (avisoPendente) {
-            avisoPendente.style.display = "inline-block";
+            avisoPendente.classList.remove('oculto');
             const alvo = document.getElementById("turmaSolicitadaPendente");
             if (alvo) alvo.innerText = `${trocaTurmaPendenteAtual.turma} (${trocaTurmaPendenteAtual.ano})`;
         }
-        if (avisoSemTurma) avisoSemTurma.style.display = "none";
-        if (form) form.style.display = "none";
+        if (avisoSemTurma) avisoSemTurma.classList.add('oculto');
+        if (form) form.classList.add('oculto');
     } else {
-        if (avisoPendente) avisoPendente.style.display = "none";
+        if (avisoPendente) avisoPendente.classList.add('oculto');
         if (!aluno.turma) {
             // Sem turma válida pra este ano — chama atenção e já abre o
             // formulário, em vez de exigir mais um clique.
-            if (avisoSemTurma) avisoSemTurma.style.display = "inline-block";
-            if (botaoTrocar) botaoTrocar.style.display = "none";
-            if (form) form.style.display = "flex";
+            if (avisoSemTurma) avisoSemTurma.classList.remove('oculto');
+            if (botaoTrocar) botaoTrocar.classList.add('oculto');
+            if (form) form.classList.remove('oculto');
         } else {
-            if (avisoSemTurma) avisoSemTurma.style.display = "none";
-            if (botaoTrocar) botaoTrocar.style.display = "";
+            if (avisoSemTurma) avisoSemTurma.classList.add('oculto');
+            if (botaoTrocar) botaoTrocar.classList.remove('oculto');
         }
     }
 
@@ -360,7 +358,7 @@ function renderizarPerfil(aluno) {
 
     const atividades = Array.isArray(aluno.atividades) ? aluno.atividades : [];
     if (atividades.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-gray, #666); padding:16px;">
+        tbody.innerHTML = `<tr><td colspan="3" class="texto-estado texto-estado--tabela">
             Nenhuma atividade registrada ainda.</td></tr>`;
         return;
     }
@@ -397,15 +395,15 @@ function configurarTrocaTurma() {
     restringirSomenteNumeros(campoTurma, "Turma");
 
     botaoTrocar.addEventListener("click", () => {
-        form.style.display = "flex";
-        botaoTrocar.style.display = "none";
+        form.classList.remove('oculto');
+        botaoTrocar.classList.add('oculto');
         campoTurma.value = "";
         campoTurma.focus();
     });
 
     botaoCancelar.addEventListener("click", () => {
-        form.style.display = "none";
-        botaoTrocar.style.display = "";
+        form.classList.add('oculto');
+        botaoTrocar.classList.remove('oculto');
     });
 
     botaoConfirmar.addEventListener("click", () => solicitarTrocaTurma());
@@ -437,7 +435,7 @@ async function solicitarTrocaTurma() {
         if (!resposta.ok || !resultado.sucesso) throw new Error(resultado.mensagem || 'Não foi possível enviar a solicitação.');
 
         mostrarAviso(resultado.mensagem, 'sucesso', 6000);
-        document.getElementById("formTrocarTurma").style.display = "none";
+        document.getElementById("formTrocarTurma").classList.add('oculto');
         await carregarPerfil(); // recarrega o perfil pra refletir a turma nova (ou o aviso de pendente)
     } catch (erro) {
         mostrarAviso(erro.message, 'erro');

@@ -21,7 +21,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const titulo = document.getElementById('admin-titulo');
     const grupoLembrarMe = document.getElementById('grupo-lembrar-me');
 
-    if (!config.lembrarMeDisponivel && grupoLembrarMe) grupoLembrarMe.style.display = 'none';
+    if (!config.lembrarMeDisponivel && grupoLembrarMe) grupoLembrarMe.classList.add('oculto');
 
     melhorarCampoSenha(document.getElementById('login-senha'));
     melhorarCampoSenha(document.getElementById('cad-senha'), { checklist: true, regras: config });
@@ -29,10 +29,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     melhorarCampoSenha(document.getElementById('rec-nova-senha'), { checklist: true, regras: config });
 
     function mostrarSomente(form) {
-        [formLogin, formCadastro, formRecuperar].forEach(f => f.style.display = (f === form) ? 'block' : 'none');
-        linkCadastro.style.display = form === formLogin ? 'inline' : 'none';
-        linkRecuperar.style.display = form === formLogin ? 'inline' : 'none';
-        linkLogin.style.display = form === formLogin ? 'none' : 'inline';
+        [formLogin, formCadastro, formRecuperar].forEach(f => f.classList.toggle('oculto', f !== form));
+        linkCadastro.classList.toggle('oculto', form !== formLogin);
+        linkRecuperar.classList.toggle('oculto', form !== formLogin);
+        linkLogin.classList.toggle('oculto', form === formLogin);
         titulo.textContent = form === formCadastro ? 'Criar conta administrativa'
             : form === formRecuperar ? 'Redefinir senha' : 'Painel Administrativo';
     }

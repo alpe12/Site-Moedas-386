@@ -11,32 +11,32 @@
 <body id="pagina_login">
 
     <noscript>
-        <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+        <div class="aviso-noscript">
             ⚠️ Este site precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
         </div>
     </noscript>
 
-    <a href="/" class="logo-text" style="margin:12px 30px; text-decoration:none; display:inline-block;">386 <span style="color: #0056b3;">EcoCoin</span></a>
+    <a href="/" class="logo-text">386 <span>EcoCoin</span></a>
     
     <div class="acesso">
         <h1 id="titulo">Acesse sua conta</h1>
         
         <section class="area-cadastro">
             
-            <form id="login" class="cadastrar" style="margin-top: 20px; border-bottom: 1px solid rgb(255, 255, 255); padding-bottom: 20px;">
+            <form id="login" class="cadastrar">
                 <ul>
                     <li><input type="email" id="email_login" placeholder="E-mail" autocomplete="email" required></li>
                     <li><input type="password" id="senha_login" placeholder="Senha" autocomplete="current-password" required></li>
                     <li><input type="submit" id="btn_entrar" class="btn-entrar" value="Entrar"></li>
             
-                    <li style="margin-top: 10px; text-align: center;">
-                    <a href="recuperar.html" style="color: white; font-size: 0.9rem; text-decoration: underline;">
+                    <li class="texto-centro">
+                    <a href="recuperar.html" class="link-claro link-claro--grande">
                     Esqueci minha senha
                     </a></li>
                 </ul>
             </form>
             
-            <form id="nova_conta" class="cadastrar" style="margin-top: 20px; border-bottom: 1px solid rgb(255, 255, 255); padding-bottom: 20px;">
+            <form id="nova_conta" class="cadastrar oculto">
                 <ul>
                     <li><input type="text" id="nome_cadastro" placeholder="Nome Completo" autocomplete="name" required></li>
                     <li><input type="text" id="turma_cadastro" placeholder="Turma" required></li>
@@ -47,18 +47,18 @@
                     <li><input type="submit" id="btn_cadastrar" class="btn-entrar" value="Cadastrar"></li>
                 </ul>
             </form>
-            <div class="redes" style="border-top: 1px solid rgb(255, 255, 255); padding-top: 20px; ">
+            <div class="redes">
                 <ul>
-                    <li><a id="btn_inicio" class="btn-entrar" style="background-color: white; margin-top: 10px; display:block; text-align:center;" href="/">Voltar à página inicial</a></li>
-                    <li><button id="btn_conta" class="btn-entrar" style="background-color: var(--primary-dark); color: white;">Não tenho conta</button></li>
+                    <li><a id="btn_inicio" class="btn-entrar btn-entrar--bloco" href="/">Voltar à página inicial</a></li>
+                    <li><button id="btn_conta" class="btn-entrar btn-entrar--escuro">Não tenho conta</button></li>
                 </ul>
             </div>
 
-            <div style="text-align: center; margin-top: 15px;">
+            <div class="bloco-ajuda-whatsapp">
                 <a href="https://wa.me/SEUNUMERO?text=Olá,%20preciso%20de%20ajuda%20para%20recuperar%20minha%20senha%20do%20EcoCoin"
                     id="link-whatsapp-login"
                     target="_blank"
-                    style="color: white; font-size: 0.8rem; text-decoration: underline;">
+                    class="link-claro">
                     Problema no login? Fale com um monitor
                 </a>
             </div>

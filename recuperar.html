@@ -12,38 +12,37 @@
 <body id="pagina_recuperar">
 
     <noscript>
-        <div style="background:#fef2f2; color:#7f1d1d; text-align:center; padding:14px 20px; font-weight:700; border-bottom:2px solid #dc2626;">
+        <div class="aviso-noscript">
             ⚠️ Este site precisa de JavaScript habilitado para funcionar. Habilite o JavaScript no seu navegador.
         </div>
     </noscript>
 
-    <a href="/" class="logo-text" style="margin:12px 30px; text-decoration:none; display:inline-block;">386 <span style="color: #0056b3;">EcoCoin</span></a>
+    <a href="/" class="logo-text">386 <span>EcoCoin</span></a>
     
     <div class="acesso">
         <h1 id="titulo">Redefinir Senha</h1>
 
         <section class="area-cadastro">
-            <form id="form-recuperar" class="cadastrar" style="margin-top: 20px; border-bottom: 1px solid rgb(255, 255, 255); padding-bottom: 20px;"
-                  onsubmit="event.preventDefault(); verificarERedefinir();">
+            <form id="form-recuperar" class="cadastrar">
             <ul>
                 <li><input type="text" id="rec_matricula" inputmode="numeric" placeholder="Matrícula" autocomplete="off" required></li>
                 <li><input type="email" id="rec_email" placeholder="E-mail cadastrado" autocomplete="email" required></li>
-                <li><input type="text" id="rec_token" maxlength="6" placeholder="Código de recuperação" autocomplete="off" style="text-transform:uppercase;" required></li>
+                <li><input type="text" id="rec_token" maxlength="6" placeholder="Código de recuperação" autocomplete="off" required></li>
                 <li><input type="password" id="nova_senha" placeholder="Nova Senha" autocomplete="new-password" required></li>
                 
                 <li><input type="submit" class="btn-entrar" value="Redefinir Senha"></li>
                 
-                <li style="margin-top: 15px; text-align: center;">
-                    <span style="color: white; font-size: 0.8rem;">Não tem mais o código?</span><br>
+                <li class="texto-centro">
+                    <span class="texto-claro">Não tem mais o código?</span><br>
                     <a href="https://wa.me/SEUNUMERO?text=Olá,%20preciso%20de%20ajuda%20para%20recuperar%20minha%20senha%20do%20EcoCoin"
                         id="link-whatsapp-recuperar" target="_blank"
-                        style="color: white; font-size: 0.8rem; text-decoration: underline;">
+                        class="link-claro">
                         Fale com um monitor pelo WhatsApp
                     </a>
                 </li>
 
-                <li style="margin-top: 15px;">
-                    <a href="login.html" style="color: white; font-size: 0.8rem; text-decoration: underline;">Voltar ao Login</a>
+                <li>
+                    <a href="login.html" class="link-claro">Voltar ao Login</a>
                 </li>
             </ul>
             </form>

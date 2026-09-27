@@ -47,7 +47,7 @@ function carregarMenu() {
 
     header.innerHTML = `
         <div class="nav-container">
-            <a href="/" class="logo-text" style="text-decoration:none;">386 <span>EcoCoin</span></a>
+            <a href="/" class="logo-text">386 <span>EcoCoin</span></a>
             <button type="button" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
             <nav><ul>
                 <li><a href="/">INÍCIO</a></li>
@@ -111,9 +111,7 @@ function garantirConteinerAvisos() {
     if (!conteiner) {
         conteiner = document.createElement('div');
         conteiner.id = 'conteiner-avisos';
-        conteiner.style.cssText = `
-            position: fixed; top: 16px; right: 16px; z-index: 9999;
-            display: flex; flex-direction: column; gap: 10px; max-width: 340px;`;
+        conteiner.className = 'conteiner-avisos';
         document.body.appendChild(conteiner);
     }
     return conteiner;
@@ -125,27 +123,18 @@ function garantirConteinerAvisos() {
  */
 function mostrarAviso(mensagem, tipo = 'info', duracaoMs = 4500) {
     const conteiner = garantirConteinerAvisos();
-    const cores = {
-        info: { fundo: '#eff6ff', borda: '#2563eb', texto: '#1e3a8a' },
-        sucesso: { fundo: '#f0fdf4', borda: '#16a34a', texto: '#14532d' },
-        erro: { fundo: '#fef2f2', borda: '#dc2626', texto: '#7f1d1d' },
-    };
-    const cor = cores[tipo] || cores.info;
+    const classesPorTipo = { info: 'aviso-toast--info', sucesso: 'aviso-toast--sucesso', erro: 'aviso-toast--erro' };
+    const classeTipo = classesPorTipo[tipo] || classesPorTipo.info;
 
     const aviso = document.createElement('div');
-    aviso.style.cssText = `
-        background: ${cor.fundo}; border-left: 4px solid ${cor.borda}; color: ${cor.texto};
-        padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-        font-size: 0.9rem; font-weight: 600; line-height: 1.4;
-        opacity: 0; transform: translateX(20px); transition: opacity 0.25s ease, transform 0.25s ease;`;
+    aviso.className = `aviso-toast ${classeTipo}`;
     aviso.textContent = mensagem;
     conteiner.appendChild(aviso);
 
-    requestAnimationFrame(() => { aviso.style.opacity = '1'; aviso.style.transform = 'translateX(0)'; });
+    requestAnimationFrame(() => aviso.classList.add('aviso-toast--visivel'));
 
     setTimeout(() => {
-        aviso.style.opacity = '0';
-        aviso.style.transform = 'translateX(20px)';
+        aviso.classList.remove('aviso-toast--visivel');
         setTimeout(() => aviso.remove(), 300);
     }, duracaoMs);
 }
@@ -187,17 +176,16 @@ function restringirSomenteLetras(input, nomeCampo) {
  */
 function melhorarCampoSenha(input, { checklist = false, regras = null } = {}) {
     const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'position:relative;';
+    wrapper.className = 'wrapper-senha';
     input.replaceWith(wrapper);
     wrapper.appendChild(input);
-    input.style.paddingRight = '42px';
     if (!input.autocomplete || input.autocomplete === 'off') input.autocomplete = input.autocomplete || 'off';
 
     const botao = document.createElement('button');
     botao.type = 'button';
     botao.textContent = '👁️';
     botao.setAttribute('aria-label', 'Mostrar senha');
-    botao.style.cssText = 'position:absolute; right:4px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.15rem; padding:6px; line-height:1;';
+    botao.className = 'botao-mostrar-senha';
     wrapper.appendChild(botao);
     botao.addEventListener('click', () => {
         const mostrando = input.type === 'text';
@@ -208,7 +196,7 @@ function melhorarCampoSenha(input, { checklist = false, regras = null } = {}) {
 
     if (checklist && regras) {
         const lista = document.createElement('div');
-        lista.style.cssText = 'margin-top:8px; font-size:0.8rem; display:flex; flex-direction:column; gap:3px;';
+        lista.className = 'checklist-senha';
         wrapper.insertAdjacentElement('afterend', lista);
 
         const itens = [{ testar: v => v.length >= regras.senhaMinTamanho, texto: `Pelo menos ${regras.senhaMinTamanho} caracteres` }];
@@ -219,7 +207,7 @@ function melhorarCampoSenha(input, { checklist = false, regras = null } = {}) {
         const render = () => {
             lista.innerHTML = itens.map(item => {
                 const ok = item.testar(input.value);
-                return `<span style="color:${ok ? '#4ade80' : '#dc2626'};">${ok ? '✓' : '✗'} ${escapeHtml(item.texto)}</span>`;
+                return `<span class="${ok ? 'regra-ok' : 'regra-erro'}">${ok ? '✓' : '✗'} ${escapeHtml(item.texto)}</span>`;
             }).join('');
         };
         input.addEventListener('input', render);

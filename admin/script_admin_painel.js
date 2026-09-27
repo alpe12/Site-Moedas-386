@@ -49,11 +49,11 @@ function renderizarPedidosPendentes(pedidos) {
     }
     corpo.innerHTML = pedidos.map(p => `
         <tr>
-            <td>${linkAluno(p.matricula, escapeHtml(p.nomeAluno))} <span style="color:var(--admin-texto-suave);">(${escapeHtml(p.matricula)})</span></td>
+            <td>${linkAluno(p.matricula, escapeHtml(p.nomeAluno))} <span class="admin-texto-suave">(${escapeHtml(p.matricula)})</span></td>
             <td>${escapeHtml(p.item)}</td>
             <td>🪙 ${formatarMoeda(p.valor)}</td>
             <td>${escapeHtml(formatarDataHora(p.data))}</td>
-            <td style="white-space:nowrap;">
+            <td class="admin-celula-acoes">
                 <button class="admin-btn sucesso pequeno" data-id="${escapeHtml(p.id)}" data-status="Aprovado">Aprovar</button>
                 <button class="admin-btn perigo pequeno" data-id="${escapeHtml(p.id)}" data-status="Cancelado">Cancelar</button>
             </td>
@@ -86,7 +86,7 @@ function renderizarContasPendentes(contas) {
     const secao = document.getElementById('secao-contas-pendentes');
     const corpo = document.getElementById('corpo-contas-pendentes');
     if (contas.length === 0) return;
-    secao.style.display = 'block';
+    secao.classList.remove('oculto');
     corpo.innerHTML = contas.map(c => `
         <tr><td>${linkAluno(c.matricula, escapeHtml(c.nome))}</td><td>${escapeHtml(c.matricula)}</td><td>${escapeHtml(c.turma)}</td></tr>
     `).join('');
@@ -96,7 +96,7 @@ function renderizarTrocasTurmaPendentes(trocas) {
     const secao = document.getElementById('secao-trocas-turma-pendentes');
     const corpo = document.getElementById('corpo-trocas-turma-pendentes');
     if (trocas.length === 0) return;
-    secao.style.display = 'block';
+    secao.classList.remove('oculto');
     corpo.innerHTML = trocas.map(t => {
         const anterior = t.turmaAnterior
             ? `${escapeHtml(t.turmaAnterior)} (${escapeHtml(String(t.turmaAnteriorAno ?? '?'))})`
@@ -109,7 +109,7 @@ function renderizarTrocasTurmaPendentes(trocas) {
             <td>${anterior}</td>
             <td>${escapeHtml(t.turmaSolicitada)} (${escapeHtml(String(t.ano))})${marca}</td>
             <td>${escapeHtml(formatarDataHora(t.data))}</td>
-            <td style="white-space:nowrap;">
+            <td class="admin-celula-acoes">
                 <button class="admin-btn secundario pequeno" data-id="${escapeHtml(t.id)}">Revisar</button>
             </td>
         </tr>`;
@@ -125,7 +125,7 @@ function renderizarAdminsPendentes(admins) {
     const secao = document.getElementById('secao-admins-pendentes');
     const corpo = document.getElementById('corpo-admins-pendentes');
     if (admins.length === 0) return;
-    secao.style.display = 'block';
+    secao.classList.remove('oculto');
     corpo.innerHTML = admins.map(a => `
         <tr><td>${escapeHtml(a.nome)}</td><td>${escapeHtml(a.email)}</td></tr>
     `).join('');
