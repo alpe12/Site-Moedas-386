@@ -139,9 +139,11 @@ prévia é atualizada na hora; caso o arquivo não esteja referenciado em
 nenhum outro lugar, a limpeza de arquivos órfãos é acionada no servidor.
 
 Cada tela tem um botão "👁️ Visualizar" que mostra uma prévia de como o
-item/slide vai aparecer no site público — usa as folhas de estilo reais
-do site (`style.css`, `estilo_loja.css`/`estilo_index.css`, carregadas só
-pra essa prévia) pra ficar fiel de verdade, não uma aproximação.
+item/slide vai aparecer no site público — pra ficar fiel de verdade, não
+uma aproximação, ela usa as regras CSS reais do site, servidas por
+`admin/css_preview.php` (só os trechos de `style.css` marcados com
+`@preview`, sem carregar a folha de estilo inteira — veja o comentário no
+topo de `style.css` e do próprio `css_preview.php`).
 
 Limite de 5 MB por imagem, só jpg/png/gif/webp são aceitos (conferido pelo
 conteúdo real do arquivo, não só pela extensão do nome). Baixar de uma URL

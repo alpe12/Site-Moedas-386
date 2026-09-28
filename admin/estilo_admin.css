@@ -191,6 +191,16 @@ p.admin-subtitulo { color: var(--admin-texto-suave); margin: 0 0 24px; }
 .admin-preview-item { margin-top: 20px; padding: 20px; background: var(--admin-fundo); border-radius: 10px; }
 .admin-preview-item__conteudo { max-width: 220px; }
 
+/* Baseline do site público DENTRO das prévias. O site tem, em style.css, um
+   reset global ("* { margin:0; padding:0 }") e "line-height:1.5" no body —
+   que NÃO chegam aqui: css_preview.php só devolve os trechos marcados com
+   @preview (de propósito, pra não vazar regra global do site pro painel).
+   Então reproduzimos só o que a prévia precisa, e só dentro dela. O :where()
+   zera a especificidade: qualquer regra real do site vence, não importa a
+   ordem dos <link>. */
+:where(.admin-preview-item__conteudo, .preview-slide-conteudo) { line-height: 1.5; }
+:where(.admin-preview-item__conteudo, .preview-slide-conteudo) * { margin: 0; padding: 0; }
+
 /* Colunas de ícone/miniatura e subtexto (id/matrícula) nas tabelas de catálogo */
 .admin-celula-icone { font-size: 1.5rem; width: 40px; }
 .admin-miniatura { width: 32px; height: 32px; object-fit: cover; border-radius: 6px; }

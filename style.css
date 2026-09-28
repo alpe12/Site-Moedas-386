@@ -1,6 +1,66 @@
+/* ==========================================================================
+   style.css — ÚNICA folha de estilo do site público (área dos alunos)
+   ==========================================================================
+
+   O painel admin tem a sua própria folha (admin/estilo_admin.css), separada
+   de propósito: são dois sistemas visuais diferentes, e o público não deve
+   baixar o CSS do painel.
+
+   Índice (a ordem das seções importa: a cascata segue a ordem do arquivo):
+      1. Estilos globais e utilitários       7. Resumo por turma (home)
+      2. Nav / header compartilhado          8. Resumo por turma (ranking)
+      3. Cards                                9. Ajustes para celular
+      4. Tabelas compartilhadas             10. Home — carrossel, eventos, projetos
+      5. Login / cadastro / recuperar       11. Loja — vitrine e pedidos
+      6. Ranking / Perfil (páginas single)
+   As seções 10 e 11 eram estilo_index.css e estilo_loja.css. Ficam DEPOIS
+   da 9 de propósito, pra manter a mesma ordem em que o navegador carregava
+   os três arquivos (style.css → estilo_*.css) e a cascata continuar igual.
+
+   --------------------------------------------------------------------------
+   MARCADORES @preview — leia antes de mexer nos trechos marcados
+   --------------------------------------------------------------------------
+   As telas admin/conteudo.html (prévia do slide do carrossel) e
+   admin/loja.html (prévia do card de item da loja) mostram "como vai
+   aparecer no site". Pra isso elas NÃO carregam este arquivo inteiro — se
+   carregassem, as regras globais daqui (body, table, th, td, tr:hover, o
+   reset "* { margin:0; padding:0 }"...) vazariam pro resto do painel e
+   bagunçariam as tabelas e o layout do admin. Em vez disso carregam
+   admin/css_preview.php, que lê ESTE arquivo e devolve, como CSS, somente
+   os trechos que estiverem entre um par de comentários:
+
+        / * @preview:inicio  legenda opcional * /
+        ...regras...
+        / * @preview:fim * /
+
+   (escritos SEM os espaços entre "/" e "*" — aparecem separados aqui só
+   porque um comentário CSS não pode conter outro.)
+
+   Regras do jogo:
+     • Vale só no nível raiz do arquivo. NÃO coloque marcador dentro de um
+       @media/@supports: o PHP copia o texto entre os marcadores como está,
+       sem reconstruir o bloco em volta.
+     • @media não é extraído, de propósito: a largura da janela do admin não
+       é a do visitante do site, e as prévias são caixas de largura fixa.
+     • Cada par é independente; pode haver quantos quiser. Marcadores
+       desbalanceados ou aninhados fazem o PHP responder erro 500 (com o
+       motivo num comentário CSS) em vez de servir um CSS quebrado.
+     • Mexeu numa regra marcada → a prévia muda junto. É o objetivo: a
+       prévia usa as MESMAS regras do site, não uma cópia que pode ficar
+       desatualizada.
+     • Passou a usar uma classe nova no HTML das prévias
+       (script_admin_loja.js / script_admin_conteudo.js)? A regra dela
+       precisa ficar dentro de um par de marcadores, senão a prévia sai sem
+       estilo. O mesmo vale pras variáveis: o :root inteiro já é marcado.
+
+   Trechos marcados hoje: o :root (variáveis), .card/.cartao (seção 3), o
+   slide do carrossel (seção 10) e o card de item da loja (seção 11).
+   ========================================================================== */
+
 /* ==========================================
    1. ESTILOS GLOBAIS (Compartilhados por todo o site)
    ========================================== */
+/* @preview:inicio  variáveis de cor/raio/sombra (todas as regras marcadas usam) */
 :root {
     --primary-blue: #227bdb;
     --primary-dark: #175aa3;
@@ -32,6 +92,7 @@
     --fundo-neutro: var(--bg-light);
     --cor-alerta: #dc2626;
 }
+/* @preview:fim */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -166,6 +227,7 @@ nav a:hover, nav a.active-link, nav a.link-ativo { color: var(--primary-blue) !i
 /* ==========================================
    3. CARDS PADRONIZADOS PARA TODO O SITE
    ========================================== */
+/* @preview:inicio  card base (usado pela prévia do item da loja) */
 .card, .cartao {
     background: var(--white);
     border-radius: var(--raio-grande); 
@@ -174,6 +236,7 @@ nav a:hover, nav a.active-link, nav a.link-ativo { color: var(--primary-blue) !i
     border: 1px solid var(--border);
     margin-bottom: 24px;
 }
+/* @preview:fim */
 
 /* ==========================================
    4. ESTRUTURA BASICA DE TABELAS COMPARTILHADAS
@@ -627,3 +690,149 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
 
     footer { padding: 24px 16px; }
 }
+
+/* ==========================================
+   10. HOME — boas-vindas, carrossel, eventos, projetos, vitrine e mini ranking
+   (era estilo_index.css; o grid .conteiner-painel está na seção 7)
+   ========================================== */
+/* Bloco de Boas-Vindas */
+.cartao-boas-vindas { 
+    background: linear-gradient(135deg, #e0f2fe, #bfeac5); 
+    padding: 32px; 
+    border-radius: var(--raio-grande); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    gap: 24px; 
+    margin-bottom: 24px; 
+}
+.texto-boas-vindas h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; color: #0f172a; }
+.texto-boas-vindas p { color: #334155; font-size: 0.95rem; max-width: 600px; }
+.botao-principal-painel { background: var(--primary-blue); color: #fff; border: none; padding: 12px 24px; border-radius: var(--raio-medio); font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; display: inline-block; text-decoration: none; text-align: center; }
+.botao-principal-painel:hover { background: var(--primary-dark); }
+
+/* Carrossel de Imagens */
+.conteiner-carrossel { position: relative; aspect-ratio: 21 / 10; max-height: 340px; overflow: hidden; border-radius: var(--raio-grande); box-shadow: var(--sombra-media); margin-bottom: 24px; background: #000; }
+/* @preview:inicio  slide do carrossel (prévia em admin/conteudo.html) */
+.meus-slides { display: none; height: 100%; }
+.meus-slides.ativo { display: block; }
+.meus-slides img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+.legenda-slide { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 24px; font-weight: 700; color: #fff; font-size: 1.1rem; }
+/* @preview:fim */
+.anterior, .proximo { cursor: pointer; position: absolute; top: 0; height: 100%; width: 50px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 24px; text-decoration: none; opacity: 0; transition: 0.2s; z-index: 10; }
+.proximo { right: 0; } .anterior { left: 0; }
+.conteiner-carrossel:hover .anterior, .conteiner-carrossel:hover .proximo { opacity: 1; background: rgba(0,0,0,0.1); }
+.anterior:hover, .proximo:hover { background: rgba(0,0,0,0.5) !important; }
+
+/* Seletor de Abas de Eventos */
+.cabecalho-abas { display: flex; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 20px; }
+.botao-numero { background: #f1f5f9; border: none; padding: 8px 16px; border-radius: var(--raio-medio); color: var(--text-gray); font-weight: 700; cursor: pointer; transition: 0.2s; }
+.botao-numero.ativo { background: var(--primary-blue); color: #fff; }
+.tag-status { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; display: inline-block; margin-bottom: 12px; color: #ffffff !important; background-color: var(--primary-blue); }
+.tag-status.tag-esporte { background-color: #0e4768; }
+.tag-status.tag-oficina { background-color: #fd7e14; }
+.caixa-conteudo h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+.descricao { color: var(--text-gray); font-size: 0.95rem; margin-bottom: 16px; }
+.rodape-info { font-size: 0.85rem; color: var(--text-gray); border-top: 1px solid var(--border); padding-top: 12px; font-weight: 500; }
+.botao-acao { background: var(--text-dark); color: #fff; border: none; padding: 10px 20px; border-radius: var(--raio-medio); font-weight: 600; cursor: pointer; margin-top: 16px; transition: 0.2s; }
+.botao-acao:hover { background: #000; }
+.botao-evento { display: none; }
+.botao-evento.ativo { display: inline-block; }
+
+/* Menu Expansível (Acordeon) */
+.titulo-secao { font-size: 1.2rem; font-weight: 800; margin: 32px 0 16px; }
+.acordeon { background: var(--white); border-radius: var(--raio-grande); border: 1px solid var(--border); overflow: hidden; }
+.acordeon-item { border-bottom: 1px solid var(--border); }
+.acordeon-item:last-child { border: none; }
+.acordeon-item input { display: none; }
+.acordeon-item label { display: block; padding: 18px 24px; background: var(--white); font-weight: 600; cursor: pointer; transition: 0.2s; }
+.acordeon-item label:hover { background: #f8fafc; color: var(--primary-blue); }
+.acordeon-item .conteudo { max-height: 0; overflow: hidden; padding: 0 24px; transition: 0.3s ease; background: #f8fafc; }
+.acordeon-item input:checked ~ .conteudo { max-height: 200px; padding: 18px 24px; }
+
+/* Vitrine de Destaque da Loja na Esquerda */
+.cartao-loja-destaque { background: linear-gradient(135deg, #fef08a, #fef9c3); border: 1px solid #fef23a; border-radius: var(--raio-grande); padding: 24px; margin-bottom: 24px; }
+.cartao-loja-destaque h2 { font-size: 1.3rem; font-weight: 800; margin: 6px 0; }
+.cartao-loja-destaque p { font-size: 0.9rem; color: #713f12; margin-bottom: 14px; }
+.botao-secundario { background: #713f12; color: #fff; border: none; padding: 8px 16px; border-radius: var(--raio-medio); font-weight: 600; cursor: pointer; display: inline-block; text-decoration: none; text-align: center; }
+
+/* Gráficos do Mini Ranking Lateral */
+.titulo-widget { font-size: 1rem; font-weight: 800; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+.linha-linha-podio { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: var(--raio-medio); font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; }
+.emblema-medalha { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #fff; font-weight: 800; font-size: 0.8rem; }
+.nome-usuario { flex: 1; margin-left: 12px; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Pódios Metálicos */
+.podio-ouro { background: var(--ouro-claro); color: var(--ouro); border: 1px solid #fde68a; }
+.podio-ouro .emblema-medalha { background: var(--ouro); }
+.podio-prata { background: var(--prata-claro); color: #64748b; border: 1px solid #cbd5e1; }
+.podio-prata .emblema-medalha { background: var(--prata); }
+.podio-bronze { background: var(--bronze-claro); color: var(--bronze); border: 1px solid #fed7aa; }
+.podio-bronze .emblema-medalha { background: var(--bronze); }
+
+@media (max-width: 900px) {
+    .conteiner-painel { grid-template-columns: 1fr; gap: 24px; }
+    .cartao-boas-vindas { flex-direction: column; align-items: flex-start; }
+    .conteiner-carrossel { max-height: 220px; margin-left: auto; margin-right: auto; }
+}
+
+@media (max-width: 480px) {
+    .cartao-boas-vindas { padding: 20px; }
+    .legenda-slide { padding: 16px; font-size: 1rem; }
+    .cabecalho-abas { flex-wrap: wrap; gap: 8px; }
+    /* Em telas estreitas o texto quebra em mais linhas — sem isso o
+       conteúdo do acordeão aberto fica cortado pelo max-height fixo. */
+    .acordeon-item input:checked ~ .conteudo { max-height: 400px; }
+}
+
+/* ==========================================
+   11. LOJA — vitrine de itens e "Meus Pedidos" (era estilo_loja.css)
+   ========================================== */
+/* Layout da Vitrine */
+.conteiner-loja { max-width: 1200px; margin: 40px auto; padding: 0 24px; }
+.painel-usuario-loja { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+
+.descricao-loja { color: var(--text-gray); font-size: 0.95rem; margin-top: 4px; }
+
+/* Aviso mostrado no lugar da vitrine quando a loja exige login (ou a
+   conta não está autenticada) */
+#avisoLoginLoja { text-align: center; padding: 40px 20px; }
+#avisoLoginLoja p { color: var(--texto-suave); font-size: 1.05rem; }
+#avisoLoginLoja a { color: var(--primary-blue); font-weight: 700; }
+
+/* Grade de Produtos */
+.grade-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; margin-top: 24px; }
+
+/* @preview:inicio  card de item da loja (prévia em admin/loja.html) */
+.cartao-item-loja { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+.icone-item-loja { width: 100%; height: 120px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; background: var(--fundo-neutro, #f8f9fa); border-radius: var(--raio-medio); margin-bottom: 12px; overflow: hidden; }
+.icone-item-loja img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.preco-tag { font-size: 1.4rem; font-weight: 800; color: var(--success-green); margin: 8px 0; display: block; }
+.botao-resgatar { width: 100%; background: var(--text-dark); color: #fff; border: none; padding: 10px 16px; border-radius: var(--raio-medio); font-weight: 600; cursor: pointer; transition: 0.2s; }
+.botao-resgatar:hover { background: var(--primary-blue); }
+.botao-resgatar:disabled { background: #94a3b8; cursor: not-allowed; }
+/* @preview:fim */
+
+.tag-categoria-loja { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--primary-blue); background: #e0f2fe; padding: 4px 10px; border-radius: 20px; display: inline-block; }
+
+/* Meus Pedidos Realizados */
+#secaoPedidos { margin-top: 40px; width: 100%; }
+.cabecalho-pedidos { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+.cabecalho-pedidos h3 { font-size: 1.3rem; font-weight: 700; }
+#filtroStatusPedido { padding: 10px 16px; border-radius: var(--raio-medio); border: 1px solid var(--cor-borda); background: #fff; font-weight: 600; color: var(--texto-principal); cursor: pointer; outline: none; }
+
+/* A tabela em si já herda width/border-collapse/th/td de style.css (regras
+   globais de <table>/<th>/<td>) — só o que é específico desta tabela
+   fica aqui. */
+#secaoPedidos thead tr { background: var(--fundo-neutro); }
+#secaoPedidos th:nth-child(3), #secaoPedidos th:nth-child(4),
+#secaoPedidos td:nth-child(3), #secaoPedidos td:nth-child(4) { text-align: center; }
+#secaoPedidos td:nth-child(1) { font-weight: 700; }
+#secaoPedidos td:nth-child(2) { font-weight: 600; color: var(--text-gray); }
+
+.status-pedido { padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; text-transform: uppercase; background: #fef3c7; color: #d97706; }
+.status-pedido--aprovado { background: #dbeafe; color: var(--primary-blue); }
+.status-pedido--resgatado { background: #dcfce7; color: var(--success-green); }
+.status-pedido--cancelado { background: #f1f5f9; color: var(--text-gray); }
+
+.botao-cancelar-pedido { background: #fff; border: 1px solid var(--cor-alerta); color: var(--cor-alerta); border-radius: 6px; padding: 6px 12px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
