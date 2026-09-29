@@ -79,6 +79,10 @@ if ($view === 'completo') {
 
         $comSaldo = array_values(array_filter($alunos, fn($a) => $a['saldo'] > 0));
         usort($comSaldo, fn($a, $b) => $b['saldo'] <=> $a['saldo']);
+        // Posição real no ranking geral, gravada ANTES de qualquer filtro de
+        // busca — assim quem aparece sozinho numa busca continua mostrando o
+        // lugar de verdade (ex.: 12º) em vez de virar 1º.
+        $comSaldo = array_map(fn($a, $i) => $a + ['posicao' => $i + 1], $comSaldo, array_keys($comSaldo));
 
         $busca = MOSTRAR_APENAS_PRIMEIRA_LETRA ? '' : mb_strtolower(trim((string)($_GET['busca'] ?? '')));
 
@@ -96,7 +100,7 @@ if ($view === 'completo') {
         $limite = min($limite, RANKING_LIMITE_MAXIMO); // nunca mais que o teto, não importa o que o parâmetro peça
 
         return array_map(
-            fn($a) => ['nome' => $a['nome'], 'turma' => $a['turma'], 'turmaEsteAno' => $a['turmaEsteAno'], 'saldo' => round($a['saldo'], 2)],
+            fn($a) => ['posicao' => $a['posicao'], 'nome' => $a['nome'], 'turma' => $a['turma'], 'turmaEsteAno' => $a['turmaEsteAno'], 'saldo' => round($a['saldo'], 2)],
             array_slice($base, 0, $limite)
         );
     });

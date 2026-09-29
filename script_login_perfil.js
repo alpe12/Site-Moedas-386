@@ -69,7 +69,36 @@ async function carregarPerfil() {
     }
 }
 
+/**
+ * Se já existe uma sessão válida, não faz sentido mostrar a tela de login
+ * de novo: vai direto para o perfil. Usa replace() para que o botão
+ * "voltar" não traga o aluno de volta para o login. Se a checagem falhar
+ * (rede, servidor), segue para o login normalmente.
+ */
+async function redirecionarSeJaLogado() {
+    try {
+        const resposta = await fetch('api/sessao.php', { credentials: 'same-origin', cache: 'no-store' });
+        if (!resposta.ok) return false;
+        const status = await resposta.json();
+        if (status.autenticado) {
+            window.location.replace('perfil.html');
+            return true;
+        }
+    } catch {
+        // Sem resposta: só mostra o login.
+    }
+    return false;
+}
+
 async function inicializarLogin() {
+    if (await redirecionarSeJaLogado()) return;
+
+    // Voltando para esta página pelo cache do navegador (botão "voltar"),
+    // o código acima não roda de novo — confere a sessão outra vez.
+    window.addEventListener('pageshow', (evento) => {
+        if (evento.persisted) redirecionarSeJaLogado();
+    });
+
     const config = await window.configPromise;
 
     const botao_conta = document.getElementById("btn_conta");

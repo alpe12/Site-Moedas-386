@@ -108,7 +108,10 @@ async function atualizarTabela() {
         // busca no servidor teria — filtrar aqui dá o mesmo resultado, sem
         // gastar uma requisição por letra digitada.
         const buscaMin = busca.toLowerCase();
-        const filtrados = poolRankingCompleto.filter(a => String(a.nome || '').toLowerCase().includes(buscaMin));
+        // Grava a posição real (índice no pool completo) antes de filtrar.
+        const filtrados = poolRankingCompleto
+            .map((a, i) => ({ ...a, posicao: a.posicao ?? i + 1 }))
+            .filter(a => String(a.nome || '').toLowerCase().includes(buscaMin));
         renderizarTabelaCompleta(filtrados.slice(0, limite));
         return;
     }
@@ -137,7 +140,7 @@ function renderizarTabelaCompleta(lista) {
 
     corpo.innerHTML = lista.map((aluno, index) => `
         <tr>
-            <td>${index + 1}º</td>
+            <td>${aluno.posicao ?? index + 1}º</td>
             <td>${escapeHtml(aluno.nome)}</td>
             <td>${escapeHtml(aluno.turma)}</td>
             <td class="valor-eco">${formatarMoeda(aluno.saldo)}</td>
