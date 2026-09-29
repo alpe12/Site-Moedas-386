@@ -119,7 +119,8 @@ session_set_cookie_params([
     // deixar o cookie sobrevivendo no navegador além do que faz sentido.
     'lifetime' => LOGIN_DURACAO_ATIVADA ? LOGIN_DURACAO_SEGUNDOS : 0,
     'path' => '/',
-    'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+    'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+                (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'])[0])) === 'https'),
     'httponly' => true,
     'samesite' => 'Lax',
 ]);

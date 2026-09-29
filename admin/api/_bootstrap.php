@@ -139,7 +139,8 @@ session_set_cookie_params([
     // Restrito a /admin/: o navegador nunca manda este cookie pro resto
     // do site, e o cookie do site público nunca chega aqui.
     'path' => '/admin/',
-    'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+    'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+                (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'])[0])) === 'https'),
     'httponly' => true,
     'samesite' => 'Lax',
 ]);

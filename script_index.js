@@ -63,7 +63,8 @@ async function personalizarBoasVindas() {
         if (!aluno || !aluno.nome) return;
 
         const titulo = document.getElementById('titulo-boas-vindas');
-        if (titulo) titulo.textContent = `Olá, ${aluno.nome}!`;
+        const primeiroNome = aluno.nome.trim().split(/\s+/)[0];
+        if (titulo) titulo.textContent = `Olá, ${primeiroNome}!`;
 
         document.getElementById('botao-boas-vindas')?.remove();
     } catch (erro) {
