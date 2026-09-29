@@ -818,6 +818,7 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
 .botao-resgatar { width: 100%; background: var(--text-dark); color: #fff; border: none; padding: 10px 16px; border-radius: var(--raio-medio); font-weight: 600; cursor: pointer; transition: 0.2s; }
 .botao-resgatar:hover { background: var(--primary-blue); }
 .botao-resgatar:disabled { background: #94a3b8; cursor: not-allowed; }
+.botao-resgatar--sem-saldo:disabled { background: #f1f5f9; color: #64748b; border: 1px dashed #cbd5e1; }
 /* @preview:fim */
 
 .tag-categoria-loja { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--primary-blue); background: #e0f2fe; padding: 4px 10px; border-radius: 20px; display: inline-block; }

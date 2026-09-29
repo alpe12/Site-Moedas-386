@@ -68,7 +68,23 @@ function renderizarGradeItens(itens, contaAtiva, motivoBloqueio) {
         mostrarAviso('Sua conta ainda está pendente de aprovação. Você poderá resgatar itens assim que ela for aprovada.', 'info', 7000);
     }
 
-    const textoBotao = contaAtiva ? 'Resgatar' : (motivoBloqueio === 'deslogado' ? 'Faça login' : 'Pendente');
+    // Saldo só é conhecido quando logado e com conta ativa.
+    const semSaldo = item => contaAtiva && saldoAtualAluno < Number(item.valor);
+
+    const botaoDoItem = item => {
+        if (!contaAtiva) {
+            const texto = motivoBloqueio === 'deslogado' ? 'Faça login' : 'Pendente';
+            return `<button class="botao-resgatar" disabled>${texto}</button>`;
+        }
+        if (semSaldo(item)) {
+            const falta = Number(item.valor) - saldoAtualAluno;
+            return `<button class="botao-resgatar botao-resgatar--sem-saldo" disabled
+                        title="Você precisa de mais 🪙 ${formatarMoeda(falta)} para resgatar este item">
+                        Faltam 🪙 ${formatarMoeda(falta)}
+                    </button>`;
+        }
+        return `<button class="botao-resgatar">Resgatar</button>`;
+    };
 
     grade.innerHTML = itens.map(item => `
         <div class="cartao cartao-item-loja" data-item-id="${escapeHtml(item.id)}">
@@ -79,7 +95,7 @@ function renderizarGradeItens(itens, contaAtiva, motivoBloqueio) {
             </div>
             <h3>${escapeHtml(item.nome)}</h3>
             <span class="preco-tag">${formatarMoeda(item.valor)} 🪙</span>
-            <button class="botao-resgatar" ${contaAtiva ? '' : 'disabled'}>${textoBotao}</button>
+            ${botaoDoItem(item)}
         </div>
     `).join('');
 
@@ -87,6 +103,7 @@ function renderizarGradeItens(itens, contaAtiva, motivoBloqueio) {
         grade.querySelectorAll('.cartao-item-loja').forEach(cartao => {
             const id = cartao.dataset.itemId;
             const item = itens.find(i => i.id === id);
+            if (!item || semSaldo(item)) return;
             cartao.querySelector('.botao-resgatar').addEventListener('click', () => resgatarItem(item));
         });
     }
