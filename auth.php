@@ -87,6 +87,17 @@ if ($acao === 'cadastro') {
         json_response(['sucesso' => false, 'mensagem' => 'E-mail inválido.'], 400);
     }
 
+    // CPF e celular seguem CPF_MODO/TELEFONE_MODO (config.php): em 'oculto'
+    // o que vier na requisição é ignorado e a coluna fica vazia.
+    [$cpf, $erro] = resolver_campo_cadastro(cpf_modo(), (string)($data['cpf'] ?? ''), 'CPF', 'validar_cpf', 'formatar_cpf');
+    if ($erro !== null) {
+        json_response(['sucesso' => false, 'mensagem' => $erro], 400);
+    }
+    [$telefone, $erro] = resolver_campo_cadastro(telefone_modo(), (string)($data['telefone'] ?? ''), 'celular', 'validar_telefone', 'formatar_telefone');
+    if ($erro !== null) {
+        json_response(['sucesso' => false, 'mensagem' => $erro], 400);
+    }
+
     if (($erro = validar_senha($senha)) !== null) {
         json_response(['sucesso' => false, 'mensagem' => $erro], 400);
     }
@@ -112,7 +123,7 @@ if ($acao === 'cadastro') {
     // Verifica duplicidade (matrícula, e-mail e nome completo) e grava sob o
     // mesmo lock, para que dois cadastros simultâneos não passem os dois
     // pela checagem antes de qualquer um escrever (condição de corrida).
-    $resultado = with_locked_csv(USERS_CSV, function (array $usuarios) use ($matricula, $email, $nome, $nomeNormalizado, $turma, $hash, $token, $ativo) {
+    $resultado = with_locked_csv(USERS_CSV, function (array $usuarios) use ($matricula, $email, $cpf, $telefone, $nome, $nomeNormalizado, $turma, $hash, $token, $ativo) {
         foreach ($usuarios as $u) {
             if ((string)$u['matricula'] === $matricula) {
                 return ['return' => ['erro' => 'matricula_duplicada']];
@@ -126,6 +137,7 @@ if ($acao === 'cadastro') {
         }
         $usuarios[] = [
             'matricula' => $matricula, 'nome' => $nome, 'email' => $email,
+            'cpf' => $cpf, 'telefone' => $telefone,
             'senha_hash' => $hash, 'reset_token' => $token, 'ativo' => $ativo,
         ];
         return ['rows' => $usuarios, 'return' => ['ok' => true]];

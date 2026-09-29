@@ -126,6 +126,7 @@ async function inicializarLogin() {
         restringirSomenteNumeros(campoTurma, "Turma");
     }
     if (campoNome) restringirSomenteLetras(campoNome, "Nome completo");
+    configurarCamposContato(config);
 
     // Mostrar/ocultar em todo campo de senha; a listinha de regras que
     // acende verde/vermelho só faz sentido onde a senha está sendo
@@ -186,6 +187,77 @@ async function fazerLogin() {
     }
 }
 
+/**
+ * CPF e celular do cadastro: 'oculto' remove o campo do formulário,
+ * 'opcional' mostra (pode ficar em branco) e 'obrigatorio' mostra e exige
+ * — o mesmo CPF_MODO/TELEFONE_MODO que o servidor aplica (api/config.php).
+ */
+function configurarCamposContato(config) {
+    const campos = [
+        { modo: config.cpfModo, idLi: "li_cpf_cadastro", idInput: "cpf_cadastro", rotulo: "CPF", mascara: mascararCpf },
+        { modo: config.telefoneModo, idLi: "li_telefone_cadastro", idInput: "telefone_cadastro", rotulo: "Celular com DDD", mascara: mascararTelefone },
+    ];
+    for (const { modo, idLi, idInput, rotulo, mascara } of campos) {
+        const li = document.getElementById(idLi);
+        const input = document.getElementById(idInput);
+        if (!li || !input) continue;
+        if (modo !== "opcional" && modo !== "obrigatorio") {
+            li.remove(); // oculto: some do formulário (e do preenchimento automático)
+            continue;
+        }
+        input.required = modo === "obrigatorio";
+        input.placeholder = modo === "opcional" ? `${rotulo} (opcional)` : rotulo;
+        input.addEventListener("input", () => { input.value = mascara(input.value); });
+        li.classList.remove("oculto");
+    }
+}
+
+/** 000.000.000-00 enquanto digita. */
+function mascararCpf(valor) {
+    const d = valor.replace(/\D/g, "").slice(0, 11);
+    let s = d.slice(0, 3);
+    if (d.length > 3) s += "." + d.slice(3, 6);
+    if (d.length > 6) s += "." + d.slice(6, 9);
+    if (d.length > 9) s += "-" + d.slice(9, 11);
+    return s;
+}
+
+/** (00) 90000-0000 enquanto digita; um +55 colado na frente é descartado. */
+function mascararTelefone(valor) {
+    let d = valor.replace(/\D/g, "");
+    if (d.length > 11 && d.startsWith("55")) d = d.slice(2);
+    d = d.slice(0, 11);
+    if (!d) return "";
+    let s = "(" + d.slice(0, 2);
+    if (d.length > 2) s += ") " + d.slice(2, 7);
+    if (d.length > 7) s += "-" + d.slice(7);
+    return s;
+}
+
+/** CPF válido? Formato (11 dígitos ou 000.000.000-00) + dígitos verificadores (módulo 11). Espelha validar_cpf() de config.php. */
+function cpfValido(cpf) {
+    if (!/^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/.test(cpf)) return false;
+    const d = cpf.replace(/\D/g, "");
+    if (/^(\d)\1{10}$/.test(d) || d === "01234567890") return false; // repetidos e o CPF de teste
+    for (const n of [9, 10]) {
+        let soma = 0;
+        for (let i = 0; i < n; i++) soma += Number(d[i]) * (n + 1 - i);
+        if (Number(d[n]) !== ((soma * 10) % 11) % 10) return false;
+    }
+    return true;
+}
+
+/** Espelha validar_telefone() de config.php. Devolve a mensagem de erro, ou null se estiver ok. */
+function erroTelefone(telefone, config) {
+    if (!/^\+?[\d\s().\-]+$/.test(telefone)) return "Celular inválido. Digite o DDD e o número, ex.: (21) 91234-5678.";
+    let d = telefone.replace(/\D/g, "");
+    if (d.length === 13 && d.startsWith("55")) d = d.slice(2);
+    if (d.length !== 11) return "Celular inválido. Digite o DDD e o número, ex.: (21) 91234-5678.";
+    if (!(config.dddsValidos || []).includes(Number(d.slice(0, 2)))) return "Celular inválido: DDD inexistente.";
+    if (d[2] !== "9") return "Celular inválido: o número deve começar com 9 depois do DDD.";
+    return null;
+}
+
 /** Validação no navegador, espelhando as mesmas regras que o servidor aplica (config.php). */
 function validarCadastro(campos, config) {
     const palavrasNome = campos.nome.split(/\s+/).filter(Boolean);
@@ -204,6 +276,16 @@ function validarCadastro(campos, config) {
     }
 
     if (!campos.email.includes('@')) return "E-mail inválido.";
+
+    // Campo de contato só entra aqui se o modo dele não for 'oculto' (nesse
+    // caso o valor já vem "" e o servidor ignora de qualquer forma).
+    if (config.cpfModo === "obrigatorio" && !campos.cpf) return "Informe o CPF.";
+    if (campos.cpf && !cpfValido(campos.cpf)) return "CPF inválido.";
+    if (config.telefoneModo === "obrigatorio" && !campos.telefone) return "Informe o celular.";
+    if (campos.telefone) {
+        const erroTel = erroTelefone(campos.telefone, config);
+        if (erroTel) return erroTel;
+    }
 
     return validarSenha(campos.senha, config);
 }
@@ -227,6 +309,9 @@ async function fazerCadastro(config) {
     const matricula = document.getElementById("matricula_cadastro").value.trim();
     const turma = document.getElementById("turma_cadastro").value.trim();
     const email = document.getElementById("email_cadastro").value.trim().toLowerCase();
+    // Ausentes do formulário (modo 'oculto') viram "".
+    const cpf = document.getElementById("cpf_cadastro")?.value.trim() ?? "";
+    const telefone = document.getElementById("telefone_cadastro")?.value.trim() ?? "";
     const senha = document.getElementById("senha_cadastro").value;
     const confSenha = document.getElementById("confsenha").value;
 
@@ -240,7 +325,7 @@ async function fazerCadastro(config) {
         return;
     }
 
-    const erroValidacao = validarCadastro({ nome, matricula, turma, email, senha }, config);
+    const erroValidacao = validarCadastro({ nome, matricula, turma, email, cpf, telefone, senha }, config);
     if (erroValidacao) {
         mostrarAviso(erroValidacao, 'erro');
         return;
@@ -252,7 +337,7 @@ async function fazerCadastro(config) {
             headers: { "Content-Type": "application/json" },
             credentials: "same-origin",
             body: JSON.stringify({
-                acao: "cadastro", nome, matricula, turma, email, senha
+                acao: "cadastro", nome, matricula, turma, email, cpf, telefone, senha
             })
         });
 

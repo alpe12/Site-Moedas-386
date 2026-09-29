@@ -42,6 +42,10 @@
                     <li><input type="text" id="turma_cadastro" placeholder="Turma" required></li>
                     <li><input type="text" id="matricula_cadastro" inputmode="numeric" autocomplete="off" placeholder="Matrícula" required></li>
                     <li><input type="email" id="email_cadastro" placeholder="E-mail" autocomplete="email" required></li>
+                    <!-- CPF e celular: começam ocultos; script_login_perfil.js mostra, torna
+                         obrigatório ou remove cada um conforme CPF_MODO/TELEFONE_MODO (api/config.php). -->
+                    <li id="li_cpf_cadastro" class="oculto"><input type="text" id="cpf_cadastro" inputmode="numeric" autocomplete="off" placeholder="CPF" maxlength="14"></li>
+                    <li id="li_telefone_cadastro" class="oculto"><input type="tel" id="telefone_cadastro" inputmode="tel" autocomplete="tel-national" placeholder="Celular com DDD" maxlength="15"></li>
                     <li><input type="password" id="senha_cadastro" placeholder="Senha" autocomplete="new-password" required></li>
                     <li><input type="password" id="confsenha" placeholder="Confirmar Senha" autocomplete="new-password" required></li>
                     <li><input type="submit" id="btn_cadastrar" class="btn-entrar" value="Cadastrar"></li>

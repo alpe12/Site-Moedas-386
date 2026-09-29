@@ -44,7 +44,7 @@ const SITE_CSV_HEADERS = [
     // compartilhado com o admin abaixo) pra a lógica de "qual é a turma
     // atual"/"qual valia numa data" — atividades.php e pedidos.php usam a
     // segunda pra mostrar a turma que o aluno tinha NA ÉPOCA de cada ação.
-    'usuarios' => ['matricula', 'nome', 'email', 'senha_hash', 'reset_token', 'ativo'],
+    'usuarios' => ['matricula', 'nome', 'email', 'cpf', 'telefone', 'senha_hash', 'reset_token', 'ativo'],
     'atividades' => ['id', 'matriculas', 'data', 'atividade', 'valor'],
     'pedidos' => ['id', 'data', 'matricula', 'nomeAluno', 'item_id', 'item', 'valor', 'status'],
     'itens' => ['id', 'nome', 'valor', 'icone', 'imagem', 'ativo'],

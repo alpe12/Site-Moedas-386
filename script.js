@@ -14,6 +14,7 @@ window.configPromise = fetch('api/config_publica.php', { cache: 'default' })
         senhaMinTamanho: 8, senhaMinLetras: 0, senhaMinNumeros: 0, senhaMinEspeciais: 0,
         matriculaTamanho: 15, matriculaAnoMin: 2000, matriculaAnoMax: 2099,
         turmaTamanho: 4, whatsappLink: '#',
+        cpfModo: 'oculto', telefoneModo: 'oculto', dddsValidos: [],
         mostrarApenasPrimeiraLetra: false, lojaVisivelSemLogin: false,
         rankingLimitePadrao: 20, rankingLimiteMaximo: 100,
     }));

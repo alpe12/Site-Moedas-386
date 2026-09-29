@@ -18,12 +18,16 @@ const CSV_HEADERS = [
     // aluno a recuperar a senha, não é segredo criptográfico.
     // ativo: só importa quando EXIGIR_APROVACAO_CONTA está ligado em
     // config.php; veja conta_esta_ativa().
+    // cpf/telefone: contato pedido no cadastro conforme CPF_MODO/
+    // TELEFONE_MODO em config.php; ficam vazios se o modo for 'oculto', se
+    // o campo for opcional e deixado em branco, ou em contas criadas
+    // antes destas colunas existirem.
     // Não existe mais uma coluna "turma" aqui — a turma (atual e todo o
     // histórico de trocas) vive inteiramente em turmas_historico.csv desde
     // que a troca de turma pelo aluno foi adicionada; veja o comentário de
     // 'turmas_historico' logo abaixo e api/turma_utils.php. O cadastro cria
     // a primeira linha de lá junto com o usuário (auth.php).
-    'usuarios' => ['matricula', 'nome', 'email', 'senha_hash', 'reset_token', 'ativo'],
+    'usuarios' => ['matricula', 'nome', 'email', 'cpf', 'telefone', 'senha_hash', 'reset_token', 'ativo'],
     // Créditos e ajustes de saldo (valor pode ser negativo). Não existe mais
     // um "saldo" gravado em algum CSV: ganho/gasto/saldo de cada aluno são
     // sempre calculados na hora a partir deste arquivo + pedidos_loja.csv —

@@ -44,6 +44,17 @@ ficam dessincronizados:
   entra em detalhe de qual regra falhou, para não dar dica de como formar
   uma matrícula falsa que passe na validação.
 - **Formato da turma**: tamanho fixo (padrão 4 dígitos).
+- **`CPF_MODO`** e **`TELEFONE_MODO`** (padrão `'opcional'` nos dois): como o
+  cadastro trata o CPF e o celular para contato. `'oculto'` = o campo nem
+  aparece no formulário e a coluna fica sempre vazia (um valor enviado
+  direto à API é ignorado); `'opcional'` = aparece, pode ficar em branco,
+  mas se preenchido é validado; `'obrigatorio'` = aparece e precisa ser
+  preenchido e válido. O CPF é validado pelo formato **e** pelos dígitos
+  verificadores (regra do módulo 11; sequências como `111.111.111-11` são
+  recusadas). O celular precisa ter DDD existente e começar com 9 depois do
+  DDD (aceita pontuação e um `+55` na frente). Um valor de modo inválido
+  (erro de digitação) é tratado como `'oculto'` e registrado no log de
+  erros do PHP. Trocar o modo só vale para cadastros novos.
 - **`WHATSAPP_LINK`**: o link usado em todo o site sempre que se sugere
   "fale com um monitor" — troque `SEUNUMERO` pelo número real.
 - **`EXIGIR_APROVACAO_CONTA`** (padrão `false`): toda conta nova sempre
@@ -123,8 +134,16 @@ dos dois lados.
 
 `usuarios.csv`
 
-    matricula,nome,email,senha_hash,reset_token,ativo
+    matricula,nome,email,cpf,telefone,senha_hash,reset_token,ativo
 
+- `cpf` / `telefone`: gravados com pontuação de propósito —
+  `000.000.000-00` e `(00) 90000-0000` — para o Excel/Sheets não engolir o
+  zero à esquerda de um CPF ao abrir o arquivo. Vazios se o modo do campo for
+  `'oculto'`, se ficou em branco num campo opcional, ou em contas criadas
+  antes destas colunas existirem. Bases antigas ganham as colunas sozinhas
+  na próxima gravação em `usuarios.csv`; para fazer isso antes, com backup,
+  use `migrar_cpf_telefone.php` (descartável — veja o comentário no topo
+  dele; depois de rodar, é só apagá-lo).
 - `reset_token`: 6 caracteres A-Z0-9, gerado no cadastro e mostrado ao aluno
   **uma única vez**, na hora. Fica salvo em texto puro de propósito — é para
   um monitor conseguir abrir o CSV e ler o código para ajudar o aluno, não é

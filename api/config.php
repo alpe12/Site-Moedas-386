@@ -28,6 +28,24 @@ define('MATRICULA_ANO_MAX', max(MATRICULA_ANO_MAX_MANUAL, (int)date('Y') + 1));
 // --- Formato da turma (ex.: 0901) ---
 const TURMA_TAMANHO = 4;
 
+// --- CPF e celular para contato no cadastro ---
+// Cada um dos dois campos aceita um destes modos:
+//   'oculto'      -> não aparece no formulário e não é pedido. A coluna
+//                    continua existindo em usuarios.csv, sempre vazia
+//                    (mesmo que alguém envie o valor direto à API, ele é
+//                    ignorado).
+//   'opcional'    -> (padrão) aparece no formulário; pode ficar em branco,
+//                    mas se for preenchido tem que ser válido (o CPF passa
+//                    também pela conferência dos dígitos verificadores).
+//   'obrigatorio' -> aparece e precisa ser preenchido com um valor válido.
+// Trocar o modo vale só para cadastros novos — contas que já existem não
+// são alteradas nem exigidas a preencher nada.
+// Gravação em usuarios.csv: CPF como 000.000.000-00 e celular como
+// (00) 90000-0000 — com a pontuação de propósito, para o Excel/Sheets não
+// engolir o zero à esquerda de um CPF ao abrir o arquivo.
+const CPF_MODO = 'opcional';
+const TELEFONE_MODO = 'opcional';
+
 // --- Contato (usado em mensagens de erro/ajuda no site inteiro) ---
 const WHATSAPP_LINK = 'https://wa.me/SEUNUMERO?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20o%20EcoCoin';
 
@@ -169,6 +187,9 @@ function config_publica(): array {
         'matriculaAnoMin' => MATRICULA_ANO_MIN,
         'matriculaAnoMax' => MATRICULA_ANO_MAX,
         'turmaTamanho' => TURMA_TAMANHO,
+        'cpfModo' => cpf_modo(),
+        'telefoneModo' => telefone_modo(),
+        'dddsValidos' => ddds_validos(),
         'whatsappLink' => WHATSAPP_LINK,
         'mostrarApenasPrimeiraLetra' => MOSTRAR_APENAS_PRIMEIRA_LETRA,
         'lojaVisivelSemLogin' => LOJA_VISIVEL_SEM_LOGIN,
@@ -221,6 +242,123 @@ function validar_turma(string $turma): ?string {
         return "A turma deve ter exatamente " . TURMA_TAMANHO . " números.";
     }
     return null;
+}
+
+/**
+ * Lê o modo de um campo opcional do cadastro ('oculto', 'opcional' ou
+ * 'obrigatorio'). Um valor desconhecido (erro de digitação em config.php)
+ * cai em 'oculto' — o mais discreto, já que não coleta nada — e deixa um
+ * aviso no log de erros do PHP em vez de falhar calado.
+ */
+function modo_campo_cadastro(string $valor, string $nomeConfig): string {
+    static $avisados = [];
+    $normalizado = strtr(mb_strtolower(trim($valor)), ['ó' => 'o']);
+    if (in_array($normalizado, ['oculto', 'opcional', 'obrigatorio'], true)) return $normalizado;
+    if (empty($avisados[$nomeConfig])) {
+        $avisados[$nomeConfig] = true;
+        error_log("config: $nomeConfig tem um valor inválido (\"$valor\"); use 'oculto', 'opcional' ou 'obrigatorio'. Tratando como 'oculto'.");
+    }
+    return 'oculto';
+}
+
+function cpf_modo(): string { return modo_campo_cadastro(CPF_MODO, 'CPF_MODO'); }
+function telefone_modo(): string { return modo_campo_cadastro(TELEFONE_MODO, 'TELEFONE_MODO'); }
+
+/**
+ * Aplica o modo de um campo opcional do cadastro ao valor recebido.
+ * Devolve [valorParaGravar, erro]: em 'oculto' o valor enviado é
+ * ignorado (grava ''); em 'opcional' um valor em branco passa e um
+ * preenchido é validado; em 'obrigatorio' o valor em branco também é erro.
+ * $validar devolve null se o valor estiver ok, ou a mensagem de erro;
+ * $formatar devolve a forma como o valor é gravado.
+ */
+function resolver_campo_cadastro(string $modo, string $bruto, string $rotulo, callable $validar, callable $formatar): array {
+    if ($modo === 'oculto') return ['', null];
+    $bruto = trim($bruto);
+    if ($bruto === '') {
+        return $modo === 'obrigatorio' ? ['', "Informe o $rotulo."] : ['', null];
+    }
+    if (($erro = $validar($bruto)) !== null) return ['', $erro];
+    return [$formatar($bruto), null];
+}
+
+/** Só os dígitos de um CPF no formato aceito (11 dígitos ou 000.000.000-00). null se o formato não bate. */
+function cpf_digitos(string $cpf): ?string {
+    $cpf = trim($cpf);
+    if (!preg_match('/^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/', $cpf)) return null;
+    return preg_replace('/\D/', '', $cpf);
+}
+
+/**
+ * Confere os dois dígitos verificadores (regra do módulo 11) e rejeita
+ * sequências repetidas como 111.111.111-11 e o número de teste 012.345.678-90
+ * (que passaria na conta, mas é sempre um CPF falso).
+ */
+function cpf_digitos_verificadores_ok(string $d): bool {
+    if (preg_match('/^(\d)\1{10}$/', $d) || $d === '01234567890') return false;
+    foreach ([9, 10] as $n) {
+        $soma = 0;
+        for ($i = 0; $i < $n; $i++) $soma += (int)$d[$i] * ($n + 1 - $i);
+        $esperado = ($soma * 10) % 11 % 10;
+        if ((int)$d[$n] !== $esperado) return false;
+    }
+    return true;
+}
+
+/** Valida formato + dígitos verificadores do CPF. Devolve null se estiver ok, ou a mensagem de erro. */
+function validar_cpf(string $cpf): ?string {
+    $d = cpf_digitos($cpf);
+    if ($d === null || !cpf_digitos_verificadores_ok($d)) return "CPF inválido.";
+    return null;
+}
+
+/** CPF (já validado) na forma gravada em usuarios.csv: 000.000.000-00. */
+function formatar_cpf(string $cpf): string {
+    $d = cpf_digitos($cpf) ?? '';
+    return substr($d, 0, 3) . '.' . substr($d, 3, 3) . '.' . substr($d, 6, 3) . '-' . substr($d, 9, 2);
+}
+
+/** DDDs em uso no Brasil. */
+function ddds_validos(): array {
+    return [
+        11, 12, 13, 14, 15, 16, 17, 18, 19,
+        21, 22, 24, 27, 28,
+        31, 32, 33, 34, 35, 37, 38,
+        41, 42, 43, 44, 45, 46, 47, 48, 49,
+        51, 53, 54, 55,
+        61, 62, 63, 64, 65, 66, 67, 68, 69,
+        71, 73, 74, 75, 77, 79,
+        81, 82, 83, 84, 85, 86, 87, 88, 89,
+        91, 92, 93, 94, 95, 96, 97, 98, 99,
+    ];
+}
+
+/**
+ * Só os 11 dígitos (DDD + número) de um celular. Aceita pontuação comum
+ * — (21) 91234-5678, 21 91234 5678 — e um +55/55 na frente. null se o
+ * formato não bate.
+ */
+function telefone_digitos(string $telefone): ?string {
+    $telefone = trim($telefone);
+    if (!preg_match('/^\+?[\d\s().\-]+$/', $telefone)) return null;
+    $d = preg_replace('/\D/', '', $telefone);
+    if (strlen($d) === 13 && str_starts_with($d, '55')) $d = substr($d, 2);
+    return strlen($d) === 11 ? $d : null;
+}
+
+/** Valida um celular brasileiro (DDD existente + 9 na frente do número). Devolve null se estiver ok, ou a mensagem de erro. */
+function validar_telefone(string $telefone): ?string {
+    $d = telefone_digitos($telefone);
+    if ($d === null) return "Celular inválido. Digite o DDD e o número, ex.: (21) 91234-5678.";
+    if (!in_array((int)substr($d, 0, 2), ddds_validos(), true)) return "Celular inválido: DDD inexistente.";
+    if ($d[2] !== '9') return "Celular inválido: o número deve começar com 9 depois do DDD.";
+    return null;
+}
+
+/** Celular (já validado) na forma gravada em usuarios.csv: (00) 90000-0000. */
+function formatar_telefone(string $telefone): string {
+    $d = telefone_digitos($telefone) ?? '';
+    return '(' . substr($d, 0, 2) . ') ' . substr($d, 2, 5) . '-' . substr($d, 7, 4);
 }
 
 /** Exige nome e sobrenome (pelo menos duas palavras). */
