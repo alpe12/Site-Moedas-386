@@ -36,6 +36,9 @@ const SITE_CARROSSEL_CSV = SITE_PRIVATE_DIR . '/carrossel.csv';
 const SITE_EVENTOS_CSV = SITE_PRIVATE_DIR . '/eventos.csv';
 const SITE_PROJETOS_CSV = SITE_PRIVATE_DIR . '/projetos.csv';
 const SITE_TURMAS_HISTORICO_CSV = SITE_PRIVATE_DIR . '/turmas_historico.csv';
+// Log das ações dos ALUNOS (gravado pelo site público, api/_bootstrap.php) —
+// aqui o painel só LÊ, em admin/api/log_usuarios.php.
+const SITE_USER_LOG_CSV = SITE_PRIVATE_DIR . '/log_usuarios.csv';
 
 const SITE_CSV_HEADERS = [
     // Não existe mais uma coluna "turma" aqui — desde a troca de turma
@@ -52,6 +55,7 @@ const SITE_CSV_HEADERS = [
     'eventos' => ['id', 'tag', 'titulo', 'descricao', 'rodape', 'link', 'ordem', 'ativo'],
     'projetos' => ['id', 'titulo', 'parceria', 'descricao', 'ordem', 'ativo'],
     'turmas_historico' => ['id', 'matricula', 'turma', 'ano', 'data_solicitacao', 'data_efetiva', 'retroativo_definido', 'aprovacao_forcada', 'aprovado'],
+    'log_usuarios' => ['data', 'matricula', 'nome', 'acao', 'detalhes', 'ip'],
 ];
 
 require __DIR__ . '/config.php';
@@ -100,6 +104,7 @@ function caminhos_para_headers(): array {
             SITE_EVENTOS_CSV => SITE_CSV_HEADERS['eventos'],
             SITE_PROJETOS_CSV => SITE_CSV_HEADERS['projetos'],
             SITE_TURMAS_HISTORICO_CSV => SITE_CSV_HEADERS['turmas_historico'],
+            SITE_USER_LOG_CSV => SITE_CSV_HEADERS['log_usuarios'],
         ];
     }
     return $mapa;

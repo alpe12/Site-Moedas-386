@@ -43,6 +43,7 @@ async function inicializarRecuperar() {
 
 async function inicializarPerfil() {
     configurarTrocaTurma();
+    await configurarDadosConta();
     document.getElementById("btnSair")?.addEventListener("click", sair);
     await carregarPerfil();
 }
@@ -486,6 +487,226 @@ function renderizarPerfil(aluno) {
                 <td>${valor > 0 ? "+" : ""}${formatarMoeda(valor)}</td>
             </tr>`;
     }).join('');
+}
+
+// ==========================================
+// MEUS DADOS (e-mail, CPF, celular, senha) — api/conta.php
+// ==========================================
+// Os valores gravados só chegam ao navegador quando o aluno abre o cartão
+// (carregarDadosConta) — api/profile.php não os manda.
+let dadosContaAtuais = { email: "", cpf: "", telefone: "" };
+
+/**
+ * Liga o cartão "Meus Dados" em perfil.html. CPF e celular seguem o mesmo
+ * CPF_MODO/TELEFONE_MODO do cadastro (api/config.php): 'oculto' remove o
+ * campo, 'opcional' e 'obrigatorio' mostram. Aqui os dois nunca levam o
+ * atributo "required": em 'obrigatorio', uma conta antiga ainda sem CPF não
+ * é obrigada a preenchê-lo só para trocar o e-mail — é o servidor quem
+ * decide (resolver_edicao_campo(), api/config.php).
+ */
+async function configurarDadosConta() {
+    const form = document.getElementById("formDadosConta");
+    if (!form) return;
+    const config = await window.configPromise;
+
+    const campos = [
+        { modo: config.cpfModo, idBloco: "campoContaCpf", idInput: "contaCpf", rotulo: "CPF", mascara: mascararCpf },
+        { modo: config.telefoneModo, idBloco: "campoContaTelefone", idInput: "contaTelefone", rotulo: "Celular com DDD", mascara: mascararTelefone },
+    ];
+    for (const { modo, idBloco, idInput, rotulo, mascara } of campos) {
+        const bloco = document.getElementById(idBloco);
+        const input = document.getElementById(idInput);
+        if (!bloco || !input) continue;
+        if (modo !== "opcional" && modo !== "obrigatorio") {
+            bloco.remove(); // oculto: some do formulário
+            continue;
+        }
+        input.placeholder = modo === "opcional" ? `${rotulo} (opcional)` : rotulo;
+        input.addEventListener("input", () => { input.value = mascara(input.value); });
+        bloco.classList.remove("oculto");
+    }
+
+    // A listinha de regras só aparece quando o aluno começa a digitar uma
+    // senha nova (senão ficaria toda vermelha num campo que é opcional).
+    const novaSenha = document.getElementById("contaNovaSenha");
+    melhorarCampoSenha(novaSenha, { checklist: true, regras: config });
+    const checklist = novaSenha.closest(".wrapper-senha")?.nextElementSibling;
+    const atualizarChecklist = () => checklist?.classList.toggle("oculto", novaSenha.value === "");
+    novaSenha.addEventListener("input", atualizarChecklist);
+    atualizarChecklist();
+    melhorarCampoSenha(document.getElementById("contaConfNovaSenha"));
+    melhorarCampoSenha(document.getElementById("contaSenhaAtual"));
+
+    form.addEventListener("submit", (evento) => { evento.preventDefault(); salvarDadosConta(config); });
+
+    // Trocar a senha também é opcional e começa recolhido: quem só quer mudar
+    // o celular nem vê os campos de senha nova.
+    document.getElementById("btnAlternarNovaSenha")?.addEventListener("click", () => {
+        const abrindo = document.getElementById("secaoNovaSenha").classList.contains("oculto");
+        definirSecaoNovaSenha(abrindo);
+        if (abrindo) document.getElementById("contaNovaSenha")?.focus();
+    });
+
+    // O formulário começa recolhido; este botão abre e fecha. Fechar descarta
+    // o que ficou digitado e sem salvar (inclusive qualquer senha), voltando
+    // aos valores gravados.
+    const botaoAlternar = document.getElementById("btnAlternarDadosConta");
+    botaoAlternar?.addEventListener("click", async () => {
+        const abrindo = form.classList.contains("oculto");
+
+        if (!abrindo) {
+            aplicarDadosContaNoFormulario();
+            form.classList.add("oculto");
+            botaoAlternar.textContent = "Alterar meus dados";
+            botaoAlternar.setAttribute("aria-expanded", "false");
+            return;
+        }
+
+        // Os dados só são pedidos ao servidor agora; o formulário só aparece
+        // quando já chegaram (nunca vazio, para não parecer que não há nada).
+        botaoAlternar.disabled = true;
+        botaoAlternar.textContent = "Carregando...";
+        let abriu = false;
+        try {
+            abriu = await carregarDadosConta();
+        } catch (erro) {
+            mostrarAviso(erro.message, 'erro');
+        }
+        botaoAlternar.disabled = false;
+        botaoAlternar.textContent = abriu ? "Fechar" : "Alterar meus dados";
+        if (!abriu) return;
+
+        form.classList.remove("oculto");
+        botaoAlternar.setAttribute("aria-expanded", "true");
+        document.getElementById("contaEmail")?.focus();
+    });
+}
+
+/**
+ * Abre ou fecha a parte "nova senha" do formulário. Ao fechar, apaga o que
+ * foi digitado nela — assim uma senha nova deixada pela metade nunca vai
+ * junto no envio sem o aluno perceber.
+ */
+function definirSecaoNovaSenha(aberta) {
+    const secao = document.getElementById("secaoNovaSenha");
+    const botao = document.getElementById("btnAlternarNovaSenha");
+    if (!secao || !botao) return;
+    secao.classList.toggle("oculto", !aberta);
+    botao.textContent = aberta ? "Manter minha senha atual" : "Alterar minha senha";
+    botao.setAttribute("aria-expanded", String(aberta));
+    if (!aberta) {
+        for (const id of ["contaNovaSenha", "contaConfNovaSenha"]) {
+            const campo = document.getElementById(id);
+            if (campo) campo.value = "";
+        }
+        document.getElementById("contaNovaSenha")?.dispatchEvent(new Event("input"));
+    }
+}
+
+/**
+ * Busca e-mail, CPF e celular gravados (api/conta.php, GET) e preenche o
+ * formulário. Chamada a cada vez que o cartão é aberto, então o que aparece
+ * é sempre o valor de agora. Devolve false se a sessão expirou (já redireciona
+ * para o login); lança um Error com a mensagem para qualquer outra falha.
+ */
+async function carregarDadosConta() {
+    const resposta = await fetch('api/conta.php', { credentials: 'same-origin', cache: 'no-store' });
+    if (resposta.status === 401) { window.location.href = 'login.html'; return false; }
+    const resultado = await resposta.json().catch(() => ({}));
+    if (!resposta.ok || !resultado.sucesso) throw new Error(resultado.mensagem || 'Não foi possível carregar seus dados. Tente novamente.');
+
+    dadosContaAtuais = { email: resultado.email || "", cpf: resultado.cpf || "", telefone: resultado.telefone || "" };
+    aplicarDadosContaNoFormulario();
+    return true;
+}
+
+function aplicarDadosContaNoFormulario() {
+    const definir = (id, valor) => { const el = document.getElementById(id); if (el) el.value = valor; };
+    definir("contaEmail", dadosContaAtuais.email);
+    definir("contaCpf", dadosContaAtuais.cpf);
+    definir("contaTelefone", dadosContaAtuais.telefone);
+    definir("contaNovaSenha", "");
+    definir("contaConfNovaSenha", "");
+    definir("contaSenhaAtual", "");
+    definirSecaoNovaSenha(false); // recolhe (e limpa) a parte da senha nova
+}
+
+async function salvarDadosConta(config) {
+    const valorDe = (id) => document.getElementById(id)?.value ?? null;
+    const email = (valorDe("contaEmail") || "").trim().toLowerCase();
+    // null = campo ausente do formulário (modo 'oculto'): nem é enviado.
+    const cpfCampo = valorDe("contaCpf");
+    const telefoneCampo = valorDe("contaTelefone");
+    const cpf = cpfCampo === null ? null : cpfCampo.trim();
+    const telefone = telefoneCampo === null ? null : telefoneCampo.trim();
+    const novaSenha = valorDe("contaNovaSenha") || "";
+    const confNovaSenha = valorDe("contaConfNovaSenha") || "";
+    const senhaAtual = valorDe("contaSenhaAtual") || "";
+
+    if (!email || !email.includes("@")) { mostrarAviso("E-mail inválido.", 'erro'); return; }
+
+    if (cpf !== null) {
+        if (cpf === "" && config.cpfModo === "obrigatorio" && dadosContaAtuais.cpf) { mostrarAviso("Informe o CPF.", 'erro'); return; }
+        if (cpf !== "" && !cpfValido(cpf)) { mostrarAviso("CPF inválido.", 'erro'); return; }
+    }
+    if (telefone !== null) {
+        if (telefone === "" && config.telefoneModo === "obrigatorio" && dadosContaAtuais.telefone) { mostrarAviso("Informe o celular.", 'erro'); return; }
+        if (telefone !== "") {
+            const erroTel = erroTelefone(telefone, config);
+            if (erroTel) { mostrarAviso(erroTel, 'erro'); return; }
+        }
+    }
+    const senhaNovaAberta = !document.getElementById("secaoNovaSenha")?.classList.contains("oculto");
+    if (senhaNovaAberta && novaSenha === "") {
+        mostrarAviso('Digite a nova senha, ou clique em "Manter minha senha atual" se não quiser trocá-la.', 'erro');
+        document.getElementById("contaNovaSenha")?.focus();
+        return;
+    }
+    if (novaSenha !== "" || confNovaSenha !== "") {
+        if (novaSenha !== confNovaSenha) { mostrarAviso("As novas senhas não coincidem!", 'erro'); return; }
+        const erroSenha = validarSenha(novaSenha, config);
+        if (erroSenha) { mostrarAviso(erroSenha, 'erro'); return; }
+    }
+
+    const mudou = email !== dadosContaAtuais.email.toLowerCase()
+        || (cpf !== null && cpf !== dadosContaAtuais.cpf)
+        || (telefone !== null && telefone !== dadosContaAtuais.telefone)
+        || novaSenha !== "";
+    if (!mudou) { mostrarAviso("Nenhuma alteração para salvar.", 'info'); return; }
+
+    if (!senhaAtual) {
+        mostrarAviso("Digite sua senha atual (no quadro cinza, abaixo) para salvar as alterações.", 'erro');
+        document.getElementById("contaSenhaAtual")?.focus();
+        return;
+    }
+
+    const corpo = { senhaAtual, email };
+    if (cpf !== null) corpo.cpf = cpf;
+    if (telefone !== null) corpo.telefone = telefone;
+    if (novaSenha !== "") corpo.novaSenha = novaSenha;
+
+    const botao = document.getElementById("btnSalvarDadosConta");
+    if (botao) botao.disabled = true;
+    try {
+        const resposta = await fetch('api/conta.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(corpo)
+        });
+        if (resposta.status === 401) { window.location.href = 'login.html'; return; }
+        const resultado = await resposta.json();
+        if (!resposta.ok || !resultado.sucesso) throw new Error(resultado.mensagem || 'Não foi possível salvar as alterações.');
+
+        dadosContaAtuais = { email: resultado.email || "", cpf: resultado.cpf || "", telefone: resultado.telefone || "" };
+        aplicarDadosContaNoFormulario(); // mostra o valor já formatado pelo servidor e limpa as senhas
+        mostrarAviso(resultado.senhaAlterada ? 'Dados e senha atualizados! Nos outros aparelhos onde você estava conectado(a), será preciso entrar de novo.' : resultado.mensagem, 'sucesso', 8000);
+    } catch (erro) {
+        mostrarAviso(erro.message, 'erro');
+        document.getElementById("contaSenhaAtual").value = ""; // pede a senha de novo em qualquer falha
+    } finally {
+        if (botao) botao.disabled = false;
+    }
 }
 
 /**

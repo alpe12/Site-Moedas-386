@@ -34,9 +34,9 @@
             </div>
             <div class="perfil-info">
                 <h1 id="nomeAluno">Carregando...</h1>
-                <p>
-                    <strong>Matrícula:</strong> <span id="matriculaAluno"></span> | 
-                    <strong>Turma:</strong> <span id="turmaAluno"></span>
+                <p class="perfil-dados">
+                    <span class="perfil-dado"><strong>Matrícula:</strong> <span id="matriculaAluno"></span></span>
+                    <span class="perfil-dado"><strong>Turma:</strong> <span id="turmaAluno"></span></span>
                     <button type="button" id="btnTrocarTurma" class="link-acao">Atualizar minha turma</button>
                 </p>
                 <p id="avisoSemTurmaEsteAno" class="aviso-pendente oculto">
@@ -54,6 +54,49 @@
                 </div>
                 <div id="saldoAluno" class="saldo-aluno"></div>
             </div>
+        </div>
+
+        <div class="card" id="cardDadosConta">
+            <div class="card-cabecalho-dados">
+                <span class="card-title">Meus Dados</span>
+                <!-- Recolhido por padrão: o formulário só aparece depois deste clique. -->
+                <button type="button" id="btnAlternarDadosConta" class="link-acao" aria-expanded="false" aria-controls="formDadosConta">Alterar meus dados</button>
+            </div>
+            <form id="formDadosConta" class="form-dados-conta oculto" novalidate>
+                <label for="contaEmail">E-mail</label>
+                <input type="email" id="contaEmail" autocomplete="email">
+
+                <!-- CPF e celular: começam ocultos; script_login_perfil.js mostra ou remove cada um
+                     conforme CPF_MODO/TELEFONE_MODO (api/config.php) — o mesmo do cadastro. -->
+                <div id="campoContaCpf" class="oculto">
+                    <label for="contaCpf">CPF</label>
+                    <input type="text" id="contaCpf" inputmode="numeric" autocomplete="off" maxlength="14">
+                </div>
+                <div id="campoContaTelefone" class="oculto">
+                    <label for="contaTelefone">Celular com DDD</label>
+                    <input type="tel" id="contaTelefone" inputmode="tel" autocomplete="tel-national" maxlength="15">
+                </div>
+
+                <!-- Trocar a senha é opcional e fica recolhido: só aparece depois do clique. -->
+                <div class="form-dados-conta__senha">
+                    <button type="button" id="btnAlternarNovaSenha" class="link-acao" aria-expanded="false" aria-controls="secaoNovaSenha">Alterar minha senha</button>
+                    <div id="secaoNovaSenha" class="oculto">
+                        <label for="contaNovaSenha">Nova senha</label>
+                        <input type="password" id="contaNovaSenha" autocomplete="new-password">
+                        <label for="contaConfNovaSenha">Repita a nova senha</label>
+                        <input type="password" id="contaConfNovaSenha" autocomplete="new-password">
+                    </div>
+                </div>
+
+                <!-- Vale para QUALQUER alteração acima (e-mail, CPF, celular ou senha). -->
+                <div class="form-dados-conta__confirmacao">
+                    <label for="contaSenhaAtual">Para salvar, digite sua senha atual</label>
+                    <p class="form-dados-conta__ajuda">É a senha que você usa hoje para entrar no site. Pedimos isso sempre que algo é alterado, para proteger a sua conta.</p>
+                    <input type="password" id="contaSenhaAtual" autocomplete="current-password">
+                </div>
+
+                <button type="submit" id="btnSalvarDadosConta" class="btn-entrar">Salvar alterações</button>
+            </form>
         </div>
 
         <!-- <div class="card">

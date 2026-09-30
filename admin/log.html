@@ -32,13 +32,22 @@
 </header>
 
 <main class="admin-main">
-    <h1 class="admin-titulo">Log de ações administrativas</h1>
-    <p class="admin-subtitulo">Toda ação que muda algo no site fica registrada aqui, mais recente primeiro.</p>
+    <h1 class="admin-titulo">Log de ações</h1>
+    <p class="admin-subtitulo" id="subtitulo-log"></p>
+
+    <div class="admin-abas" role="tablist">
+        <button type="button" class="admin-aba ativa" role="tab" data-aba="admins" aria-selected="true">Administradores</button>
+        <button type="button" class="admin-aba" role="tab" data-aba="alunos" aria-selected="false">Alunos</button>
+    </div>
+
+    <div class="admin-barra-busca oculto" id="barra-busca-log">
+        <input type="search" id="busca-log" placeholder="Buscar por matrícula, nome, ação ou detalhe" autocomplete="off" aria-label="Buscar no log de alunos">
+    </div>
 
     <div class="admin-cartao">
         <div class="rolagem-horizontal">
             <table class="admin-tabela">
-                <thead><tr><th>Quando</th><th>Admin</th><th>Ação</th><th>Detalhes</th></tr></thead>
+                <thead id="cabecalho-log"></thead>
                 <tbody id="corpo-log">
                     <tr><td colspan="4" class="admin-vazio">Carregando...</td></tr>
                 </tbody>

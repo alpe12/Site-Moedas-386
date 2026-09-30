@@ -282,6 +282,28 @@ function resolver_campo_cadastro(string $modo, string $bruto, string $rotulo, ca
     return [$formatar($bruto), null];
 }
 
+/**
+ * Versão de resolver_campo_cadastro() para EDITAR um campo que já existe
+ * (perfil do aluno, api/conta.php). Devolve [novoValor, erro], onde
+ * novoValor é null quando não há nada a mudar:
+ *   - modo 'oculto', ou campo que nem veio na requisição ($enviado null);
+ *   - valor enviado igual ao que já está gravado — inclusive em branco
+ *     sobre em branco, que NÃO é erro nem em modo 'obrigatorio': o modo só
+ *     vale para cadastros novos, contas antigas sem o campo não são
+ *     obrigadas a preenchê-lo (veja o comentário de CPF_MODO).
+ * Fora isso, valem as mesmas regras do cadastro: em 'obrigatorio' não dá
+ * para apagar um valor já preenchido; em 'opcional' dá (enviar em branco
+ * limpa o campo).
+ */
+function resolver_edicao_campo(string $modo, mixed $enviado, string $atual, string $rotulo, callable $validar, callable $formatar): array {
+    if ($modo === 'oculto' || $enviado === null) return [null, null];
+    $bruto = trim((string)$enviado);
+    if ($bruto === '' && $atual === '') return [null, null];
+    [$valor, $erro] = resolver_campo_cadastro($modo, $bruto, $rotulo, $validar, $formatar);
+    if ($erro !== null) return [null, $erro];
+    return [$valor === $atual ? null : $valor, null];
+}
+
 /** Só os dígitos de um CPF no formato aceito (11 dígitos ou 000.000.000-00). null se o formato não bate. */
 function cpf_digitos(string $cpf): ?string {
     $cpf = trim($cpf);

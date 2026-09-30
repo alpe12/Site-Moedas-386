@@ -151,6 +151,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             json_response(['sucesso' => false, 'mensagem' => $mensagem], 400);
         }
 
+        registrar_log_usuario($matricula, (string)$nomeUsuario, 'cancelar_pedido', "id=$pedidoId");
+
         json_response(['sucesso' => true, 'mensagem' => 'Pedido cancelado. O valor voltou para o seu saldo.']);
     }
 
@@ -215,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'valor' => number_format($preco, 2, '.', ''), 'status' => 'Pendente',
         ];
 
-        return ['rows' => $pedidos, 'return' => ['ok' => true, 'saldo' => $saldoAtual - $preco]];
+        return ['rows' => $pedidos, 'return' => ['ok' => true, 'saldo' => $saldoAtual - $preco, 'pedidoId' => $id]];
     }, headers_para_arquivo(ORDERS_CSV));
 
     if (!is_array($resultado) || !empty($resultado['erro'])) {
@@ -224,6 +226,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensagem = $mensagens[$erro] ?? (mensagem_erro_lock($erro) ?? 'Não foi possível registrar o pedido.');
         json_response(['sucesso' => false, 'mensagem' => $mensagem], 400);
     }
+
+    registrar_log_usuario($matricula, (string)$nomeUsuario, 'resgate', "id={$resultado['pedidoId']} item=\"{$item['nome']}\" valor=" . number_format($preco, 2, '.', ''));
 
     json_response([
         'sucesso' => true,

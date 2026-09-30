@@ -133,7 +133,7 @@
 .checklist-senha .regra-erro { color: #dc2626; }
 
 body {
-    font-family: 'Noto Color Emoji', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Noto Emoji Fallback', 'Segoe UI', system-ui, -apple-system, sans-serif;
     background-color: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.5;
@@ -396,6 +396,13 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
 .perfil-info { display: flex; flex-direction: column; justify-content: center; }
 .perfil-info h1 { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); }
 
+/* Matrícula, turma e "Atualizar minha turma": cada um é um bloco que nunca é
+   cortado no meio ("Matrícula:" numa linha e o número na outra); quando não
+   cabe tudo na linha, quebra ENTRE os blocos. */
+.perfil-dados { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; }
+.perfil-dado { white-space: nowrap; }
+.perfil-dados .link-acao { margin-left: 0; text-align: left; }
+
 /* Botão "Trocar de turma" e afins — parecem link, não caixa de botão, pra
    não competir visualmente com o cabeçalho do perfil. */
 .link-acao {
@@ -442,6 +449,51 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
 /* O botão "Confirmar" some junto de outros botões de largura total do
    .btn-entrar — aqui ele fica lado a lado com o campo de turma. */
 .form-troca-turma .btn-entrar { width: auto; padding: 8px 18px; display: inline-block; }
+
+/* Cartão "Meus Dados" (perfil.html): e-mail, CPF, celular e senha.
+   O formulário começa recolhido (classe .oculto); o botão do cabeçalho abre e fecha. */
+.card-cabecalho-dados { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.form-dados-conta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 420px;
+    margin-top: 12px;
+}
+.form-dados-conta label { font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-top: 8px; }
+.form-dados-conta label small { font-weight: 400; color: var(--text-gray); }
+.form-dados-conta input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--raio-medio);
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+/* A senha atual fica separada: é a confirmação de tudo que está acima. */
+.form-dados-conta__senha { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.form-dados-conta__senha .link-acao { margin-left: 0; align-self: flex-start; }
+.form-dados-conta__senha > div { display: flex; flex-direction: column; gap: 6px; }
+.form-dados-conta__senha > div.oculto { display: none; }
+/* Caixa própria: deixa claro que a senha atual vale para TUDO o que está acima. */
+.form-dados-conta__confirmacao {
+    margin-top: 18px;
+    padding: 14px;
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    border-radius: var(--raio-medio);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.form-dados-conta__confirmacao label { margin-top: 0; }
+.form-dados-conta__ajuda { margin: 0 0 4px; font-size: 0.78rem; color: var(--text-gray); }
+.form-dados-conta .btn-entrar {
+    width: auto; align-self: flex-start; margin-top: 14px; padding: 10px 24px;
+    background-color: var(--primary-blue); color: var(--white); font-weight: 700;
+}
+.form-dados-conta .btn-entrar:hover { background-color: var(--primary-dark); }
+.form-dados-conta .btn-entrar:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .saldo-aluno { font-weight: bold; margin-top: 10px; font-size: 1.2rem; }
 .texto-ajuda-turma {
@@ -694,6 +746,7 @@ input[type="submit"] { color: var(--white); background-color: var(--primary-blue
         padding: 20px 16px !important;
     }
     .perfil-info { align-items: center; }
+    .perfil-dados { justify-content: center; }
 
     footer { padding: 24px 16px; }
 }

@@ -62,6 +62,9 @@ json_response([
     // uso interno/admin (ver admin/api/atividades.php e pedidos.php).
     'turma' => $turmaAtual['turma'] ?? '',
     'matricula' => $student['matricula'],
+    // De propósito NÃO devolve e-mail, CPF nem celular: só o cartão "Meus
+    // Dados" os usa, e ele os busca em api/conta.php (GET) quando o aluno
+    // o abre — quem só olha saldo e atividades nunca os recebe.
     'saldo' => round($financeiro['saldo'], 2),
     'atividades' => $atividades,
     'contaAtiva' => conta_esta_ativa($student),

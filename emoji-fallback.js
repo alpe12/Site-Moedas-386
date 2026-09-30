@@ -29,11 +29,24 @@
   if (unsupported.length > 0) {
     // Join the missing emojis into a single string
     const emojiString = unsupported.join('');
-    
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    // encodeURIComponent keeps the URL valid while accepting literal emojis
-    link.href = `https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&text=${encodeURIComponent(emojiString)}&display=swap`;
-    document.head.appendChild(link);
+    const fontUrl = `https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&text=${encodeURIComponent(emojiString)}&display=swap`;
+
+    fetch(fontUrl)
+      .then(response => response.text())
+      .then(cssText => {
+        // Rename the font family to a virtual name so local system fonts don't override unicode-range
+        const customCss = cssText.replace(/Noto Color Emoji/g, 'Noto Emoji Fallback');
+        
+        const style = document.createElement('style');
+        style.textContent = customCss;
+        document.head.appendChild(style);
+      })
+      .catch(() => {
+        // Fallback to regular link if fetch fails
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = fontUrl;
+        document.head.appendChild(link);
+      });
   }
 })();

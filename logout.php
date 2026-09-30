@@ -4,6 +4,9 @@ require __DIR__ . '/api/_bootstrap.php';
 
 sessao_iniciar_se_necessario();
 if (session_status() === PHP_SESSION_ACTIVE) {
+    if (!empty($_SESSION['authenticated']) && !empty($_SESSION['matricula'])) {
+        registrar_log_usuario((string)$_SESSION['matricula'], (string)($_SESSION['nome'] ?? ''), 'logout');
+    }
     $_SESSION = [];
     if (ini_get('session.use_cookies')) {
         $p = session_get_cookie_params();

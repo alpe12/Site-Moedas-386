@@ -74,6 +74,24 @@ cresce — se ficar grande demais depois de muito tempo de uso, pode ser
 arquivado/rotacionado manualmente (renomeie e crie um novo com só o
 cabeçalho).
 
+### Log de ações dos alunos
+
+A mesma página (`/admin/log.html`) tem uma segunda aba, **Alunos**, com o
+que os alunos fazem no site — entrar, sair, trocar os próprios dados,
+resgates, troca de turma. Vem de `.private/log_usuarios.csv` (na raiz do
+site, não em `admin/.private/`), gravado pelo site público e lido por
+`admin/api/log_usuarios.php`, que exige login de admin. A aba tem busca por
+matrícula, nome, ação ou detalhe. Formato e ações registradas: seção "Log de
+ações dos alunos" da `README-PHP-CSV.md`.
+
+CPF e celular aparecem por extenso no log (só admins o leem) e na tela do
+aluno; `aluno.html` mostra também o último login registrado.
+
+O mesmo log também aparece no fim de `/admin/aluno.html`, filtrado pelo aluno
+que você abriu (as 100 ações mais recentes, vindas de `aluno_detalhe.php`),
+com um link para abrir o log de alunos já filtrado por aquela matrícula
+(`log.html?aba=alunos&busca=<matrícula>`).
+
 ## Estrutura de páginas
 
 - `index.html` — login / criar conta / redefinir senha.

@@ -35,7 +35,12 @@ if ($acao === 'login') {
     foreach ($usuarios as $u) {
         if (normalize_email($u['email']) !== $email) continue;
 
-        if (!password_verify($senha, $u['senha_hash'])) break;
+        if (!password_verify($senha, $u['senha_hash'])) {
+            // Só quando o e-mail existe: dá pra atribuir a tentativa a uma
+            // conta de verdade (não enche o log com e-mails inventados).
+            registrar_log_usuario(trim((string)$u['matricula']), (string)$u['nome'], 'login_falhou', 'senha incorreta');
+            break;
+        }
 
         // Só cria sessão de verdade agora que sabemos que o login deu
         // certo — um visitante que só errou a senha nunca ganha um arquivo
@@ -46,6 +51,11 @@ if ($acao === 'login') {
         $_SESSION['matricula'] = trim((string)$u['matricula']);
         $_SESSION['nome'] = (string)$u['nome'];
         $_SESSION['ultima_atividade'] = time();
+        // Se a senha da conta mudar depois, esta sessão deixa de valer (veja
+        // assinatura_senha() em api/_bootstrap.php).
+        $_SESSION['assinatura_senha'] = assinatura_senha((string)$u['senha_hash']);
+
+        registrar_log_usuario($_SESSION['matricula'], $_SESSION['nome'], 'login');
 
         json_response([
             'sucesso' => true,
@@ -173,6 +183,8 @@ if ($acao === 'cadastro') {
         'turma-' . bin2hex(random_bytes(4)), $matricula, $turma, (string)ano_letivo_atual(), $agoraTurma, $agoraTurma, '1', '0', '1',
     ], headers_para_arquivo(TURMAS_HISTORICO_CSV));
 
+    registrar_log_usuario($matricula, $nome, 'cadastro', "turma=$turma");
+
     // Fora isso, uma conta nova não precisa de nenhuma sincronização extra:
     // sem atividades nem pedidos ainda, o saldo calculado dela já começa em
     // zero automaticamente (veja calcular_saldo_aluno()).
@@ -206,13 +218,15 @@ if ($acao === 'redefinirSenha') {
     enforce_rate_limit('redefinirSenha', $matricula . '|' . $email, 5, 3600);
 
     $novoHash = password_hash($novaSenha, PASSWORD_DEFAULT);
-    $resultado = with_locked_csv(USERS_CSV, function (array $usuarios) use ($matricula, $email, $token, $novoHash) {
+    $nomeAluno = '';
+    $resultado = with_locked_csv(USERS_CSV, function (array $usuarios) use ($matricula, $email, $token, $novoHash, &$nomeAluno) {
         $encontrado = false;
         foreach ($usuarios as &$u) {
             if ((string)$u['matricula'] === $matricula
                 && normalize_email($u['email']) === $email
                 && strtoupper(trim((string)$u['reset_token'])) === $token) {
                 $u['senha_hash'] = $novoHash;
+                $nomeAluno = (string)$u['nome'];
                 $encontrado = true;
             }
         }
@@ -228,6 +242,11 @@ if ($acao === 'redefinirSenha') {
             . 'fale com um monitor pelo WhatsApp para confirmar sua identidade: ' . WHATSAPP_LINK);
         json_response(['sucesso' => false, 'mensagem' => $mensagem], 400);
     }
+
+    // Tentativas que falham não entram no log: a matrícula vem do formulário
+    // (de quem quer que esteja tentando), então qualquer um poderia encher o
+    // log de outra pessoa com falhas.
+    registrar_log_usuario($matricula, $nomeAluno, 'senha_redefinida', 'pelo código de recuperação');
 
     json_response(['sucesso' => true, 'mensagem' => 'Senha alterada com sucesso!']);
 }

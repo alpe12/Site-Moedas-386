@@ -141,9 +141,7 @@ dos dois lados.
   zero à esquerda de um CPF ao abrir o arquivo. Vazios se o modo do campo for
   `'oculto'`, se ficou em branco num campo opcional, ou em contas criadas
   antes destas colunas existirem. Bases antigas ganham as colunas sozinhas
-  na próxima gravação em `usuarios.csv`; para fazer isso antes, com backup,
-  use `migrar_cpf_telefone.php` (descartável — veja o comentário no topo
-  dele; depois de rodar, é só apagá-lo).
+  na próxima gravação em `usuarios.csv`.
 - `reset_token`: 6 caracteres A-Z0-9, gerado no cadastro e mostrado ao aluno
   **uma única vez**, na hora. Fica salvo em texto puro de propósito — é para
   um monitor conseguir abrir o CSV e ler o código para ajudar o aluno, não é
@@ -668,6 +666,21 @@ Com `LOGIN_DURACAO_ATIVADA = false`, volta ao comportamento antigo: o
 cookie dura até o navegador fechar, sem nenhuma expiração por tempo de
 inatividade.
 
+### Trocar a senha encerra as outras sessões
+
+Ao entrar (`auth.php`), a sessão guarda uma "assinatura" da senha da conta
+(`assinatura_senha()`: um hash do `senha_hash` — nunca o hash em si).
+`aplicar_expiracao_login()` compara essa assinatura com a da senha gravada
+em `usuarios.csv` a cada requisição autenticada; se a senha mudou, a sessão
+é encerrada. Vale para qualquer troca — pelo perfil (`api/conta.php`) ou
+pelo código de recuperação — e para qualquer aparelho: as outras sessões
+caem na próxima requisição que fizerem, não no instante da troca. A sessão
+de quem acabou de trocar a senha continua (ganha ID novo e a assinatura
+nova). Não precisa de coluna nova no CSV. Sessões criadas antes deste
+recurso adotam a assinatura de agora na primeira requisição (ninguém é
+deslogado na atualização); se `usuarios.csv` não puder ser lido naquele
+instante, a sessão é mantida em vez de derrubar todo mundo.
+
 ## Atividades para vários alunos de uma vez
 
 A coluna `matriculas` de `atividades.csv` aceita mais de uma matrícula na
@@ -683,6 +696,30 @@ inteiro estiver entre aspas — o que o Excel/Google Sheets faz sozinho ao
 salvar, mas ninguém garante isso editando o arquivo à mão num editor de
 texto simples (um `,` sem aspas quebraria o arquivo em colunas erradas).
 Usando só `;` essa ambiguidade nem chega a existir.
+
+## Log de ações dos alunos
+
+Cada ação relevante de um aluno grava uma linha em `.private/log_usuarios.csv`:
+`data,matricula,nome,acao,detalhes,ip`. Quem lê é só o painel admin, na aba
+**Alunos** de `/admin/log.html` (`admin/api/log_usuarios.php` exige login de
+admin e aceita `?busca=` por matrícula, nome, ação ou detalhe); o arquivo em
+si fica em `.private/`, fechado para o navegador. Nada aqui edita ou apaga
+linhas — o arquivo só cresce (arquive-o manualmente se ficar grande: renomeie
+e deixe o site criar um novo).
+
+Ações registradas: `login`, `login_falhou` (senha errada em e-mail que
+existe), `logout`, `cadastro`, `senha_redefinida` (pelo código de
+recuperação), `alterar_dados`, `alterar_dados_recusado` (senha atual errada),
+`solicitar_troca_turma`, `cancelar_troca_turma`, `resgate` e
+`cancelar_pedido`. Sessão que expira sozinha não gera `logout`.
+
+O que **nunca** vai para o log: senha (nem o hash) e código de recuperação.
+E-mail, CPF e celular aparecem por extenso (valor antigo → novo): só admins
+leem o log, e o painel já mostra os mesmos valores na tela do aluno
+(`aluno.html`).
+Para registrar uma ação nova, chame `registrar_log_usuario($matricula,
+$nome, 'acao', 'detalhes')` (`api/_bootstrap.php`) — se a gravação falhar,
+só deixa um aviso no log de erros do PHP, nunca derruba a ação do aluno.
 
 ## Endpoints da API
 
@@ -701,7 +738,21 @@ Usando só `;` essa ambiguidade nem chega a existir.
     nome já recortado — ignorada se `MOSTRAR_APENAS_PRIMEIRA_LETRA` estiver
     ligado; restrita ao topo N se `RANKING_BUSCA_LIMITADA` estiver ligado).
 - `api/profile.php` — exige login; devolve os dados do aluno autenticado, o
-  histórico de atividades e se a conta está ativa.
+  histórico de atividades e se a conta está ativa. **Não** devolve e-mail,
+  CPF nem celular — só o cartão "Meus Dados" os usa, e ele os busca em
+  `api/conta.php` (GET) quando o aluno o abre.
+- `api/conta.php` — exige login; serve o cartão "Meus Dados" de `perfil.html`.
+  `GET` devolve e-mail, CPF e celular do próprio aluno (só é chamado quando
+  ele abre o cartão; em modo `oculto`, CPF/celular vão vazios). `POST` altera
+  os dados: e-mail, CPF, celular e senha. **Toda** alteração exige `senhaAtual` na mesma requisição. Corpo:
+  `{ senhaAtual, email?, cpf?, telefone?, novaSenha? }` — campo ausente ou
+  igual ao gravado não muda nada. CPF e celular seguem `CPF_MODO` /
+  `TELEFONE_MODO` (`oculto` ignora; `opcional` aceita apagar; `obrigatorio`
+  não deixa apagar um valor já preenchido, mas uma conta antiga ainda em
+  branco não é obrigada a preencher para mudar outra coisa). Limitado a 10
+  envios a cada 15 min por aluno. Trocar a senha renova o ID da sessão atual e
+  encerra todas as outras sessões da conta (veja "Trocar a senha encerra as
+  outras sessões").
 - `api/loja.php` — exige login para comprar/cancelar; a listagem de itens
   pode ficar pública se `LOJA_VISIVEL_SEM_LOGIN` estiver ligado.
   - `GET` (sem parâmetro `aba`): saldo do aluno e o catálogo de itens ativos

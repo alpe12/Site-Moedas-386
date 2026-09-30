@@ -136,12 +136,16 @@ function renderizarPerfil(dados) {
         ? `${formatarDataHora(dados.cadastroAproximado)} <span class="admin-texto-pequeno">(aproximado — data da primeira turma registrada no cadastro; não existe uma data de cadastro gravada diretamente)</span>`
         : '<span class="admin-subtitulo">Não disponível (aluno sem nenhuma turma registrada).</span>';
 
+    const naoInformado = '<span class="admin-subtitulo">Não informado</span>';
     document.getElementById('tabela-cadastro').innerHTML = `
         <tr><th>Matrícula</th><td>${escapeHtml(aluno.matricula)}</td></tr>
         <tr><th>Nome</th><td>${escapeHtml(aluno.nome)}</td></tr>
         <tr><th>E-mail</th><td>${escapeHtml(aluno.email)}</td></tr>
+        <tr><th>CPF</th><td>${aluno.cpf ? escapeHtml(aluno.cpf) : naoInformado}</td></tr>
+        <tr><th>Celular</th><td>${aluno.telefone ? escapeHtml(aluno.telefone) : naoInformado}</td></tr>
         <tr><th>Conta</th><td>${contaAtiva ? '<span class="admin-tag ativo">Ativa</span>' : '<span class="admin-tag pendente">Pendente de aprovação</span>'}</td></tr>
         <tr><th>Cadastrado em</th><td>${cadastroTexto}</td></tr>
+        <tr><th>Último login</th><td>${dados.ultimoLogin ? escapeHtml(formatarDataHora(dados.ultimoLogin)) : '<span class="admin-subtitulo">Nenhum registrado ainda</span> <span class="admin-texto-pequeno">(o log de ações só existe desde que foi criado)</span>'}</td></tr>
         <tr><th>Código de recuperação de senha</th><td><code>${escapeHtml(aluno.resetToken || '—')}</code> <span class="admin-texto-pequeno">(mostre ao aluno se ele perder o código, pra redefinir a senha)</span></td></tr>
     `;
 
@@ -182,4 +186,22 @@ function renderizarPerfil(dados) {
                 <td><span class="admin-tag ${CLASSES_STATUS[p.status] || ''}">${escapeHtml(p.status)}</span></td>
                 <td>${escapeHtml(p.turma)}</td>
             </tr>`).join('');
+
+    // --- Log de ações do aluno (o mesmo de log.html, aba "Alunos") ---
+    const logAluno = dados.log || [];
+    const logTotal = Number(dados.logTotal) || logAluno.length;
+    document.getElementById('tabela-log-aluno').innerHTML = logAluno.length === 0
+        ? '<tr><td colspan="4" class="admin-vazio">Nenhuma ação registrada para este aluno ainda.</td></tr>'
+        : logAluno.map(l => `
+            <tr>
+                <td class="admin-nowrap">${escapeHtml(formatarDataHora(l.data))}</td>
+                <td>${escapeHtml(l.acao)}</td>
+                <td>${escapeHtml(l.detalhes)}</td>
+                <td class="admin-nowrap">${escapeHtml(l.ip)}</td>
+            </tr>`).join('');
+
+    const linkLogCompleto = `log.html?aba=alunos&busca=${encodeURIComponent(aluno.matricula)}`;
+    document.getElementById('nota-log-aluno').innerHTML =
+        (logTotal > logAluno.length ? `Mostrando as ${logAluno.length} ações mais recentes de ${logTotal}. ` : '')
+        + `<a href="${escapeHtml(linkLogCompleto)}">Abrir no log de alunos</a> (com busca).`;
 }

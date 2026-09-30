@@ -77,6 +77,8 @@ if ($acao === 'cancelar') {
         json_response(['sucesso' => false, 'mensagem' => $mensagem], 400);
     }
 
+    registrar_log_usuario($matricula, $user['nome'], 'cancelar_troca_turma', "id=$id");
+
     json_response(['sucesso' => true, 'mensagem' => 'Solicitação cancelada.']);
 }
 
@@ -170,6 +172,8 @@ if (!is_array($resultado) || !empty($resultado['erro'])) {
 }
 
 $precisaAprovacao = $resultado['precisaAprovacao'] ?? EXIGIR_APROVACAO_TROCA_TURMA;
+
+registrar_log_usuario($matricula, $user['nome'], 'solicitar_troca_turma', "turma=$turma ano=$ano" . ($precisaAprovacao ? ' (aguardando aprovação)' : ' (aplicada)'));
 
 json_response([
     'sucesso' => true,

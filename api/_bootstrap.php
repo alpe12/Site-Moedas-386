@@ -10,6 +10,7 @@ const CARROSSEL_CSV = PRIVATE_DIR . '/carrossel.csv';
 const EVENTOS_CSV = PRIVATE_DIR . '/eventos.csv';
 const PROJETOS_CSV = PRIVATE_DIR . '/projetos.csv';
 const TURMAS_HISTORICO_CSV = PRIVATE_DIR . '/turmas_historico.csv';
+const USER_LOG_CSV = PRIVATE_DIR . '/log_usuarios.csv';
 const RATE_LIMIT_FILE = PRIVATE_DIR . '/rate_limit.json';
 
 const CSV_HEADERS = [
@@ -67,6 +68,12 @@ const CSV_HEADERS = [
     // (o que cada coluna significa, quando "aprovado" é exigido, etc.) no
     // topo de api/turma_utils.php e na seção "Troca de turma" do README.
     'turmas_historico' => ['id', 'matricula', 'turma', 'ano', 'data_solicitacao', 'data_efetiva', 'retroativo_definido', 'aprovacao_forcada', 'aprovado'],
+    // Log das ações dos alunos (login, troca de dados, resgates...), só de
+    // escrita aqui — quem lê é o painel admin (admin/api/log_usuarios.php),
+    // e só admin. Uma linha por ação, nunca editada nem apagada. "nome" é
+    // uma cópia do nome no momento da ação (o log continua legível mesmo
+    // que a conta mude depois). Veja registrar_log_usuario().
+    'log_usuarios' => ['data', 'matricula', 'nome', 'acao', 'detalhes', 'ip'],
 ];
 
 require __DIR__ . '/config.php';
@@ -162,6 +169,45 @@ function sessao_iniciar_se_necessario(bool $forcar = false): void {
 }
 
 /**
+ * "Assinatura" da senha de uma conta: um hash do senha_hash gravado em
+ * usuarios.csv. Guardada na sessão ao entrar (auth.php) e comparada a cada
+ * requisição autenticada (sessao_confere_com_a_conta): quando a senha muda
+ * — troca em api/conta.php ou redefinição pelo código de recuperação — a
+ * assinatura da conta muda e TODAS as sessões abertas com a senha antiga
+ * deixam de valer na próxima requisição, em qualquer aparelho. Não precisa
+ * de coluna nova no CSV, e nunca guarda o senha_hash em si na sessão.
+ */
+function assinatura_senha(string $senhaHash): string {
+    return hash('sha256', $senhaHash);
+}
+
+/**
+ * A sessão atual ainda corresponde à senha atual da conta? false só quando
+ * a conta EXISTE e a assinatura guardada na sessão é de uma senha antiga.
+ * Nos casos em que não dá para afirmar, a sessão é mantida (melhor não
+ * derrubar todo mundo por um CSV que não abriu naquele instante):
+ *   - lista de usuários vazia (falha de leitura) ou conta não encontrada;
+ *   - sessão criada antes deste recurso (sem assinatura): adota a
+ *     assinatura de agora — ninguém é deslogado à toa na atualização.
+ */
+function sessao_confere_com_a_conta(): bool {
+    $matricula = (string)($_SESSION['matricula'] ?? '');
+    $usuarios = csv_assoc(USERS_CSV);
+    if ($matricula === '' || !$usuarios) return true;
+
+    foreach ($usuarios as $u) {
+        if (trim((string)($u['matricula'] ?? '')) !== $matricula) continue;
+        $atual = assinatura_senha((string)($u['senha_hash'] ?? ''));
+        if (!isset($_SESSION['assinatura_senha'])) {
+            $_SESSION['assinatura_senha'] = $atual;
+            return true;
+        }
+        return hash_equals((string)$_SESSION['assinatura_senha'], $atual);
+    }
+    return true;
+}
+
+/**
  * Se LOGIN_DURACAO_ATIVADA estiver ligado, confere se já passou tempo
  * demais desde a última requisição autenticada; se sim, encerra a sessão
  * (equivalente a um logout automático). Enquanto a sessão continuar válida,
@@ -179,6 +225,13 @@ function aplicar_expiracao_login(): void {
             session_destroy();
             return;
         }
+    }
+
+    // Senha trocada em outro lugar desde que esta sessão começou: encerra.
+    if (!sessao_confere_com_a_conta()) {
+        $_SESSION = [];
+        session_destroy();
+        return;
     }
 
     $_SESSION['ultima_atividade'] = time();
@@ -298,6 +351,7 @@ function caminhos_para_headers(): array {
             EVENTOS_CSV => CSV_HEADERS['eventos'],
             PROJETOS_CSV => CSV_HEADERS['projetos'],
             TURMAS_HISTORICO_CSV => CSV_HEADERS['turmas_historico'],
+            USER_LOG_CSV => CSV_HEADERS['log_usuarios'],
         ];
     }
     return $mapa;
@@ -314,6 +368,44 @@ foreach (caminhos_para_headers() as $arquivo => $header) {
 function conta_esta_ativa(array $usuario): bool {
     if (!EXIGIR_APROVACAO_CONTA) return true;
     return trim((string)($usuario['ativo'] ?? '')) === '1';
+}
+
+/**
+ * Deixa um texto seguro pra virar célula do log de usuários: tira
+ * caracteres de controle (quebra de linha falsificaria uma linha de log),
+ * limita o tamanho e neutraliza o gatilho de fórmula do Excel/Sheets (=, +,
+ * -, @ no começo) com um apóstrofo — parte do que vai pro log (ex.: o
+ * e-mail novo) veio do próprio aluno.
+ */
+function log_texto_seguro(string $valor, int $maximo): string {
+    $valor = trim(preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $valor) ?? '');
+    if (mb_strlen($valor) > $maximo) $valor = mb_substr($valor, 0, $maximo - 1) . '…';
+    if (preg_match('/^[=+\-@\t]/', $valor)) $valor = "'" . $valor;
+    return $valor;
+}
+
+/**
+ * Registra uma ação de aluno em log_usuarios.csv (só admins conseguem ver,
+ * em /admin/log.html). Nunca derruba a ação que está sendo registrada: se
+ * não conseguir gravar, só deixa uma linha no log de erros do PHP.
+ *
+ * NUNCA passe senha (nem hash) nem o código de recuperação em $detalhes.
+ * CPF e celular podem ir por extenso: só admins leem o log, e os mesmos
+ * valores já estão em usuarios.csv e na tela do aluno no painel.
+ */
+function registrar_log_usuario(string $matricula, string $nome, string $acao, string $detalhes = ''): void {
+    try {
+        append_csv(USER_LOG_CSV, [
+            date('c'),
+            log_texto_seguro($matricula, 40),
+            log_texto_seguro($nome, 80),
+            $acao,
+            log_texto_seguro($detalhes, 500),
+            client_ip(),
+        ], CSV_HEADERS['log_usuarios']);
+    } catch (Throwable $e) {
+        error_log('registrar_log_usuario: ' . $e->getMessage());
+    }
 }
 
 /** Lê turmas_historico.csv inteiro, já agrupado por matrícula (veja api/turma_utils.php). */

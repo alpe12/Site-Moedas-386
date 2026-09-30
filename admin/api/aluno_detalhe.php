@@ -91,12 +91,45 @@ foreach (csv_assoc(SITE_ORDERS_CSV) as $p) {
 }
 usort($pedidos, fn($x, $y) => strcmp((string)$y['id'], (string)$x['id']));
 
+// Log das ações DESTE aluno (login, troca de dados, resgates...) — o mesmo
+// log_usuarios.csv da aba "Alunos" de log.html, filtrado pela matrícula.
+// Só as mais recentes vêm aqui; o log completo fica em log.html.
+const LOG_ALUNO_LIMITE = 100;
+$logDoAluno = [];
+foreach (csv_assoc(SITE_USER_LOG_CSV) as $l) {
+    if ((string)($l['matricula'] ?? '') !== $matricula) continue;
+    $logDoAluno[] = [
+        'data' => $l['data'] ?? '',
+        'acao' => $l['acao'] ?? '',
+        'detalhes' => $l['detalhes'] ?? '',
+        'ip' => $l['ip'] ?? '',
+    ];
+}
+// Inverter antes do usort() (estável no PHP 8) deixa, entre ações do mesmo
+// segundo, a gravada por último primeiro.
+$logDoAluno = array_reverse($logDoAluno);
+usort($logDoAluno, fn($x, $y) => strcmp((string)$y['data'], (string)$x['data']));
+$logTotal = count($logDoAluno);
+// Último login registrado (a lista já está do mais recente ao mais antigo).
+// O log só existe desde a versão que o criou: antes disso, não há o que mostrar.
+$ultimoLogin = null;
+foreach ($logDoAluno as $l) {
+    if (($l['acao'] ?? '') === 'login') { $ultimoLogin = (string)$l['data']; break; }
+}
+$logDoAluno = array_slice($logDoAluno, 0, LOG_ALUNO_LIMITE);
+
 json_response([
     'sucesso' => true,
     'aluno' => [
         'matricula' => (string)($usuario['matricula'] ?? ''),
         'nome' => (string)($usuario['nome'] ?? ''),
         'email' => (string)($usuario['email'] ?? ''),
+        // Valores por extenso, como estão em usuarios.csv: qualquer admin já
+        // os lê abrindo o arquivo, e o painel deve mostrar tudo que o sistema
+        // sabe sobre o aluno. Vazio = o aluno não informou (ou o campo está
+        // em modo 'oculto').
+        'cpf' => (string)($usuario['cpf'] ?? ''),
+        'telefone' => (string)($usuario['telefone'] ?? ''),
         // Valor bruto de usuarios.csv + a config que decide se ele chega a
         // ser exigido — mesmo padrão de admin/api/painel.php ($contasPendentes):
         // o PHP do painel nunca lê o config.php do site público, então quem
@@ -116,4 +149,7 @@ json_response([
     'financeiro' => $financeiro,
     'atividades' => $atividades,
     'pedidos' => $pedidos,
+    'log' => $logDoAluno,
+    'logTotal' => $logTotal,
+    'ultimoLogin' => $ultimoLogin,
 ]);

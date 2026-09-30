@@ -33,7 +33,7 @@
 
 <main class="admin-main">
     <h1 class="admin-titulo">Aluno</h1>
-    <p class="admin-subtitulo">Busque um aluno para ver tudo que o sistema guarda sobre ele: dados de cadastro, saldo, atividades, pedidos e histórico de turmas — tudo num só lugar.</p>
+    <p class="admin-subtitulo">Busque um aluno para ver tudo que o sistema guarda sobre ele: dados de cadastro, saldo, atividades, pedidos, histórico de turmas e o log de ações dele no site — tudo num só lugar.</p>
 
     <div class="admin-cartao admin-form">
         <label for="busca-aluno-perfil" class="admin-label-topo">Buscar aluno (nome, matrícula ou turma)</label>
@@ -115,6 +115,17 @@
             <p class="admin-subtitulo admin-nota-tabela">
                 Para alterar o status de um pedido, use a tela <a href="pedidos.html">Pedidos</a>.
             </p>
+        </div>
+
+        <div class="admin-cartao">
+            <h2>📜 Log de ações do aluno</h2>
+            <div class="rolagem-horizontal">
+                <table class="admin-tabela">
+                    <thead><tr><th>Quando</th><th>Ação</th><th>Detalhes</th><th>IP</th></tr></thead>
+                    <tbody id="tabela-log-aluno"></tbody>
+                </table>
+            </div>
+            <p class="admin-subtitulo admin-nota-tabela" id="nota-log-aluno"></p>
         </div>
 
     </div>
